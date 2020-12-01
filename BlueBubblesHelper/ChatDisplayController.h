@@ -8,6 +8,7 @@
 
 #ifndef ChatDisplayController_h
 #define ChatDisplayController_h
+#import "IMChat.h"
 
 // Helper class that includes all of the important info of ChatDisplayController locally here
 // Most of this was extracted by looking at FScriptObject Browser
@@ -15,7 +16,7 @@
 // it is just a helper class to make things easier
 @interface ChatDisplayController : NSObject
 +(NSString *) getGuid: (id) existingChatDisplayController;
-+(id) getChat: (id) existingChatDisplayController;
++(IMChat *) getChat: (id) existingChatDisplayController;
 @end
 
 #endif /* ChatDisplayController_h */

@@ -11,7 +11,6 @@
 		93AC09CC2565E45F0000C60C /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
 		93B28EA9257399C00056DAD4 /* ChatDisplayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EA8257399C00056DAD4 /* ChatDisplayController.m */; };
 		93B28EAD25739A430056DAD4 /* SelectorHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EAC25739A430056DAD4 /* SelectorHelper.m */; };
-		93DFDC592568D3CD009551D2 /* JSRollCall.m in Sources */ = {isa = PBXBuildFile; fileRef = 93DFDC582568D3CD009551D2 /* JSRollCall.m */; };
 		93FD993A2568E7360060D430 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
 		FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */; };
 		FBCE4EC1201C0F4D002F8A61 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCE4EC0201C0F4D002F8A61 /* Foundation.framework */; };
@@ -20,6 +19,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9316AE94257600E8002AE8EE /* IMMessageItem-IMChat_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMMessageItem-IMChat_Internal.h"; sourceTree = "<group>"; };
+		9316AE962576029C002AE8EE /* IMChatRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChatRegistry.h; sourceTree = "<group>"; };
+		9316AE98257606EC002AE8EE /* IMChat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChat.h; sourceTree = "<group>"; };
+		9316AE9A257614E2002AE8EE /* IMTypingChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMTypingChatItem.h; sourceTree = "<group>"; };
 		93AC09C52565E4150000C60C /* IMCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMCore.framework; path = ../../../../../System/Library/PrivateFrameworks/IMCore.framework; sourceTree = "<group>"; };
 		93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlueBubblesHelper.m; sourceTree = "<group>"; };
 		93B28EA5257399450056DAD4 /* Logging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
@@ -27,9 +30,6 @@
 		93B28EA8257399C00056DAD4 /* ChatDisplayController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ChatDisplayController.m; sourceTree = "<group>"; };
 		93B28EAB25739A2A0056DAD4 /* SelectorHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectorHelper.h; sourceTree = "<group>"; };
 		93B28EAC25739A430056DAD4 /* SelectorHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectorHelper.m; sourceTree = "<group>"; };
-		93DFDC572568D3CD009551D2 /* JSRollCall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSRollCall.h; path = ../../../../Downloads/JSRollCall.h; sourceTree = "<group>"; };
-		93DFDC582568D3CD009551D2 /* JSRollCall.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSRollCall.m; path = ../../../../Downloads/JSRollCall.m; sourceTree = "<group>"; };
-		93DFDC5C2568DDF4009551D2 /* IMChat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChat.h; sourceTree = "<group>"; };
 		93DFDC5D2568DFD4009551D2 /* IMMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMMessage.h; sourceTree = "<group>"; };
 		93FD99392568E7360060D430 /* NetworkController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkController.m; sourceTree = "<group>"; };
 		93FD993D2568E7500060D430 /* NetworkController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetworkController.h; sourceTree = "<group>"; };
@@ -122,8 +122,6 @@
 		FBCE4EC3201C0F4D002F8A61 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				93DFDC572568D3CD009551D2 /* JSRollCall.h */,
-				93DFDC582568D3CD009551D2 /* JSRollCall.m */,
 				FBCE4EC4201C0F4D002F8A61 /* Info.plist */,
 				FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */,
 				93B28EA5257399450056DAD4 /* Logging.h */,
@@ -145,8 +143,11 @@
 		FBCE4EDB201C264F002F8A61 /* IMCore */ = {
 			isa = PBXGroup;
 			children = (
+				9316AE9A257614E2002AE8EE /* IMTypingChatItem.h */,
+				9316AE98257606EC002AE8EE /* IMChat.h */,
+				9316AE962576029C002AE8EE /* IMChatRegistry.h */,
+				9316AE94257600E8002AE8EE /* IMMessageItem-IMChat_Internal.h */,
 				93DFDC5D2568DFD4009551D2 /* IMMessage.h */,
-				93DFDC5C2568DDF4009551D2 /* IMChat.h */,
 				FBCE4EDA201C0FDE002F8A61 /* IMAccount.h */,
 				FBCE4ED7201C0FDE002F8A61 /* IMAccountController.h */,
 				FBCE4ED9201C0FDE002F8A61 /* IMHandle.h */,
@@ -246,7 +247,6 @@
 				93B28EAD25739A430056DAD4 /* SelectorHelper.m in Sources */,
 				93FD993A2568E7360060D430 /* NetworkController.m in Sources */,
 				FBCE4ECC201C0F4D002F8A61 /* ZKSwizzle.m in Sources */,
-				93DFDC592568D3CD009551D2 /* JSRollCall.m in Sources */,
 				93B28EA9257399C00056DAD4 /* ChatDisplayController.m in Sources */,
 				93AC09CC2565E45F0000C60C /* BlueBubblesHelper.m in Sources */,
 			);
