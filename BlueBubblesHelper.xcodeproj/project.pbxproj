@@ -19,6 +19,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		71554C06257B2E4600296B93 /* IMChatHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMChatHistoryController.h; sourceTree = "<group>"; };
+		71554C0F257B58F100296B93 /* IMTranscriptChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMTranscriptChatItem.h; sourceTree = "<group>"; };
+		71554C17257B609B00296B93 /* IMTextMessagePartChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMTextMessagePartChatItem.h; sourceTree = "<group>"; };
+		71554C19257B616400296B93 /* IMMessagePartChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMMessagePartChatItem.h; sourceTree = "<group>"; };
+		71554C1B257B618400296B93 /* IMMessageChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMMessageChatItem.h; sourceTree = "<group>"; };
+		71554C1D257B61B000296B93 /* IMTranscriptChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMTranscriptChatItem.h; path = ../../../Downloads/IMTranscriptChatItem.h; sourceTree = "<group>"; };
 		9316AE94257600E8002AE8EE /* IMMessageItem-IMChat_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMMessageItem-IMChat_Internal.h"; sourceTree = "<group>"; };
 		9316AE962576029C002AE8EE /* IMChatRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChatRegistry.h; sourceTree = "<group>"; };
 		9316AE98257606EC002AE8EE /* IMChat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChat.h; sourceTree = "<group>"; };
@@ -143,10 +149,16 @@
 		FBCE4EDB201C264F002F8A61 /* IMCore */ = {
 			isa = PBXGroup;
 			children = (
+				71554C0F257B58F100296B93 /* IMTranscriptChatItem.h */,
 				9316AE9A257614E2002AE8EE /* IMTypingChatItem.h */,
 				9316AE98257606EC002AE8EE /* IMChat.h */,
+				71554C1B257B618400296B93 /* IMMessageChatItem.h */,
+				71554C1D257B61B000296B93 /* IMTranscriptChatItem.h */,
 				9316AE962576029C002AE8EE /* IMChatRegistry.h */,
+				71554C19257B616400296B93 /* IMMessagePartChatItem.h */,
+				71554C17257B609B00296B93 /* IMTextMessagePartChatItem.h */,
 				9316AE94257600E8002AE8EE /* IMMessageItem-IMChat_Internal.h */,
+				71554C06257B2E4600296B93 /* IMChatHistoryController.h */,
 				93DFDC5D2568DFD4009551D2 /* IMMessage.h */,
 				FBCE4EDA201C0FDE002F8A61 /* IMAccount.h */,
 				FBCE4ED7201C0FDE002F8A61 /* IMAccountController.h */,
@@ -361,7 +373,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEPLOYMENT_LOCATION = YES;
-				DEVELOPMENT_TEAM = Z4AB4HBG69;
+				DEVELOPMENT_TEAM = V8ZV57CTZN;
 				DSTROOT = /;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -390,7 +402,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEPLOYMENT_LOCATION = YES;
-				DEVELOPMENT_TEAM = Z4AB4HBG69;
+				DEVELOPMENT_TEAM = V8ZV57CTZN;
 				DSTROOT = /;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

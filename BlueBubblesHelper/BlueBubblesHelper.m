@@ -10,6 +10,7 @@
 
 #import <objc/runtime.h>
 
+#import "IMTextMessagePartChatItem.h"
 #import "IMHandle.h"
 #import "IMPerson.h"
 #import "IMAccount.h"
@@ -124,8 +125,38 @@ BlueBubblesHelper *plugin;
 
     DLog(@"BLUEBUBBLESHELPER: Message received: %@, %@", event, eventData);
     
+    if([event isEqualToString:@"send-reaction"]) {
+        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
+        
+        DLog(@"BLUEBUBBLESHELPER: REACTION INCOMING %@", eventData);
+        
+        IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
+        if(chat != nil) {
+            //Map the reaction type
+            long long reactionLong = [BlueBubblesHelper parseReactionType:(eventDataArr[2])];
+            
+            DLog(@"BLUEBUBBLESHELPER: %lld", reactionLong);
+
+            // Get the messageItem
+            IMTextMessagePartChatItem *messageItem = [BlueBubblesHelper getMessageItem:(chat) :(eventDataArr[1])];
+
+            DLog(@"BLUEBUBBLESHELPER: %@", [[[messageItem message] messageSummaryInfo] valueForKey:@"ust"]);
+
+            //Build the message summary
+            NSDictionary *messageSummary = @{@"amc":[[[messageItem message] messageSummaryInfo] valueForKey:@"ust"],@"ams":[[messageItem message] plainBody]};
+
+            DLog(@"BLUEBUBBLESHELPER: %lld", reactionLong);
+            DLog(@"BLUEBUBBLESHELPER: %@", messageItem);
+            DLog(@"BLUEBUBBLESHELPER: %@", messageSummary);
+
+            // Send the tapback
+            [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(messageItem) withMessageSummaryInfo:(messageSummary)];
+
+            DLog(@"BLUEBUBBLESHELPER: sent reaction");
+        }
+    }
     // If the server tells us to start typing
-    if([event isEqualToString: @"start-typing"]) {
+     else if([event isEqualToString: @"start-typing"]) {
         // Get the IMChat instance for the guid specified in eventData
         IMChat *chat = [BlueBubblesHelper getChat: eventData];
         if(chat != nil) {
@@ -169,6 +200,50 @@ BlueBubblesHelper *plugin;
     
     IMChat* imChat = [[IMChatRegistry sharedInstance] existingChatWithGUID: guid];
     return imChat;
+}
+
++(long long) parseReactionType:(NSString *)reactionType {
+    NSString *lowerCaseType = [reactionType lowercaseString];
+    
+    DLog(@"BLUBUBBLESHELPER: %@", lowerCaseType);
+    
+    if([@"love" isEqualToString:(lowerCaseType)]) return 2000;
+    if([@"like" isEqualToString:(lowerCaseType)]) return 2001;
+    if([@"dislike" isEqualToString:(lowerCaseType)]) return 2002;
+    if([@"laugh" isEqualToString:(lowerCaseType)]) return 2003;
+    if([@"emphasize" isEqualToString:(lowerCaseType)]) return 2004;
+    if([@"question" isEqualToString:(lowerCaseType)]) return 2005;
+    if([@"-love" isEqualToString:(lowerCaseType)]) return 3000;
+    if([@"-like" isEqualToString:(lowerCaseType)]) return 3001;
+    if([@"-dislike" isEqualToString:(lowerCaseType)]) return 3002;
+    if([@"-laugh" isEqualToString:(lowerCaseType)]) return 3003;
+    if([@"-emphasize" isEqualToString:(lowerCaseType)]) return 3004;
+    if([@"-question" isEqualToString:(lowerCaseType)]) return 3005;
+    return 0;
+}
+
++(IMTextMessagePartChatItem *) getMessageItem:(IMChat *)chat :(NSString *)actionMessageGuid {
+    if(chat == nil) return nil;
+    
+    NSArray *items = [chat chatItems];
+    
+    for(id item in items) {
+        // If the type is Text (maybe can pass other types??)
+        if([NSStringFromClass([item class]) isEqualToString: @"IMTextMessagePartChatItem"]) {
+//            DLog(@"BLUEBUBBLESHELPER: %@", item);
+//            DLog(@"BLUEBUBBLESHELPER: %@", [[item message] guid]);
+
+            // If the guid matches, return the item
+            if([[[item message] guid] isEqualToString:(actionMessageGuid)]) {
+                
+                DLog(@"BLUEBUBBLESHELPER: %@", [[item message] guid]);
+
+                return item;
+            }
+        }
+    }
+    
+    return nil;
 }
 
 +(BOOL) isTyping: (NSString *)guid {
@@ -288,6 +363,39 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
 
 @end
 
+//ZKSwizzleInterface(WBWT_IMChat, IMChat, NSObject)
+//@implementation WBWT_IMChat
+//-(id)messageForGUID:(id)arg1 {
+//
+//}
+//@end
+//
+//-(void)sendMessageAcknowledgment:(long long)arg1 forChatItem:(id)arg2 withAssociatedMessageInfo:(id)arg3 withGuid:(id)arg4 {
+//    DLog(@"BLUEBUBBLESHELPER: sending reaction 1");
+//    return;
+//}
+//
+//-(void)sendMessageAcknowledgment:(long long)arg1 forChatItem:(id)arg2 withAssociatedMessageInfo:(id)arg3 {
+//    DLog(@"BLUEBUBBLESHELPER: sending reaction 2");
+//    return;
+//}
+//
+//-(void)sendMessageAcknowledgment:(long long)arg1 forChatItem:(id)arg2 withMessageSummaryInfo:(id)arg3 withGuid:(id)arg4 {
+//    DLog(@"BLUEBUBBLESHELPER: sending reaction 3");
+//    return;
+//}
+//
+//-(void)sendMessageAcknowledgment:(long long)arg1 forChatItem:(id)arg2 withMessageSummaryInfo:(id)arg3 {
+//    DLog(@"BLUEBUBBLESHELPER: sending reaction 4");
+//    DLog(@"BLUEBUBBLESHELPER: %lld", arg1);
+//    DLog(@"BLUEBUBBLESHELPER: %@", arg2);
+//    DLog(@"BLUEBUBBLESHELPER: %@", arg3);
+//
+//
+//    return;
+//}
+//
+//@end
 
 //ZKSwizzleInterface(WBWT_IMMessage, IMMessage, NSObject)
 //@implementation WBWT_IMMessage
