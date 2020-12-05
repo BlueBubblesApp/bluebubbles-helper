@@ -185,6 +185,16 @@ BlueBubblesHelper *plugin;
         if(eventData != nil) {
             [BlueBubblesHelper updateTypingStatus:eventData];
         }
+    // If server tells us to change the display name
+    } else if ([event isEqualToString:@"set-display-name"]) {
+        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
+        
+        IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
+        if(chat != nil) {
+            // Set the display name
+            [chat _setDisplayName:(eventDataArr[1])];
+        }
+        DLog(@"BLUEBUBBLESHELPER: Setting display name of chat %@ to %@", eventDataArr[0], eventDataArr[1]);
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
@@ -365,8 +375,8 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
 
 //ZKSwizzleInterface(WBWT_IMChat, IMChat, NSObject)
 //@implementation WBWT_IMChat
-//-(id)messageForGUID:(id)arg1 {
-//
+//-(void)_setDisplayName:(id)arg1 {
+//    DLog(@"BLUEBUBBLESHELPER: %@", [arg1 className]);
 //}
 //@end
 //
