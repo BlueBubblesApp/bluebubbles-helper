@@ -154,11 +154,35 @@ BlueBubblesHelper *plugin;
 
             DLog(@"BLUEBUBBLESHELPER: sent reaction");
         }
-    }
+    } else if([event isEqualToString: @"send-message"]) {
+        // Index 0 is chat guid, index 1 is the message text, index 2 is the tempguid
+        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
+        NSAttributedString* textBody = [[NSAttributedString alloc] initWithString:eventDataArr[1]];
+
+
+//        IMAccountController *sharedAccountController = [IMAccountController sharedInstance];
+//
+//        IMAccount *activeAccount = [sharedAccountController activeIMessageAccount];
+//
+//        if(activeAccount == nil) {
+//            activeAccount = [sharedAccountController activeSMSAccount];
+//        }
+        
+        IMChat *activeChat = [BlueBubblesHelper getChat:eventDataArr[0]];
+        
+        IMMessage* myMessage;
+        if(activeChat != nil) {
+            myMessage = [IMMessage instantMessageWithText:textBody flags:1048581];
+            [activeChat sendMessage:myMessage];
+            DLog(@"BLUEBUBBLESHELPER: sent message");
+            [BlueBubblesHelper updateMessage:eventDataArr[0] :eventDataArr[2] :[myMessage guid]];
+        }
+        
     // If the server tells us to start typing
-     else if([event isEqualToString: @"start-typing"]) {
+    } else if([event isEqualToString: @"start-typing"]) {
         // Get the IMChat instance for the guid specified in eventData
         IMChat *chat = [BlueBubblesHelper getChat: eventData];
+        
         if(chat != nil) {
             // If the IMChat instance is not null, start typing
             [chat setLocalUserIsTyping:YES];
@@ -291,6 +315,12 @@ BlueBubblesHelper *plugin;
         [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
         DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", guid);
     }
+}
+
++(void) updateMessage:(NSString *)chatGuid :(NSString *)tempGuid :(NSString *)newGuid {
+    [[NetworkController sharedInstance] sendMessage: @{@"event": @"message-match", @"chatGuid": chatGuid, @"tempGuid": tempGuid, @"newGuid": newGuid}];
+    
+    DLog(@"BLUEBUBBLESHELPER: %@ updated message guid", newGuid);
 }
 
 @end

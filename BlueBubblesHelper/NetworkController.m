@@ -63,7 +63,7 @@ static id sharedInstance = nil;
   [self closeConnection];
 }
 
-- (void)sendMessage:(NSDictionary*)data {
+- (void)sendMessage:(NSDictionary *)data {
     NSError *error;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data options:0 error:&error];
     NSString *message = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
