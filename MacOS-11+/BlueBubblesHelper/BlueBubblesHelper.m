@@ -140,14 +140,21 @@ BlueBubblesHelper *plugin;
 
             if (messageItem.type == IMItemTypeMessage) {
                 IMMessageItem *imMessage = (IMMessageItem *)messageItem;
-                IMChatItem *item = (IMChatItem *)imMessage.message._imMessageItem._newChatItems;
+                IMChatItem *item = (IMChatItem *)imMessage._newChatItems;
 
                 //Build the message summary
                 NSDictionary *messageSummary = @{@"amc":[[imMessage messageSummaryInfo] valueForKey:@"ust"],@"ams":[imMessage body].string};
 
                 DLog(@"BLUEBUBBLESHELPER: Reaction Long: %lld", reactionLong);
                 // Send the tapback
-                [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(messageSummary)];
+                // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
+                NSData *dataenc = [[imMessage body].string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
+                NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
+                if ([encodevalue isEqualToString:@"\\ufffc"]) {
+                    [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(@{})];
+                } else {
+                    [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(messageSummary)];
+                }
 
                 DLog(@"BLUEBUBBLESHELPER: sent reaction");
             }
