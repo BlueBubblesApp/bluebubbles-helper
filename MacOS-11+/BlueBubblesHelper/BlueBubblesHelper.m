@@ -24,7 +24,7 @@
 #import "Logging.h"
 #import "ChatDisplayController.h"
 #import "SelectorHelper.h"
-
+#import "IMHandleRegistrar.h"
 
 
 @interface BlueBubblesHelper : NSObject
@@ -45,6 +45,28 @@ BlueBubblesHelper *plugin;
         }
     }
     return plugin;
+}
+
+// Helper method to log a long string
+-(void) logString:(NSString*)logString{
+
+        int stepLog = 800;
+        NSInteger strLen = [@([logString length]) integerValue];
+        NSInteger countInt = strLen / stepLog;
+
+        if (strLen > stepLog) {
+        for (int i=1; i <= countInt; i++) {
+            NSString *character = [logString substringWithRange:NSMakeRange((i*stepLog)-stepLog, stepLog)];
+            NSLog(@"BLUEBUBBLESHELPER: %@", character);
+
+        }
+        NSString *character = [logString substringWithRange:NSMakeRange((countInt*stepLog), strLen-(countInt*stepLog))];
+        NSLog(@"BLUEBUBBLESHELPER: %@", character);
+        } else {
+
+        NSLog(@"BLUEBUBBLESHELPER: %@", logString);
+        }
+
 }
 
 // Called when macforge initializes the plugin
@@ -200,6 +222,32 @@ BlueBubblesHelper *plugin;
             [chat _setDisplayName:(eventDataArr[1])];
         }
         DLog(@"BLUEBUBBLESHELPER: Setting display name of chat %@ to %@", eventDataArr[0], eventDataArr[1]);
+    // If the server tells us to add a participant
+    } else if ([event isEqualToString:@"add-participant"]) {
+        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
+
+        IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
+        NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(eventDataArr[1])];
+        
+        if(chat != nil && [chat canAddParticipants:(handles)]) {
+            [chat inviteParticipantsToiMessageChat:(handles) reason:(0)];
+            DLog(@"BLUEBUBBLESHELPER: Added participant to chat %@: %@", eventDataArr[0], eventDataArr[1]);
+        } else {
+            DLog(@"BLUEBUBBLESHELPER: Couldn't add participant to chat %@: %@", eventDataArr[0], eventDataArr[1]);
+        }
+    // If the server tells us to remove a participant
+    } else if ([event isEqualToString:@"remove-participant"]) {
+        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
+
+        IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
+        NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(eventDataArr[1])];
+        
+        if(chat != nil && [chat canAddParticipants:(handles)]) {
+            [chat removeParticipantsFromiMessageChat:(handles) reason:(0)];
+            DLog(@"BLUEBUBBLESHELPER: Removed participant from chat %@: %@", eventDataArr[0], eventDataArr[1]);
+        } else {
+            DLog(@"BLUEBUBBLESHELPER: Couldn't remove participant from chat %@: %@", eventDataArr[0], eventDataArr[1]);
+        }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
