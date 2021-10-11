@@ -8,7 +8,7 @@
 
 @import AppKit;
 
-#import <objc/runtime.h>
+#import <Foundation/Foundation.h>
 
 #import "IMTextMessagePartChatItem.h"
 #import "IMHandle.h"
@@ -125,36 +125,34 @@ BlueBubblesHelper *plugin;
 
     DLog(@"BLUEBUBBLESHELPER: Message received: %@, %@", event, eventData);
 
-//    if([event isEqualToString:@"send-reaction"]) {
-//        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
-//
-//        DLog(@"BLUEBUBBLESHELPER: REACTION INCOMING %@", eventData);
-//
-//        IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
-//        if(chat != nil) {
-//            //Map the reaction type
-//            long long reactionLong = [BlueBubblesHelper parseReactionType:(eventDataArr[2])];
-//
-//            DLog(@"BLUEBUBBLESHELPER: %lld", reactionLong);
-//
-//            // Get the messageItem
-//            IMItem *messageItem = [BlueBubblesHelper getMessageItem:(chat) :(eventDataArr[1])];
-//
-//            DLog(@"BLUEBUBBLESHELPER: %@", [[[messageItem message] messageSummaryInfo] valueForKey:@"ust"]);
-//
-//            //Build the message summary
-//            NSDictionary *messageSummary = @{@"amc":[[[messageItem message] messageSummaryInfo] valueForKey:@"ust"],@"ams":[[messageItem message] plainBody]};
-//
-//            DLog(@"BLUEBUBBLESHELPER: %lld", reactionLong);
-//            DLog(@"BLUEBUBBLESHELPER: %@", messageItem);
-//            DLog(@"BLUEBUBBLESHELPER: %@", messageSummary);
-//
-//            // Send the tapback
-//            [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(messageItem) withMessageSummaryInfo:(messageSummary)];
-//
-//            DLog(@"BLUEBUBBLESHELPER: sent reaction");
-//        }
-//    }
+    if([event isEqualToString:@"send-reaction"]) {
+        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
+
+        DLog(@"BLUEBUBBLESHELPER: REACTION INCOMING %@", eventData);
+
+        IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
+        if(chat != nil) {
+            //Map the reaction type
+            long long reactionLong = [BlueBubblesHelper parseReactionType:(eventDataArr[2])];
+
+            // Get the messageItem
+            IMItem *messageItem = [BlueBubblesHelper getMessageItem:(chat) :(eventDataArr[1])];
+
+            if (messageItem.type == IMItemTypeMessage) {
+                IMMessageItem *imMessage = (IMMessageItem *)messageItem;
+                IMChatItem *item = (IMChatItem *)imMessage.message._imMessageItem._newChatItems;
+
+                //Build the message summary
+                NSDictionary *messageSummary = @{@"amc":[[imMessage messageSummaryInfo] valueForKey:@"ust"],@"ams":[imMessage body].string};
+
+                DLog(@"BLUEBUBBLESHELPER: Reaction Long: %lld", reactionLong);
+                // Send the tapback
+                [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(messageSummary)];
+
+                DLog(@"BLUEBUBBLESHELPER: sent reaction");
+            }
+        }
+    }
     // If the server tells us to start typing
      if([event isEqualToString: @"start-typing"]) {
         // Get the IMChat instance for the guid specified in eventData
