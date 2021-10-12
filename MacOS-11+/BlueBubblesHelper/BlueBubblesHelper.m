@@ -18,6 +18,7 @@
 #import "IMService-IMService_GetService.h"
 #import "IMChat.h"
 #import "IMMessage.h"
+#import "IMMessageItem.h"
 #import "IMMessageItem-IMChat_Internal.h"
 #import "IMChatRegistry.h"
 #import "NetworkController.h"
@@ -25,6 +26,7 @@
 #import "ChatDisplayController.h"
 #import "SelectorHelper.h"
 #import "IMHandleRegistrar.h"
+#import "IMCore.h"
 
 
 @interface BlueBubblesHelper : NSObject
@@ -130,6 +132,10 @@ BlueBubblesHelper *plugin;
     };
     NSDictionary *message = @{@"event": @"ping", @"message": @"Helper Connected!"};
     [controller sendMessage:message];
+    
+    // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
+    // Quickly test a message event
+    //[self handleMessage:controller message:@"{\"event\":\"send-reply\",\"data\":\"iMessage;+;chat75010809827541591,BlueBubbles Stuff\"}"];
 }
 
 // Run when receiving a new message from the tcp socket
@@ -247,6 +253,24 @@ BlueBubblesHelper *plugin;
             DLog(@"BLUEBUBBLESHELPER: Removed participant from chat %@: %@", eventDataArr[0], eventDataArr[1]);
         } else {
             DLog(@"BLUEBUBBLESHELPER: Couldn't remove participant from chat %@: %@", eventDataArr[0], eventDataArr[1]);
+        }
+    // If the server tells us to send a reply
+    } else if ([event isEqualToString:@"send-reply"]) {
+        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
+
+        IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
+        IMItem *messageItem = [BlueBubblesHelper getMessageItem:(chat) :(eventDataArr[1])];
+        if (messageItem.type == IMItemTypeMessage) {
+            IMMessageItem *message = (IMMessageItem *)messageItem;
+            IMMessagePartChatItem *item = (IMMessagePartChatItem *)message._newChatItems;
+            NSString *identifier = IMCreateThreadIdentifierForMessagePartChatItem(item);
+            DLog(@"BLUEBUBBLESHELPER: Thread ID: %@", identifier);
+            NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: eventDataArr[2]];
+            IMMessage *messageToSend = [[IMMessage alloc] init];
+            messageToSend.text = attributedString;
+            messageToSend.flags = 100005;
+            messageToSend.threadIdentifier = identifier;
+            [chat sendMessage:(messageToSend)];
         }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
