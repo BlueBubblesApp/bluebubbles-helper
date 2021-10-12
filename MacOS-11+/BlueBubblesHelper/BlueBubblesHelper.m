@@ -294,6 +294,18 @@ BlueBubblesHelper *plugin;
         messageToSend.flags = 100005;
         messageToSend.expressiveSendStyleID = eventDataArr[2];
         [chat sendMessage:(messageToSend)];
+    // If the server tells us to send a message with a subject line
+    } else if ([event isEqualToString:@"send-subject"]) {
+        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
+
+        IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
+        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: eventDataArr[1]];
+        IMMessage *messageToSend = [[IMMessage alloc] init];
+        messageToSend.text = attributedString;
+        messageToSend.flags = 100005;
+        NSMutableAttributedString *attributedStringSubject = [[NSMutableAttributedString alloc] initWithString: eventDataArr[2]];
+        messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(attributedString) messageSubject:(attributedStringSubject) fileTransferGUIDs:(nil) flags:(100005) error:(nil) guid:(nil) subject:(nil)];
+        [chat sendMessage:(messageToSend)];
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
