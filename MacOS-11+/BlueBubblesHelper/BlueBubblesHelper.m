@@ -27,6 +27,7 @@
 #import "SelectorHelper.h"
 #import "IMHandleRegistrar.h"
 #import "IMCore.h"
+#import "IMChatHistoryController.h"
 
 
 @interface BlueBubblesHelper : NSObject
@@ -164,14 +165,25 @@ BlueBubblesHelper *plugin;
             long long reactionLong = [BlueBubblesHelper parseReactionType:(eventDataArr[2])];
 
             // Get the messageItem
-            IMItem *messageItem = [BlueBubblesHelper getMessageItem:(chat) :(eventDataArr[1])];
+            [BlueBubblesHelper getMessageItem:(chat) :(eventDataArr[1]) completionBlock:^(IMMessage *message) {
+                IMMessageItem *imMessage = (IMMessageItem *)message._imMessageItem;
+                NSObject *items = imMessage._newChatItems;
+                IMChatItem *item;
+                // sometimes items is an array so we need to account for that
+                if ([items isKindOfClass:[NSArray class]]) {
+                    for(IMChatItem* imci in (NSArray *)items) {
+                        if([imci._item.guid isEqualToString:(eventDataArr[1])]) {
 
-            if (messageItem.type == IMItemTypeMessage) {
-                IMMessageItem *imMessage = (IMMessageItem *)messageItem;
-                IMChatItem *item = (IMChatItem *)imMessage._newChatItems;
+                            DLog(@"BLUEBUBBLESHELPER: %@", eventDataArr[1]);
 
+                            item = imci;
+                        }
+                    }
+                } else {
+                    item = (IMChatItem *)items;
+                }
                 //Build the message summary
-                NSDictionary *messageSummary = @{@"amc":[[imMessage messageSummaryInfo] valueForKey:@"ust"],@"ams":[imMessage body].string};
+                NSDictionary *messageSummary = @{@"amc":@1,@"ams":[imMessage body].string};
 
                 DLog(@"BLUEBUBBLESHELPER: Reaction Long: %lld", reactionLong);
                 // Send the tapback
@@ -185,7 +197,7 @@ BlueBubblesHelper *plugin;
                 }
 
                 DLog(@"BLUEBUBBLESHELPER: sent reaction");
-            }
+            }];
         }
     }
     // If the server tells us to start typing
@@ -259,10 +271,9 @@ BlueBubblesHelper *plugin;
         NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
 
         IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
-        IMItem *messageItem = [BlueBubblesHelper getMessageItem:(chat) :(eventDataArr[1])];
-        if (messageItem.type == IMItemTypeMessage) {
-            IMMessageItem *message = (IMMessageItem *)messageItem;
-            IMMessagePartChatItem *item = (IMMessagePartChatItem *)message._newChatItems;
+        [BlueBubblesHelper getMessageItem:(chat) :(eventDataArr[1]) completionBlock:^(IMMessage *message) {
+            IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
+            IMMessagePartChatItem *item = (IMMessagePartChatItem *)messageItem._newChatItems;
             NSString *identifier = IMCreateThreadIdentifierForMessagePartChatItem(item);
             DLog(@"BLUEBUBBLESHELPER: Thread ID: %@", identifier);
             NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: eventDataArr[2]];
@@ -271,7 +282,7 @@ BlueBubblesHelper *plugin;
             messageToSend.flags = 100005;
             messageToSend.threadIdentifier = identifier;
             [chat sendMessage:(messageToSend)];
-        }
+        }];
     // If the server tells us to send a message effect
     } else if ([event isEqualToString:@"send-effect"]) {
         NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
@@ -303,7 +314,7 @@ BlueBubblesHelper *plugin;
 +(long long) parseReactionType:(NSString *)reactionType {
     NSString *lowerCaseType = [reactionType lowercaseString];
 
-    DLog(@"BLUBUBBLESHELPER: %@", lowerCaseType);
+    DLog(@"BLUEBUBBLESHELPER: %@", lowerCaseType);
 
     if([@"love" isEqualToString:(lowerCaseType)]) return 2000;
     if([@"like" isEqualToString:(lowerCaseType)]) return 2001;
@@ -320,22 +331,11 @@ BlueBubblesHelper *plugin;
     return 0;
 }
 
-+(IMItem *) getMessageItem:(IMChat *)chat :(NSString *)actionMessageGuid {
-    if(chat == nil) return nil;
-
-    NSArray<IMChatItem*>* items = [chat chatItems];
-
-    for(IMChatItem* item in items) {
-        // If the type is Text (maybe can pass other types??)
-        if([item._item.guid isEqualToString:(actionMessageGuid)]) {
-
-            DLog(@"BLUEBUBBLESHELPER: %@", item._item.guid);
-
-            return item._item;
-        }
-    }
-
-    return nil;
++(void) getMessageItem:(IMChat *)chat :(NSString *)actionMessageGuid completionBlock:(void (^)(IMMessage *message))block {
+    [[IMChatHistoryController sharedInstance] loadMessageWithGUID:(actionMessageGuid) completionBlock:^(IMMessage *message) {
+        DLog(@"BLUEBUBBLESHELPER: Got message for guid %@", actionMessageGuid);
+        block(message);
+    }];
 }
 
 +(BOOL) isTyping: (NSString *)guid {
