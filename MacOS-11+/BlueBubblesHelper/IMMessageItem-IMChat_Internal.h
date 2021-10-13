@@ -33,5 +33,8 @@
 - (id)_newChatItemsWithFilteredChat:(BOOL)arg1 isBusiness:(BOOL)arg2 parentChatIsSpam:(BOOL)arg3 hasKnownParticipants:(BOOL)arg4;
 - (NSObject*)_newChatItems;
 - (BOOL)_hasMessageChatItem;
+@property (assign,nonatomic) char hasUnseenMention;
+- (char)hasUnseenMention;
+- (void)setHasUnseenMention:(char)arg1 ;
 @end
 

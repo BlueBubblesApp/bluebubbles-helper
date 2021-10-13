@@ -38,10 +38,7 @@ typedef NS_ENUM(NSInteger, IMMessageDescriptionType) {
     unsigned long long _flags;
     BOOL _isInvitationMessage;
     long long _messageID;
-    NSDictionary *_bizIntent;
-    NSString *_locale;
-    BOOL _isSOS;
-    NSString *_associatedMessageGUID;
+    char _hasMention;
     long long _associatedMessageType;
     NSDictionary *_messageSummaryInfo;
     NSString *_associatedBalloonBundleID;
@@ -98,6 +95,7 @@ typedef NS_ENUM(NSInteger, IMMessageDescriptionType) {
 @property(retain, nonatomic, setter=_updateTimeDelivered:) NSDate *timeDelivered; // @synthesize timeDelivered=_timeDelivered;
 @property(copy, nonatomic, setter=_updateFileTransferGUIDs:) NSArray<NSString*> *fileTransferGUIDs; // @synthesize fileTransferGUIDs=_fileTransferGUIDs;
 @property(nonatomic) BOOL isInvitationMessage; // @synthesize isInvitationMessage=_isInvitationMessage;
+- (char)hasMention;
 @property(retain, nonatomic, setter=_updateError:) NSError *error; // @synthesize error=_error;
 @property(nonatomic, setter=_updateFlags:) unsigned long long flags; // @synthesize flags=_flags;
 @property(nonatomic, setter=_updateMessageID:) long long messageID; // @synthesize messageID=_messageID;
@@ -138,6 +136,7 @@ typedef NS_ENUM(NSInteger, IMMessageDescriptionType) {
 @property(readonly, nonatomic) BOOL isTypingMessage;
 @property(readonly, nonatomic) BOOL isFinished;
 @property(readonly, nonatomic) BOOL hasDataDetectorResults;
+@property (assign,nonatomic) char hasMention;
 @property(readonly, nonatomic) NSString *summaryString;
 @property(readonly, nonatomic) NSString *senderName;
 @property(readonly, nonatomic) NSString *plainBody;
@@ -160,5 +159,6 @@ typedef NS_ENUM(NSInteger, IMMessageDescriptionType) {
 - (void) setThreadOriginator:(IMMessage*)arg2 API_AVAILABLE(macos(10.16), ios(14.0), watchos(7.0));
 - (long long) replyCountsByPart API_AVAILABLE(macos(10.16), ios(14.0), watchos(7.0));
 - (void) setReplyCountsByPart:(long long)arg1 API_AVAILABLE(macos(10.16), ios(14.0), watchos(7.0));
+- (void)setHasMention:(char)arg1;
 @end
 
