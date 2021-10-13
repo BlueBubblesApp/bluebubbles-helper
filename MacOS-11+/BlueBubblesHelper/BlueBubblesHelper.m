@@ -137,7 +137,7 @@ BlueBubblesHelper *plugin;
     
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
     // Quickly test a message event
-    [self handleMessage:controller message:@"{\"event\":\"update-chat-pinned\",\"data\":\"iMessage;+;chat75010809827541591,BlueBubbles Stuff\"}"];
+    // [self handleMessage:controller message:@"{\"event\":\"update-chat-pinned\",\"data\":\"iMessage;+;chat75010809827541591,BlueBubbles Stuff\"}"];
 }
 
 // Run when receiving a new message from the tcp socket
