@@ -14,6 +14,8 @@ This is the repo for the bundle containing code to perform various tasks not acc
 - Send message with subject
 - Update pinned chats on the server Mac
 
+See the wiki for more details on how these were implemented.
+
 ### Support
 
 The bundle has been tested on MacOS 10.13 (High Sierra) - MacOS 11 (Big Sur). It could work on higher or lower MacOS versions, but we do not know for sure.
