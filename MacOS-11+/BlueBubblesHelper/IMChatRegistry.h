@@ -140,7 +140,7 @@
 - (id)_createdChatForIMHandles:(id)arg1 style:(unsigned char)arg2 groupID:(id)arg3 displayName:(id)arg4 joinedChatsOnly:(BOOL)arg5;
 - (id)_createdChatForIMHandle:(id)arg1;
 - (id)_createdChatWithIdentifier:(id)arg1 style:(unsigned char)arg2 account:(id)arg3;
-- (NSArray<IMChat*>* _Nullable)_allCreatedChats;
+- (NSArray<IMChat*>*)_allCreatedChats;
 - (void)setUserActivityForChat:(id)arg1 message:(id)arg2 orHandles:(id)arg3 title:(id)arg4;
 - (id)_inPersonFromIMHandle:(id)arg1 isMe:(BOOL)arg2;
 - (id)_inPersonNameForContact:(id)arg1 imHandle:(id)arg2;
@@ -156,9 +156,9 @@
 - (id)chatForIMHandles:(id)arg1 displayName:(id)arg2 joinedChatsOnly:(BOOL)arg3 lastAddressedHandle:(id)arg4 lastAddressedSIMID:(id)arg5;
 - (id)chatForIMHandles:(id)arg1 displayName:(id)arg2 joinedChatsOnly:(BOOL)arg3;
 - (id)chatForIMHandles:(id)arg1 lastAddressedHandle:(id)arg2 lastAddressedSIMID:(id)arg3;
-- (IMChat* _Nonnull)chatForIMHandles:(NSArray<IMHandle*>*)arg1;
+- (id)chatForIMHandles:(id)arg1;
 - (id)chatForIMHandle:(id)arg1 lastAddressedHandle:(id)arg2 lastAddressedSIMID:(id)arg3;
-- (IMChat* _Nonnull)chatForIMHandle:(IMHandle*)arg1;
+- (id)chatForIMHandle:(id)arg1;
 - (void)_unregisterChatWithGUID:(id)arg1;
 - (void)_unregisterChat:(id)arg1;
 - (void)unregisterChatWithGUID:(id)arg1;
@@ -197,6 +197,7 @@
 - (void)_chat_loadPagedHistory:(id)arg1 numberOfMessagesBefore:(unsigned long long)arg2 numberOfMessagesAfter:(unsigned long long)arg3 messageGUID:(id)arg4 queryID:(id)arg5;
 - (void)_chat_loadHistory:(id)arg1 limit:(unsigned long long)arg2 beforeGUID:(id)arg3 afterGUID:(id)arg4 queryID:(id)arg5 ;
 - (void)_chat_loadHistory:(id)arg1 limit:(unsigned long long)arg2 beforeGUID:(id)arg3 afterGUID:(id)arg4 threadIdentifier:(id)arg6 queryID:(id)arg5 API_AVAILABLE(macos(10.16), ios(14.0), watchos(7.0));
+- (IMChat*)existingChatWithPinningIdentifier:(NSString*)arg1 API_AVAILABLE(macos(10.16), ios(14.0), watchos(7.0));
 - (void)_chat:(id)arg1 updateIsBlackholed:(BOOL)arg2;
 - (void)_chat:(id)arg1 updateIsFiltered:(BOOL)arg2;
 - (void)_chat:(id)arg1 updateLastAddressedSIMID:(id)arg2;
@@ -309,4 +310,3 @@
 @property(readonly) Class superclass;
 
 @end
-

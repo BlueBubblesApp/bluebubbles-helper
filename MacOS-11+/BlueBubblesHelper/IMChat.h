@@ -287,6 +287,10 @@
 @property(readonly, nonatomic) IMMessageItem *lastFinishedMessageItem;
 @property(readonly, nonatomic) IMMessage *lastFinishedMessage;
 @property(readonly, nonatomic) IMMessage *firstMessage;
+@property(readonly, nonatomic) BOOL isPinned API_AVAILABLE(macos(10.16), ios(14.0), watchos(7.0));
+@property(readonly, nonatomic, nonnull) NSString* pinningIdentifier API_AVAILABLE(macos(10.16), ios(14.0), watchos(7.0));
+-(BOOL)isPinned API_AVAILABLE(macos(10.16), ios(14.0), watchos(7.0));
+-(NSString*)pinningIdentifier API_AVAILABLE(macos(10.16), ios(14.0), watchos(7.0));
 - (IMMessage*)messageForGUID:(id)arg1;
 - (id)_lastFinishedMessage;
 - (id)_appendArchivedItemsToItemsArray:(id)arg1;
@@ -356,8 +360,8 @@
 @property(nonatomic) unsigned long long numberOfMessagesToKeepLoaded;
 - (id)messagesToReportAsSpamFromChatItems:(id)arg1;
 - (id)allMessagesToReportAsSpam;
-- (NSArray<IMChatItem*>*)chatItemsForItems:(NSArray<IMMessageItem*>*)arg1;
-//- (NSArray<IMChatItem*>*)chatItemsForMessages:(NSArray<IMMessage*>*)arg1; unavailable on iOS?
+- (id)chatItemsForItems:(id)arg1;
+- (id)chatItemsForMessages:(id)arg1;
 - (void)_setRenderingDataDictionary:(id)arg1;
 - (id)_renderingDataDictionary;
 - (void)markChatItemAsPlayedExpressiveSend:(id)arg1;
@@ -442,4 +446,3 @@
 @property(readonly) Class superclass;
 
 @end
-

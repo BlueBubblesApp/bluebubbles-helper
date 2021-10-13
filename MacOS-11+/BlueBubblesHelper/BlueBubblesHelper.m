@@ -28,6 +28,7 @@
 #import "IMHandleRegistrar.h"
 #import "IMCore.h"
 #import "IMChatHistoryController.h"
+#import "IMPinnedConversationsController.h"
 
 
 @interface BlueBubblesHelper : NSObject
@@ -136,7 +137,7 @@ BlueBubblesHelper *plugin;
     
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
     // Quickly test a message event
-    //[self handleMessage:controller message:@"{\"event\":\"send-reply\",\"data\":\"iMessage;+;chat75010809827541591,BlueBubbles Stuff\"}"];
+    [self handleMessage:controller message:@"{\"event\":\"update-chat-pinned\",\"data\":\"iMessage;+;chat75010809827541591,BlueBubbles Stuff\"}"];
 }
 
 // Run when receiving a new message from the tcp socket
@@ -306,6 +307,26 @@ BlueBubblesHelper *plugin;
         NSMutableAttributedString *attributedStringSubject = [[NSMutableAttributedString alloc] initWithString: eventDataArr[2]];
         messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(attributedString) messageSubject:(attributedStringSubject) fileTransferGUIDs:(nil) flags:(100005) error:(nil) guid:(nil) subject:(nil)];
         [chat sendMessage:(messageToSend)];
+    // If the server tells us to update the pinned status of a chat
+    }  else if ([event isEqualToString:@"update-chat-pinned"]) {
+        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
+
+        IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
+        if (!chat.isPinned) {
+            NSArray* arr = [[[IMPinnedConversationsController sharedInstance] pinnedConversationIdentifierSet] array];
+            NSMutableArray<NSString*>* chatArr = [[NSMutableArray alloc] initWithArray:(arr)];
+            [chatArr addObject:(chat.pinningIdentifier)];
+            NSArray<NSString*>* finalArr = [chatArr copy];
+            IMPinnedConversationsController* controller = [IMPinnedConversationsController sharedInstance];
+            [controller setPinnedConversationIdentifiers:(finalArr) withUpdateReason:(@"contextMenu")];
+        } else {
+            NSArray* arr = [[[IMPinnedConversationsController sharedInstance] pinnedConversationIdentifierSet] array];
+            NSMutableArray<NSString*>* chatArr = [[NSMutableArray alloc] initWithArray:(arr)];
+            [chatArr removeObject:(chat.pinningIdentifier)];
+            NSArray<NSString*>* finalArr = [chatArr copy];
+            IMPinnedConversationsController* controller = [IMPinnedConversationsController sharedInstance];
+            [controller setPinnedConversationIdentifiers:(finalArr) withUpdateReason:(@"contextMenu")];
+        }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
@@ -501,31 +522,22 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
 //
 //@end
 
-//ZKSwizzleInterface(WBWT_IMMessage, IMMessage, NSObject)
-//@implementation WBWT_IMMessage
-//
-//+ (id)instantMessageWithAssociatedMessageContent:(id)arg1 flags:(unsigned long long)arg2 associatedMessageGUID:(id)arg3 associatedMessageType:(long long)arg4 associatedMessageRange:(struct _NSRange)arg5 messageSummaryInfo:(id)arg6 {
-//    /*/
-//     BLUEBUBBLESHELPER: instantMessageWithAssociatedMessageContent, Loved “Test”{
-//         "__kIMMessagePartAttributeName" = 0;
-//     }, 0, p:0/09EF06EB-E67C-47C0-ABBD-26310BF954AE, 2000, {
-//         amc = 1;
-//         ams = Test;
-//     }, (null)
-//     associatedMessageType: left -> right 2000 ->
-//     */
-//
-//
-//
-////    testRange.amc = arg5.amc;
-////    testRange.ams = @"Test";
-//
-//    DLog(@"BLUEBUBBLESHELPER: instantMessageWithAssociatedMessageContent, %@, %llu, %@, %lld, %@, %@", [arg1 class], arg2, [arg3 class], arg4, arg5, arg6);
-//    NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:@"TEST REACTION"];
-//    return ZKOrig(id, string, arg2, arg3, arg4, arg5, NULL);
-//}
-//
-//@end
+ZKSwizzleInterface(WBWT_IMPinnedConversationsController, IMPinnedConversationsController, NSObject)
+@implementation WBWT_IMPinnedConversationsController
+
+-(void)setPinnedConversationIdentifiers:(id)arg1 shouldUpdateStores:(BOOL)arg2 {
+
+    DLog(@"BLUEBUBBLESHELPER: instantMessageWithAssociatedMessageContent, %@", [arg1 class]);
+    ZKOrig(id, arg1, arg2);
+}
+
+-(void)setPinnedConversationIdentifierSet:(id)arg1 {
+
+    DLog(@"BLUEBUBBLESHELPER: instantMessageWithAssociatedMessageContent, %@", [arg1 class]);
+    ZKOrig(id, arg1);
+}
+
+@end
 
 //ZKSwizzleInterface(WBWT_IMChat, IMChat, NSObject)
 //@implementation WBWT_IMChat
