@@ -240,6 +240,16 @@ BlueBubblesHelper *plugin;
         } else {
             DLog(@"BLUEBUBBLESHELPER: Couldn't remove participant from chat %@: %@", eventDataArr[0], eventDataArr[1]);
         }
+    // If the server tells us to send a message
+    } else if ([event isEqualToString:@"send-message"]) {
+        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
+
+        IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
+        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: eventDataArr[1]];
+        IMMessage *messageToSend = [[IMMessage alloc] init];
+        messageToSend.text = attributedString;
+        messageToSend.flags = 100005;
+        [chat sendMessage:(messageToSend)];
     // If the server tells us to send a reply
     } else if ([event isEqualToString:@"send-reply"]) {
         NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
