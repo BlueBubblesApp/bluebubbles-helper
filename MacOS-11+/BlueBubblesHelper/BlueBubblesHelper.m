@@ -291,7 +291,7 @@ BlueBubblesHelper *plugin;
         messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(attributedString) messageSubject:(attributedStringSubject) fileTransferGUIDs:(nil) flags:(100005) error:(nil) guid:(nil) subject:(nil)];
         [chat sendMessage:(messageToSend)];
     // If the server tells us to update the pinned status of a chat
-    }  else if ([event isEqualToString:@"update-chat-pinned"]) {
+    } else if ([event isEqualToString:@"update-chat-pinned"]) {
         NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
 
         IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
@@ -310,6 +310,27 @@ BlueBubblesHelper *plugin;
             IMPinnedConversationsController* controller = [IMPinnedConversationsController sharedInstance];
             [controller setPinnedConversationIdentifiers:(finalArr) withUpdateReason:(@"contextMenu")];
         }
+    // If the server tells us to create a chat
+    } else if ([event isEqualToString:@"create-chat"]) {
+        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
+
+        NSMutableArray<IMHandle*> *handles = [[NSMutableArray alloc] initWithArray:(@[])];
+        for (NSString* str in eventDataArr) {
+            if (str != eventDataArr.lastObject) {
+                [handles addObjectsFromArray:([[IMHandleRegistrar sharedInstance] getIMHandlesForID:(str)])];
+            }
+        }
+        IMChat *chat;
+        if (handles.count > 1) {
+            chat = [[IMChatRegistry sharedInstance] chatForIMHandles:(handles)];
+        } else {
+            chat = [[IMChatRegistry sharedInstance] chatForIMHandle:(handles[0])];
+        }
+        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: eventDataArr.lastObject];
+        IMMessage *messageToSend = [[IMMessage alloc] init];
+        messageToSend.text = attributedString;
+        messageToSend.flags = 100005;
+        [chat sendMessage:(messageToSend)];
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
