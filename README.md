@@ -7,8 +7,10 @@ This is the repo for the bundle containing code to perform various tasks not acc
 - Send reactions
 - Send and receive typing indicators
 - Mark chats read on the server Mac
+- Create chats
 - Rename group chats
 - Add / remove participants from group chats
+- Send messages
 - Send replies
 - Send message effects
 - Send message with subject
