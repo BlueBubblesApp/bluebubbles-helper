@@ -257,8 +257,28 @@ BlueBubblesHelper *plugin;
         IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
         [BlueBubblesHelper getMessageItem:(chat) :(eventDataArr[1]) completionBlock:^(IMMessage *message) {
             IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
-            IMMessagePartChatItem *item = (IMMessagePartChatItem *)messageItem._newChatItems;
-            NSString *identifier = IMCreateThreadIdentifierForMessagePartChatItem(item);
+            NSObject *items = messageItem._newChatItems;
+            IMMessagePartChatItem *item;
+            // sometimes items is an array so we need to account for that
+            if ([items isKindOfClass:[NSArray class]]) {
+                for(IMMessagePartChatItem* imci in (NSArray *)items) {
+                    if([imci._item.guid isEqualToString:(eventDataArr[1])]) {
+
+                        DLog(@"BLUEBUBBLESHELPER: %@", eventDataArr[1]);
+
+                        item = imci;
+                    }
+                }
+            } else {
+                item = (IMMessagePartChatItem *)items;
+            }
+            NSString *identifier = @"";
+            // either reply to an existing thread or create a new thread
+            if (message.threadIdentifier != nil) {
+                identifier = message.threadIdentifier;
+            } else {
+                identifier = IMCreateThreadIdentifierForMessagePartChatItem(item);
+            }
             DLog(@"BLUEBUBBLESHELPER: Thread ID: %@", identifier);
             NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: eventDataArr[2]];
             IMMessage *messageToSend = [[IMMessage alloc] init];
