@@ -4,7 +4,7 @@
 //     class-dump is Copyright (C) 1997-1998, 2000-2001, 2004-2013 by Steve Nygard.
 //
 
-#import "NSObject.h"
+#import <objc/NSObject.h>
 
 @class NSMutableDictionary;
 
@@ -14,10 +14,9 @@
 }
 
 + (id)sharedInstance;
-- (void).cxx_destruct;
 @property(retain) NSMutableDictionary *_runningQueries; // @synthesize _runningQueries;
 - (void)messageQuery:(id)arg1 finishedWithResult:(id)arg2 chatGUIDs:(id)arg3;
-- (void)loadMessageWithGUID:(id)arg1 completionBlock:(CDUnknownBlockType)arg2;
+- (void)loadMessageWithGUID:(id)arg1 completionBlock:(id)arg2;
 - (void)dealloc;
 - (id)init;
 

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D258662D944A5A4DD8D3C13 /* libPods-BlueBubblesHelper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7145A2D63389BEE3AC08DDD3 /* libPods-BlueBubblesHelper.a */; };
 		93AC09C62565E4150000C60C /* IMCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93AC09C52565E4150000C60C /* IMCore.framework */; };
 		93AC09CC2565E45F0000C60C /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
 		93B28EA9257399C00056DAD4 /* ChatDisplayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EA8257399C00056DAD4 /* ChatDisplayController.m */; };
@@ -19,12 +20,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		34FA3D7312B0A0F77E4D6E54 /* Pods-BlueBubblesHelper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.debug.xcconfig"; sourceTree = "<group>"; };
+		6955E1273337B34EA5BF653B /* Pods-BlueBubblesHelper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.release.xcconfig"; sourceTree = "<group>"; };
+		7145A2D63389BEE3AC08DDD3 /* libPods-BlueBubblesHelper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71554C06257B2E4600296B93 /* IMChatHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMChatHistoryController.h; sourceTree = "<group>"; };
 		71554C0F257B58F100296B93 /* IMTranscriptChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMTranscriptChatItem.h; sourceTree = "<group>"; };
 		71554C17257B609B00296B93 /* IMTextMessagePartChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMTextMessagePartChatItem.h; sourceTree = "<group>"; };
 		71554C19257B616400296B93 /* IMMessagePartChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMMessagePartChatItem.h; sourceTree = "<group>"; };
 		71554C1B257B618400296B93 /* IMMessageChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMMessageChatItem.h; sourceTree = "<group>"; };
-		71554C1D257B61B000296B93 /* IMTranscriptChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IMTranscriptChatItem.h; path = ../../../Downloads/IMTranscriptChatItem.h; sourceTree = "<group>"; };
 		9316AE94257600E8002AE8EE /* IMMessageItem-IMChat_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMMessageItem-IMChat_Internal.h"; sourceTree = "<group>"; };
 		9316AE962576029C002AE8EE /* IMChatRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChatRegistry.h; sourceTree = "<group>"; };
 		9316AE98257606EC002AE8EE /* IMChat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChat.h; sourceTree = "<group>"; };
@@ -39,6 +42,8 @@
 		93DFDC5D2568DFD4009551D2 /* IMMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMMessage.h; sourceTree = "<group>"; };
 		93FD99392568E7360060D430 /* NetworkController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkController.m; sourceTree = "<group>"; };
 		93FD993D2568E7500060D430 /* NetworkController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetworkController.h; sourceTree = "<group>"; };
+		A6FBC1E1272074B60078F9C6 /* IMHandleRegistrar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMHandleRegistrar.h; sourceTree = "<group>"; };
+		A6FBC1E3272076730078F9C6 /* IMChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChatItem.h; sourceTree = "<group>"; };
 		FBCE4EBB201C0F4D002F8A61 /* BlueBubblesHelper.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BlueBubblesHelper.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		FBCE4EC0201C0F4D002F8A61 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
@@ -61,12 +66,22 @@
 				FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */,
 				93AC09C62565E4150000C60C /* IMCore.framework in Frameworks */,
 				FBCE4EC1201C0F4D002F8A61 /* Foundation.framework in Frameworks */,
+				2D258662D944A5A4DD8D3C13 /* libPods-BlueBubblesHelper.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0E54B2006E87399139D4F745 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				34FA3D7312B0A0F77E4D6E54 /* Pods-BlueBubblesHelper.debug.xcconfig */,
+				6955E1273337B34EA5BF653B /* Pods-BlueBubblesHelper.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		93B28EA0257398E40056DAD4 /* Overrides */ = {
 			isa = PBXGroup;
 			children = (
@@ -91,6 +106,7 @@
 				FBCE4EC2201C0F4D002F8A61 /* BlueBubblesHelper */,
 				FBCE4EBD201C0F4D002F8A61 /* Frameworks */,
 				FBCE4EBC201C0F4D002F8A61 /* Products */,
+				0E54B2006E87399139D4F745 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -108,6 +124,7 @@
 				93AC09C52565E4150000C60C /* IMCore.framework */,
 				FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */,
 				FBCE4EC0201C0F4D002F8A61 /* Foundation.framework */,
+				7145A2D63389BEE3AC08DDD3 /* libPods-BlueBubblesHelper.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -149,22 +166,23 @@
 		FBCE4EDB201C264F002F8A61 /* IMCore */ = {
 			isa = PBXGroup;
 			children = (
-				71554C0F257B58F100296B93 /* IMTranscriptChatItem.h */,
-				9316AE9A257614E2002AE8EE /* IMTypingChatItem.h */,
-				9316AE98257606EC002AE8EE /* IMChat.h */,
-				71554C1B257B618400296B93 /* IMMessageChatItem.h */,
-				71554C1D257B61B000296B93 /* IMTranscriptChatItem.h */,
-				9316AE962576029C002AE8EE /* IMChatRegistry.h */,
-				71554C19257B616400296B93 /* IMMessagePartChatItem.h */,
-				71554C17257B609B00296B93 /* IMTextMessagePartChatItem.h */,
-				9316AE94257600E8002AE8EE /* IMMessageItem-IMChat_Internal.h */,
-				71554C06257B2E4600296B93 /* IMChatHistoryController.h */,
-				93DFDC5D2568DFD4009551D2 /* IMMessage.h */,
 				FBCE4EDA201C0FDE002F8A61 /* IMAccount.h */,
 				FBCE4ED7201C0FDE002F8A61 /* IMAccountController.h */,
+				9316AE98257606EC002AE8EE /* IMChat.h */,
+				71554C06257B2E4600296B93 /* IMChatHistoryController.h */,
+				9316AE962576029C002AE8EE /* IMChatRegistry.h */,
 				FBCE4ED9201C0FDE002F8A61 /* IMHandle.h */,
+				93DFDC5D2568DFD4009551D2 /* IMMessage.h */,
+				71554C1B257B618400296B93 /* IMMessageChatItem.h */,
+				9316AE94257600E8002AE8EE /* IMMessageItem-IMChat_Internal.h */,
+				71554C19257B616400296B93 /* IMMessagePartChatItem.h */,
 				FBCE4ED8201C0FDE002F8A61 /* IMPerson.h */,
 				FBCE4ED6201C0FDE002F8A61 /* IMService-IMService_GetService.h */,
+				71554C17257B609B00296B93 /* IMTextMessagePartChatItem.h */,
+				71554C0F257B58F100296B93 /* IMTranscriptChatItem.h */,
+				9316AE9A257614E2002AE8EE /* IMTypingChatItem.h */,
+				A6FBC1E1272074B60078F9C6 /* IMHandleRegistrar.h */,
+				A6FBC1E3272076730078F9C6 /* IMChatItem.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";
@@ -176,6 +194,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FBCE4ED1201C0F4D002F8A61 /* Build configuration list for PBXNativeTarget "BlueBubblesHelper" */;
 			buildPhases = (
+				47366F660A8FC9CF6CF8AC69 /* [CP] Check Pods Manifest.lock */,
 				FBCE4EB7201C0F4D002F8A61 /* Sources */,
 				FBCE4EB8201C0F4D002F8A61 /* Frameworks */,
 				FBCE4EB9201C0F4D002F8A61 /* Resources */,
@@ -234,6 +253,28 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		47366F660A8FC9CF6CF8AC69 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-BlueBubblesHelper-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		FBCE4EE7201C26B1002F8A61 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -366,14 +407,16 @@
 		};
 		FBCE4ED2201C0F4D002F8A61 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 34FA3D7312B0A0F77E4D6E54 /* Pods-BlueBubblesHelper.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 3;
 				DEPLOYMENT_LOCATION = YES;
-				DEVELOPMENT_TEAM = V8ZV57CTZN;
+				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DSTROOT = /;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -386,6 +429,7 @@
 				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MARKETING_VERSION = 0.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -395,14 +439,16 @@
 		};
 		FBCE4ED3201C0F4D002F8A61 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6955E1273337B34EA5BF653B /* Pods-BlueBubblesHelper.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 3;
 				DEPLOYMENT_LOCATION = YES;
-				DEVELOPMENT_TEAM = V8ZV57CTZN;
+				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DSTROOT = /;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -415,6 +461,7 @@
 				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MARKETING_VERSION = 0.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

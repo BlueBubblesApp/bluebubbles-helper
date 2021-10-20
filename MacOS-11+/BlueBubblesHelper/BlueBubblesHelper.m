@@ -125,6 +125,11 @@ BlueBubblesHelper *plugin;
     NSString *event = dictionary[@"action"];
     // Data is the actual information that we need in the packet
     NSDictionary *data = dictionary[@"data"];
+    // Transaction ID enables us to communicate back to the server that the action was complete
+    NSString *transaction = nil;
+    if ([dictionary objectForKey:(@"transactionId")] != [NSNull null]) {
+        transaction = dictionary[@"transactionId"];
+    }
 
     DLog(@"BLUEBUBBLESHELPER: Message received: %@, %@", event, data);
 
@@ -165,7 +170,9 @@ BlueBubblesHelper *plugin;
                 } else {
                     [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(messageSummary)];
                 }
-
+                if (transaction != nil) {
+                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
+                }
                 DLog(@"BLUEBUBBLESHELPER: sent reaction");
             }];
         }
@@ -232,7 +239,7 @@ BlueBubblesHelper *plugin;
         }
     // If the server tells us to send a message
     } else if ([event isEqualToString:@"send-message"]) {
-        [BlueBubblesHelper sendMessage:(data)];
+        [BlueBubblesHelper sendMessage:(data) transaction:(transaction)];
     // If the server tells us to update the pinned status of a chat
     } else if ([event isEqualToString:@"update-chat-pinned"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
@@ -263,7 +270,9 @@ BlueBubblesHelper *plugin;
         } else {
             chat = [[IMChatRegistry sharedInstance] chatForIMHandle:(handles[0])];
         }
-        [BlueBubblesHelper sendMessage:(data)];
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": chat.guid}];
+        }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
@@ -325,7 +334,7 @@ BlueBubblesHelper *plugin;
     }
 }
 
-+(void) sendMessage: (NSDictionary *) data {
++(void) sendMessage: (NSDictionary *) data transaction:(NSString *) transaction {
     IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: data[@"message"]];
     NSMutableAttributedString *subjectAttributedString = nil;
@@ -342,6 +351,9 @@ BlueBubblesHelper *plugin;
         messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
         messageToSend.threadIdentifier = threadIdentifier;
         [chat sendMessage:(messageToSend)];
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
+        }
     };
     
     if ([data objectForKey:(@"selectedMessageGuid")] != [NSNull null]) {

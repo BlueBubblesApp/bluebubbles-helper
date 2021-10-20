@@ -8,7 +8,7 @@
 
 @import AppKit;
 
-#import <objc/runtime.h>
+#import <Foundation/Foundation.h>
 
 #import "IMTextMessagePartChatItem.h"
 #import "IMHandle.h"
@@ -18,14 +18,16 @@
 #import "IMService-IMService_GetService.h"
 #import "IMChat.h"
 #import "IMMessage.h"
+#import "IMMessageChatItem.h"
 #import "IMMessageItem-IMChat_Internal.h"
 #import "IMChatRegistry.h"
 #import "NetworkController.h"
 #import "Logging.h"
 #import "ChatDisplayController.h"
 #import "SelectorHelper.h"
-
-
+#import "IMHandleRegistrar.h"
+#import "IMChatHistoryController.h"
+#import "IMChatItem.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -47,17 +49,39 @@ BlueBubblesHelper *plugin;
     return plugin;
 }
 
+// Helper method to log a long string
+-(void) logString:(NSString*)logString{
+
+        int stepLog = 800;
+        NSInteger strLen = [@([logString length]) integerValue];
+        NSInteger countInt = strLen / stepLog;
+
+        if (strLen > stepLog) {
+        for (int i=1; i <= countInt; i++) {
+            NSString *character = [logString substringWithRange:NSMakeRange((i*stepLog)-stepLog, stepLog)];
+            NSLog(@"BLUEBUBBLESHELPER: %@", character);
+
+        }
+        NSString *character = [logString substringWithRange:NSMakeRange((countInt*stepLog), strLen-(countInt*stepLog))];
+        NSLog(@"BLUEBUBBLESHELPER: %@", character);
+        } else {
+
+        NSLog(@"BLUEBUBBLESHELPER: %@", logString);
+        }
+
+}
+
 // Called when macforge initializes the plugin
 + (void)load {
     // Create the singleton
     plugin = [BlueBubblesHelper sharedInstance];
-    
+
     // Get OS version for debugging purposes
     NSUInteger osx_ver = [[NSProcessInfo processInfo] operatingSystemVersion].minorVersion;
     DLog(@"BLUEBUBBLESHELPER: %@ loaded into %@ on macOS 10.%ld", [self class], [[NSBundle mainBundle] bundleIdentifier], (long)osx_ver);
-    
+
     DLog(@"BLUEBUBBLESHELPER: Initializing Connection in 5 seconds");
-    
+
     // I delay here for 5 seconds because there is a strange bug where
     // the plugin will spam think that a user starts and stops typing.
     double delayInSeconds = 5.0;
@@ -65,7 +89,6 @@ BlueBubblesHelper *plugin;
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         [plugin initializeNetworkController];
     });
-    
 }
 
 // Private method to initialize all the things required by the plugin to communicate with the main
@@ -74,127 +97,167 @@ BlueBubblesHelper *plugin;
     // Get the network controller
     NetworkController *controller = [NetworkController sharedInstance];
     [controller connect];
-    
-    // If the tcp connection fails, attempt to reconnect every 5 seconds
-    controller.connectionFailedBlock = ^(NetworkController *connection) {
-        DLog(@"BLUEBUBBLESHELPER: Failed to connect to server, trying again in 5 seconds...");
-        double delayInSeconds = 5.0;
-        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-            DLog(@"BLUEBUBBLESHELPER: Attempting to reconnect");
-            [connection connect];
-        });
-    };
-    
-    // If the tcp connection closes, attempt to reconnect every 5 seconds
-    controller.connectionClosedBlock = ^(NetworkController *connection) {
-        DLog(@"BLUEBUBBLESHELPER: Disconnected from server, attempting to reconnect in 5 seconds...");
-        double delayInSeconds = 5.0;
-        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-            DLog(@"BLUEBUBBLESHELPER: Attempting to reconnect");
-            [connection connect];
-        });
-    };
-    
-    // Debugging to detect when the plugin successfully made a connection
-    controller.connectionOpenedBlock = ^(NetworkController *controller) {
-        DLog(@"BLUEBUBBLESHELPER: Connected to server!");
-    };
-    
+
     // Upon receiving a message
     controller.messageReceivedBlock =  ^(NetworkController *controller, NSString *data) {
         [self handleMessage:controller message: data];
     };
     NSDictionary *message = @{@"event": @"ping", @"message": @"Helper Connected!"};
     [controller sendMessage:message];
+    
+    // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
+    // Quickly test a message event
+    // [self handleMessage:controller message:@"{\"action\":\"send-message\",\"data\":{\"chatGuid\":\"iMessage;-;tanay@neotia.in\",\"subject\":\"Test\",\"message\":\"Test\",\"effectId\":\"com.apple.MobileSMS.expressivesend.impact\",\"selectedMessageGuid\":null}}"];
 }
 
 // Run when receiving a new message from the tcp socket
--(void) handleMessage: (NetworkController*)controller  message:(NSString *)data {
+-(void) handleMessage: (NetworkController*)controller  message:(NSString *)message {
     // The data is in the form of a json string, so we need to convert it to a NSDictionary
-    DLog(@"BLUEBUBBLESHELPER: Received raw json: %@", data);
+    // for some reason the data is sometimes duplicated, so account for that
+    NSRange range = [message rangeOfString:@"}\n{"];
+    if(range.location != NSNotFound){
+     message = [message substringWithRange:NSMakeRange(0, range.location + 1)];
+    }
+    DLog(@"BLUEBUBBLESHELPER: Received raw json: %@", message);
     NSError *error;
-    NSData *jsonData = [data dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *jsonData = [message dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&error];
 
     // Event is the type of packet that was sent
-    NSString *event = dictionary[@"event"];
+    NSString *event = dictionary[@"action"];
     // Data is the actual information that we need in the packet
-    NSString *eventData = dictionary[@"data"];
+    NSDictionary *data = dictionary[@"data"];
+    // Transaction ID enables us to communicate back to the server that the action was complete
+    NSString *transaction = nil;
+    if ([dictionary objectForKey:(@"transactionId")] != [NSNull null]) {
+        transaction = dictionary[@"transactionId"];
+    }
 
-    DLog(@"BLUEBUBBLESHELPER: Message received: %@, %@", event, eventData);
-    
+    DLog(@"BLUEBUBBLESHELPER: Message received: %@, %@", event, data);
+
     if([event isEqualToString:@"send-reaction"]) {
-        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
-        
-        DLog(@"BLUEBUBBLESHELPER: REACTION INCOMING %@", eventData);
-        
-        IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
+        DLog(@"BLUEBUBBLESHELPER: REACTION INCOMING %@", data.description);
+
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
         if(chat != nil) {
             //Map the reaction type
-            long long reactionLong = [BlueBubblesHelper parseReactionType:(eventDataArr[2])];
-            
-            DLog(@"BLUEBUBBLESHELPER: %lld", reactionLong);
+            long long reactionLong = [BlueBubblesHelper parseReactionType:(data[@"reactionType"])];
 
             // Get the messageItem
-            IMTextMessagePartChatItem *messageItem = [BlueBubblesHelper getMessageItem:(chat) :(eventDataArr[1])];
+            [BlueBubblesHelper getMessageItem:(chat) :(data[@"selectedMessageGuid"]) completionBlock:^(IMMessage *message) {
+                IMMessageItem *imMessage = (IMMessageItem *)message._imMessageItem;
+                NSObject *items = imMessage._newChatItems;
+                IMChatItem *item;
+                // sometimes items is an array so we need to account for that
+                if ([items isKindOfClass:[NSArray class]]) {
+                    for(IMChatItem* imci in (NSArray *)items) {
+                        if([[[imci _item] guid] isEqualToString:(data[@"selectedMessageGuid"])]) {
+                            DLog(@"BLUEBUBBLESHELPER: %@", data[@"selectedMessageGuid"]);
+                            item = imci;
+                        }
+                    }
+                } else {
+                    item = (IMChatItem *)items;
+                }
+                DLog(@"BLUEBUBBLESHELPER: %@", [imMessage message]);
+                //Build the message summary
+                NSDictionary *messageSummary = @{@"amc":@1,@"ams":[[imMessage message] plainBody]};
 
-            DLog(@"BLUEBUBBLESHELPER: %@", [[[messageItem message] messageSummaryInfo] valueForKey:@"ust"]);
-
-            //Build the message summary
-            NSDictionary *messageSummary = @{@"amc":[[[messageItem message] messageSummaryInfo] valueForKey:@"ust"],@"ams":[[messageItem message] plainBody]};
-
-            DLog(@"BLUEBUBBLESHELPER: %lld", reactionLong);
-            DLog(@"BLUEBUBBLESHELPER: %@", messageItem);
-            DLog(@"BLUEBUBBLESHELPER: %@", messageSummary);
-
-            // Send the tapback
-            [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(messageItem) withMessageSummaryInfo:(messageSummary)];
-
-            DLog(@"BLUEBUBBLESHELPER: sent reaction");
+                DLog(@"BLUEBUBBLESHELPER: Reaction Long: %lld", reactionLong);
+                // Send the tapback
+                // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
+                NSData *dataenc = [[[imMessage message] plainBody] dataUsingEncoding:NSNonLossyASCIIStringEncoding];
+                NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
+                if ([encodevalue isEqualToString:@"\\ufffc"]) {
+                    [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(@{})];
+                } else {
+                    [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(messageSummary)];
+                }
+                if (transaction != nil) {
+                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
+                }
+                DLog(@"BLUEBUBBLESHELPER: sent reaction");
+            }];
         }
     }
     // If the server tells us to start typing
-     else if([event isEqualToString: @"start-typing"]) {
+     if([event isEqualToString: @"start-typing"]) {
         // Get the IMChat instance for the guid specified in eventData
-        IMChat *chat = [BlueBubblesHelper getChat: eventData];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
         if(chat != nil) {
             // If the IMChat instance is not null, start typing
             [chat setLocalUserIsTyping:YES];
         }
-        
+
     // If the server tells us to stop typing
     } else if([event isEqualToString:@"stop-typing"]) {
         // Get the IMChat instance for the guid specified in eventData
-        IMChat *chat = [BlueBubblesHelper getChat: eventData];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
         if(chat != nil) {
             // If the IMChat instance is not null, stop typing
             [chat setLocalUserIsTyping:NO];
         }
-        
+
     // If the server tells us to mark a chat as read
     } else if([event isEqualToString:@"mark-chat-read"]) {
         // Get the IMChat instance for the guid specified in eventData
-        IMChat *chat = [BlueBubblesHelper getChat: eventData];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
         if(chat != nil) {
             // If the IMChat instance is not null, mark everything as read
             [chat markAllMessagesAsRead];
         }
     } else if([event isEqualToString:@"check-typing-status"]) {
-        if(eventData != nil) {
-            [BlueBubblesHelper updateTypingStatus:eventData];
+        if(data[@"chatGuid"] != [NSNull null]) {
+            [BlueBubblesHelper updateTypingStatus:data[@"chatGuid"]];
         }
     // If server tells us to change the display name
     } else if ([event isEqualToString:@"set-display-name"]) {
-        NSArray *eventDataArr = [eventData componentsSeparatedByString:(@",")];
-        
-        IMChat *chat = [BlueBubblesHelper getChat: eventDataArr[0]];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
         if(chat != nil) {
             // Set the display name
-            [chat _setDisplayName:(eventDataArr[1])];
+            [chat _setDisplayName:(data[@"newName"])];
         }
-        DLog(@"BLUEBUBBLESHELPER: Setting display name of chat %@ to %@", eventDataArr[0], eventDataArr[1]);
+        DLog(@"BLUEBUBBLESHELPER: Setting display name of chat %@ to %@", data[@"chatGuid"], data[@"newName"]);
+    // If the server tells us to add a participant
+    } else if ([event isEqualToString:@"add-participant"]) {
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+        NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
+        
+        if(chat != nil && [chat canAddParticipants:(handles)]) {
+            [chat inviteParticipantsToiMessageChat:(handles) reason:(0)];
+            DLog(@"BLUEBUBBLESHELPER: Added participant to chat %@: %@", data[@"chatGuid"], data[@"address"]);
+        } else {
+            DLog(@"BLUEBUBBLESHELPER: Couldn't add participant to chat %@: %@", data[@"chatGuid"], data[@"address"]);
+        }
+    // If the server tells us to remove a participant
+    } else if ([event isEqualToString:@"remove-participant"]) {
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+        NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
+        
+        if(chat != nil && [chat canAddParticipants:(handles)]) {
+            [chat removeParticipantsFromiMessageChat:(handles) reason:(0)];
+            DLog(@"BLUEBUBBLESHELPER: Removed participant from chat %@: %@", data[@"chatGuid"], data[@"address"]);
+        } else {
+            DLog(@"BLUEBUBBLESHELPER: Couldn't remove participant from chat %@: %@", data[@"chatGuid"], data[@"address"]);
+        }
+    // If the server tells us to send a message
+    } else if ([event isEqualToString:@"send-message"]) {
+        [BlueBubblesHelper sendMessage:(data) transaction:(transaction)];
+    // If the server tells us to create a chat
+    } else if ([event isEqualToString:@"create-chat"]) {
+        NSMutableArray<IMHandle*> *handles = [[NSMutableArray alloc] initWithArray:(@[])];
+        for (NSString* str in data[@"addresses"]) {
+            [handles addObjectsFromArray:([[IMHandleRegistrar sharedInstance] getIMHandlesForID:(str)])];
+        }
+        IMChat *chat;
+        if (handles.count > 1) {
+            chat = [[IMChatRegistry sharedInstance] chatForIMHandles:(handles)];
+        } else {
+            chat = [[IMChatRegistry sharedInstance] chatForIMHandle:(handles[0])];
+        }
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": chat.guid}];
+        }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
@@ -207,16 +270,16 @@ BlueBubblesHelper *plugin;
 // Uses the chat registry to get an existing instance of a chat based on the chat guid
 +(IMChat *) getChat: (NSString *) guid {
     if(guid == nil) return nil;
-    
+
     IMChat* imChat = [[IMChatRegistry sharedInstance] existingChatWithGUID: guid];
     return imChat;
 }
 
 +(long long) parseReactionType:(NSString *)reactionType {
     NSString *lowerCaseType = [reactionType lowercaseString];
-    
-    DLog(@"BLUBUBBLESHELPER: %@", lowerCaseType);
-    
+
+    DLog(@"BLUEBUBBLESHELPER: %@", lowerCaseType);
+
     if([@"love" isEqualToString:(lowerCaseType)]) return 2000;
     if([@"like" isEqualToString:(lowerCaseType)]) return 2001;
     if([@"dislike" isEqualToString:(lowerCaseType)]) return 2002;
@@ -232,28 +295,11 @@ BlueBubblesHelper *plugin;
     return 0;
 }
 
-+(IMTextMessagePartChatItem *) getMessageItem:(IMChat *)chat :(NSString *)actionMessageGuid {
-    if(chat == nil) return nil;
-    
-    NSArray *items = [chat chatItems];
-    
-    for(id item in items) {
-        // If the type is Text (maybe can pass other types??)
-        if([NSStringFromClass([item class]) isEqualToString: @"IMTextMessagePartChatItem"]) {
-//            DLog(@"BLUEBUBBLESHELPER: %@", item);
-//            DLog(@"BLUEBUBBLESHELPER: %@", [[item message] guid]);
-
-            // If the guid matches, return the item
-            if([[[item message] guid] isEqualToString:(actionMessageGuid)]) {
-                
-                DLog(@"BLUEBUBBLESHELPER: %@", [[item message] guid]);
-
-                return item;
-            }
-        }
-    }
-    
-    return nil;
++(void) getMessageItem:(IMChat *)chat :(NSString *)actionMessageGuid completionBlock:(void (^)(IMMessage *message))block {
+    [[IMChatHistoryController sharedInstance] loadMessageWithGUID:(actionMessageGuid) completionBlock:^(IMMessage *message) {
+        DLog(@"BLUEBUBBLESHELPER: Got message for guid %@", actionMessageGuid);
+        block(message);
+    }];
 }
 
 +(BOOL) isTyping: (NSString *)guid {
@@ -273,6 +319,30 @@ BlueBubblesHelper *plugin;
     }
 }
 
++(void) sendMessage: (NSDictionary *) data transaction:(NSString *) transaction {
+    IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: data[@"message"]];
+    NSMutableAttributedString *subjectAttributedString = nil;
+    if ([data objectForKey:(@"subject")] != [NSNull null]) {
+        subjectAttributedString = [[NSMutableAttributedString alloc] initWithString: data[@"subject"]];
+    }
+    NSString *effectId = nil;
+    if ([data objectForKey:(@"effectId")] != [NSNull null]) {
+        effectId = data[@"effectId"];
+    }
+    
+    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier) {
+        IMMessage *messageToSend = [[IMMessage alloc] init];
+        messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
+        [chat sendMessage:(messageToSend)];
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
+        }
+    };
+    
+    createMessage(attributedString, subjectAttributedString, effectId, nil);
+}
+
 @end
 
 
@@ -288,7 +358,7 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
     // We would rather that the typing message be cancelled prematurely rather
     // than having the typing indicator stuck permanently
     NSString *guid = [self getGuid];
-    
+
     if(guid != nil) {
 
         if([self isLatestMessage]) {
@@ -304,7 +374,7 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
     // issues and will sometimes notify after the isCancelTypingMessage so we need to confirm
     // that the sender actually is typing
     [self updateTypingState];
-    
+
     // This is here to ensure that no infinite typing occurs
     // If for whatever reason the isCancelTypingMessage does not occur,
     // this should catch the error in 2 seconds
@@ -320,9 +390,9 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
                 }
             }
         }
-            
+
     });
-    
+
     return ZKOrig(BOOL);
 }
 
@@ -335,7 +405,7 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
     IMMessageItem *item = (IMMessageItem*) self;
     IMMessage *message = item.message;
     if(message.isFromMe) return NO;
-    
+
     // If the IMChat's last message matches our own IMMessage, then we can proceed
     // this should avoid spamming of the tcp socket
     return chat.lastIncomingMessage.guid == message.guid;
@@ -344,9 +414,9 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
 // Update the typing state by checking the message state
 - (void) updateTypingState {
     if(![self isLatestMessage]) return;
-    
+
     NSString *guid = [self getGuid];
-    
+
     // If we failed to get the guid for whatever reason, then we can't do anything
     if(guid != nil) {
         [BlueBubblesHelper updateTypingStatus:guid];
@@ -358,16 +428,16 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
     if(item == nil) return nil;
     IMMessage *message = item.message;
     if(message == nil) return nil;
-    
-    
+
+
     // Get the guid of the message???
     IMHandle *handle = message.sender;
     if(handle == nil) return nil;
     IMChat *chat = [[IMChatRegistry sharedInstance] existingChatForIMHandle: handle];
     if(chat == nil) return nil;
-    
-    
-    
+
+
+
     return chat.guid;
 }
 
@@ -403,32 +473,6 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
 //
 //
 //    return;
-//}
-//
-//@end
-
-//ZKSwizzleInterface(WBWT_IMMessage, IMMessage, NSObject)
-//@implementation WBWT_IMMessage
-//
-//+ (id)instantMessageWithAssociatedMessageContent:(id)arg1 flags:(unsigned long long)arg2 associatedMessageGUID:(id)arg3 associatedMessageType:(long long)arg4 associatedMessageRange:(struct _NSRange)arg5 messageSummaryInfo:(id)arg6 {
-//    /*/
-//     BLUEBUBBLESHELPER: instantMessageWithAssociatedMessageContent, Loved “Test”{
-//         "__kIMMessagePartAttributeName" = 0;
-//     }, 0, p:0/09EF06EB-E67C-47C0-ABBD-26310BF954AE, 2000, {
-//         amc = 1;
-//         ams = Test;
-//     }, (null)
-//     associatedMessageType: left -> right 2000 ->
-//     */
-//
-//
-//
-////    testRange.amc = arg5.amc;
-////    testRange.ams = @"Test";
-//
-//    DLog(@"BLUEBUBBLESHELPER: instantMessageWithAssociatedMessageContent, %@, %llu, %@, %lld, %@, %@", [arg1 class], arg2, [arg3 class], arg4, arg5, arg6);
-//    NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:@"TEST REACTION"];
-//    return ZKOrig(id, string, arg2, arg3, arg4, arg5, NULL);
 //}
 //
 //@end

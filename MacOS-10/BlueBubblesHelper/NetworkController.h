@@ -8,33 +8,15 @@
 
 #ifndef NetworkController_h
 #define NetworkController_h
+#import "GCDAsyncSocket.h"
 
 // Block typedefs
-@class NetworkController;
-typedef void (^ConnectionBlock)(NetworkController*);
-typedef void (^MessageBlock)(NetworkController*,NSString*);
+@class GCDAsyncSocket;
+typedef void (^MessageBlock)(id,NSString*);
 
-
-@interface NetworkController : NSObject<NSStreamDelegate> {
-  // Connection info
-  NSString* host;
-  int port;
-  
-  // Input
-  NSInputStream* inputStream;
-  NSMutableData* inputBuffer;
-  BOOL isInputStreamOpen;
-  
-  // Output
-  NSOutputStream* outputStream;
-  NSMutableData* outputBuffer;
-  BOOL isOutputStreamOpen;
-  
-  // Event handlers
-  MessageBlock messageReceivedBlock;
-  ConnectionBlock connectionOpenedBlock;
-  ConnectionBlock connectionFailedBlock;
-  ConnectionBlock connectionClosedBlock;
+@interface NetworkController : NSObject<GCDAsyncSocketDelegate> {
+    GCDAsyncSocket *asyncSocket;
+    MessageBlock messageReceivedBlock;
 }
 
 // Singleton instance
@@ -43,13 +25,9 @@ typedef void (^MessageBlock)(NetworkController*,NSString*);
 // Methods
 - (void)connect;
 - (void)disconnect;
-- (void)sendMessage:(NSString*)message;
+- (void)sendMessage:(NSDictionary*)message;
 
-// Properties
 @property (copy) MessageBlock messageReceivedBlock;
-@property (copy) ConnectionBlock connectionOpenedBlock;
-@property (copy) ConnectionBlock connectionFailedBlock;
-@property (copy) ConnectionBlock connectionClosedBlock;
 
 @end
 #endif /* NetworkController_h */
