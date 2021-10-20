@@ -222,7 +222,14 @@ BlueBubblesHelper *plugin;
     } else if ([event isEqualToString:@"add-participant"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
         NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
-        
+
+        if (handles != nil) {
+            IMAccountController *sharedAccountController = [IMAccountController sharedInstance];
+            IMAccount *myAccount = [sharedAccountController mostLoggedInAccount];
+            IMHandle *handle = [[IMHandle alloc] initWithAccount:(myAccount) ID:(data[@"address"]) alreadyCanonical:(YES)];
+            handles = @[handle];
+        }
+
         if(chat != nil && [chat canAddParticipants:(handles)]) {
             [chat inviteParticipantsToiMessageChat:(handles) reason:(0)];
             DLog(@"BLUEBUBBLESHELPER: Added participant to chat %@: %@", data[@"chatGuid"], data[@"address"]);
@@ -245,9 +252,17 @@ BlueBubblesHelper *plugin;
         [BlueBubblesHelper sendMessage:(data) transaction:(transaction)];
     // If the server tells us to create a chat
     } else if ([event isEqualToString:@"create-chat"]) {
+        IMAccountController *sharedAccountController = [IMAccountController sharedInstance];
+        IMAccount *myAccount = [sharedAccountController mostLoggedInAccount];
+
         NSMutableArray<IMHandle*> *handles = [[NSMutableArray alloc] initWithArray:(@[])];
         for (NSString* str in data[@"addresses"]) {
-            [handles addObjectsFromArray:([[IMHandleRegistrar sharedInstance] getIMHandlesForID:(str)])];
+            NSArray<IMHandle*> *handlesToAdd = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(str)];
+            if (handlesToAdd == nil) {
+                IMHandle *handle = [[IMHandle alloc] initWithAccount:(myAccount) ID:(str) alreadyCanonical:(YES)];
+                handlesToAdd = @[handle];
+            }
+            [handles addObjectsFromArray:(handlesToAdd)];
         }
         IMChat *chat;
         if (handles.count > 1) {
