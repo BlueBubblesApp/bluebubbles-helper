@@ -116,6 +116,11 @@ BlueBubblesHelper *plugin;
 // Run when receiving a new message from the tcp socket
 -(void) handleMessage: (NetworkController*)controller  message:(NSString *)message {
     // The data is in the form of a json string, so we need to convert it to a NSDictionary
+    // for some reason the data is sometimes duplicated, so account for that
+    NSRange range = [message rangeOfString:@"}\n{"];
+    if(range.location != NSNotFound){
+     message = [message substringWithRange:NSMakeRange(0, range.location + 1)];
+    }
     DLog(@"BLUEBUBBLESHELPER: Received raw json: %@", message);
     NSError *error;
     NSData *jsonData = [message dataUsingEncoding:NSUTF8StringEncoding];
