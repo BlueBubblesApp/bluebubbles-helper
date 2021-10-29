@@ -22,6 +22,8 @@ See the wiki for more details on how these were implemented.
 
 The bundle has been tested on MacOS 10.13 (High Sierra) - MacOS 12 (Monterey). It could work on higher or lower MacOS versions, but we do not know for sure.
 
+Currently the bundle only works on Intel based Macs, but we are working towards M1 support.
+
 ### Build Yourself
 
 #### Pre-requirements:
@@ -45,6 +47,7 @@ Its recommended have a good knowledge of Objective-C and tweak development befor
 2. https://github.com/w0lfschild/macOS_headers - pre-dumped headers for macOS
 3. https://github.com/open-imcore/barcelona - Eric Rabil's wonderful REST API built using IMCore
 4. http://stevenygard.com/projects/class-dump/ (OS X) / https://github.com/freedomtan/classdump-dyld/ (Big Sur) - scripts to dump headers on macOS
-5. ZKSwizzle
+5. https://lapcatsoftware.com/articles/bigsur.html - open-source tool from Apple to access system libraries
+6. ZKSwizzle
 
 Use the above resources and trial and error to develop new IMCore integrations! There aren't any Apple provided docs of course, so there is a lot of educated guesswork and using the above resources to try and add things to the bundle. If stuff doesn't work, don't give up! Find as many clues as you can by searching online, searching the header files, and using swizzling techniques.
