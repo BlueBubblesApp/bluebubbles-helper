@@ -174,7 +174,7 @@ BlueBubblesHelper *plugin;
                     [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(messageSummary)];
                 }
                 if (transaction != nil) {
-                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
+                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastMessage] guid]}];
                 }
                 DLog(@"BLUEBUBBLESHELPER: sent reaction");
             }];
@@ -351,7 +351,7 @@ BlueBubblesHelper *plugin;
         messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
         [chat sendMessage:(messageToSend)];
         if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastMessage] guid]}];
         }
     };
     
