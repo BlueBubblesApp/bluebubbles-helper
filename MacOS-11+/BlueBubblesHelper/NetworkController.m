@@ -34,10 +34,15 @@ static id sharedInstance = nil;
 #pragma mark - Public methods
 
 - (void)connect {
+    // we need to get the port to open the server on (to allow multiple users to use the bundle)
+    // we'll base this off the users uid (a unique id for each user, starting from 501)
+    // we'll subtract 501 to get an id starting at 0, incremented for each user
+    // then we add this to the base port to get a unique port for the socket
+    int port = 45670 + getuid()-501;
     // connect to socket
     asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSError *err = nil;
-    if (![asyncSocket connectToHost:@"localhost" onPort:45677 error:&err]) {
+    if (![asyncSocket connectToHost:@"localhost" onPort:port error:&err]) {
         // If there was an error, it's likely something like "already connected" or "no delegate set"
         DLog(@"BLUEBUBBLESHELPER: Error connecting to socket: %@", err);
     }
