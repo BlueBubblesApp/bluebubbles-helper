@@ -39,6 +39,7 @@ static id sharedInstance = nil;
     // we'll subtract 501 to get an id starting at 0, incremented for each user
     // then we add this to the base port to get a unique port for the socket
     int port = 45670 + getuid()-501;
+    DLog(@"BLUEBUBBLESHELPER: Connecting to socket on port %d", port);
     // connect to socket
     asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSError *err = nil;
