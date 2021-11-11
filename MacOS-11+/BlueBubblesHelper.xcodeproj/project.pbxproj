@@ -58,6 +58,8 @@
 		A64B88A72712352000BAD446 /* TUConversationManagerDelegate-Protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TUConversationManagerDelegate-Protocol.h"; sourceTree = "<group>"; };
 		A64B88B62714A2A200BAD446 /* IMHandleRegistrar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMHandleRegistrar.h; sourceTree = "<group>"; };
 		A64B88B82715011200BAD446 /* IMCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMCore.h; sourceTree = "<group>"; };
+		A6A0F8A72731A705000128FA /* IMFileTransferCenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransferCenter.h; sourceTree = "<group>"; };
+		A6A0F8A82731A733000128FA /* IMFileTransfer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransfer.h; sourceTree = "<group>"; };
 		A6E1F4CF27166012000A0EF6 /* IMPinnedConversationsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMPinnedConversationsController.h; sourceTree = "<group>"; };
 		B6E17DF925EE5FA4CB129B31 /* Pods-BlueBubblesHelper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.debug.xcconfig"; sourceTree = "<group>"; };
 		BFA22E41EA07AA1C37D1B255 /* Pods-BlueBubblesHelper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.release.xcconfig"; sourceTree = "<group>"; };
@@ -219,6 +221,8 @@
 				A64B88B62714A2A200BAD446 /* IMHandleRegistrar.h */,
 				A64B88B82715011200BAD446 /* IMCore.h */,
 				A6E1F4CF27166012000A0EF6 /* IMPinnedConversationsController.h */,
+				A6A0F8A72731A705000128FA /* IMFileTransferCenter.h */,
+				A6A0F8A82731A733000128FA /* IMFileTransfer.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";
@@ -452,7 +456,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEPLOYMENT_LOCATION = YES;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DSTROOT = /;
@@ -467,7 +471,7 @@
 				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = "0.0.3-alpha.1";
+				MARKETING_VERSION = 0.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -484,7 +488,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEPLOYMENT_LOCATION = YES;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DSTROOT = /;
@@ -499,7 +503,7 @@
 				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = "0.0.3-alpha.1";
+				MARKETING_VERSION = 0.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
