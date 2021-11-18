@@ -107,7 +107,7 @@ BlueBubblesHelper *plugin;
     
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
     // Quickly test a message event
-    // [self handleMessage:controller message:@"{\"action\":\"send-message\",\"data\":{\"chatGuid\":\"iMessage;-;tanay@neotia.in\",\"subject\":\"Test\",\"message\":\"Test\",\"effectId\":\"com.apple.MobileSMS.expressivesend.impact\",\"selectedMessageGuid\":null}}"];
+    //     [self handleMessage:controller message:@"{\"action\":\"send-message\",\"data\":{\"chatGuid\":\"iMessage;-;elliotnash@gmail.com\",\"subject\":\"\",\"message\":\"Elliot\",\"attributedBody\":{\"runs\":[{\"attributes\":{\"__kIMMessagePartAttributeName\":0,\"__kIMMentionConfirmedMention\":\"elliotnash@gmail.com\"},\"range\":[0,6]}],\"string\":\"Elliot\"},\"effectsId\":\"com.apple.MobileSMS.expressivesend.impact\",\"selectedMessageGuid\":null}}"];
 }
 
 // Run when receiving a new message from the tcp socket
@@ -336,6 +336,30 @@ BlueBubblesHelper *plugin;
 
 +(void) sendMessage: (NSDictionary *) data transaction:(NSString *) transaction {
     IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+    
+    // TODO make sure this is safe from exceptions
+    // now we will deserialize the attributedBody if it exists
+    NSDictionary *attributedDict = data[@"attributedBody"];
+    NSString *string = data[@"message"];
+    // we'll create the NSMutableAttributedString with the associatedBody string if we can,
+    // else we'll fall back to using the message text
+    if (attributedDict != NULL) {
+        string = attributedDict[@"string"];
+    }
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
+    // if associateBody exists, we iterate through it
+    if (attributedDict != NULL) {
+        NSArray *attrs = attributedDict[@"runs"];
+        for(NSDictionary *dict in attrs)
+        {
+            // construct range and attributes from dict and add to NSMutableAttributedString
+            NSArray *rangeArray = dict[@"range"];
+            NSRange range = NSMakeRange([(NSNumber*)[rangeArray objectAtIndex:0] intValue], [(NSNumber*)[rangeArray objectAtIndex:1] intValue]);
+            NSDictionary *attrsDict = dict[@"attributes"];
+            [attributedString addAttributes:attrsDict range:range];
+        }
+    }
+    
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: data[@"message"]];
     NSMutableAttributedString *subjectAttributedString = nil;
     if ([data objectForKey:(@"subject")] != [NSNull null]) {
