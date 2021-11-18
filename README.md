@@ -14,6 +14,7 @@ This is the repo for the bundle containing code to perform various tasks not acc
 - Send replies (requires MacOS 11+)
 - Send message effects
 - Send message with subject
+- Send mentions
 - Update pinned chats on the server Mac (requires MacOS 11, higher versions are currently unsupported)
 
 See the wiki for more details on how these were implemented.
