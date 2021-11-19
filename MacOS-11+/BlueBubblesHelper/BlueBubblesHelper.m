@@ -110,7 +110,8 @@ BlueBubblesHelper *plugin;
     
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
     // Quickly test a message event
-//     [self handleMessage:controller message:@"{\"action\":\"send-message\",\"data\":{\"chatGuid\":\"iMessage;-;elliotnash@gmail.com\",\"subject\":\"\",\"message\":\"Elliot\",\"attributedBody\":{\"runs\":[{\"attributes\":{\"__kIMMessagePartAttributeName\":0,\"__kIMMentionConfirmedMention\":\"elliotnash@gmail.com\"},\"range\":[0,6]}],\"string\":\"Elliot\"},\"effectsId\":\"com.apple.MobileSMS.expressivesend.impact\",\"selectedMessageGuid\":null}}"];
+//     [self handleMessage:controller message:@"{\"action\":\"send-message\",\"data\":{\"chatGuid\":\"iMessage;-;elliotnash@gmail.com\",\"subject\":\"\",\"message\":\"Elliot\",\"attributedBody\":{\"runs\":[{\"attributes\":{\"__kIMMessagePartAttributeName\":0,\"__kIMMentionConfirmedMention\":\"elliotnash@gmail.com\"},\"range\":[0,6]}],\"string\":\"Athena\"},\"effectsId\":\"com.apple.MobileSMS.expressivesend.impact\",\"selectedMessageGuid\":null}}"];
+//    [self handleMessage:controller message:@"{\"action\":\"send-message\",\"data\":{\"attributedBody\":null,\"chatGuid\":\"iMessage;-;elliotnash@gmail.com\",\"subject\":\"\",\"message\":\"Start Message\",\"effectId\":null,\"selectedMessageGuid\":null}}"];
 }
 
 // Run when receiving a new message from the tcp socket
@@ -356,19 +357,21 @@ BlueBubblesHelper *plugin;
 
 +(void) sendMessage: (NSDictionary *) data transaction:(NSString *) transaction {
     IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+    if (chat == nil) {
+        NSLog(@"BLUEBUBBLESHELPER: chat is null, aborting");
+        //TODO send socket error
+        return;
+    }
     
     // TODO make sure this is safe from exceptions
     // now we will deserialize the attributedBody if it exists
     NSDictionary *attributedDict = data[@"attributedBody"];
-    NSString *string = data[@"message"];
     // we'll create the NSMutableAttributedString with the associatedBody string if we can,
     // else we'll fall back to using the message text
-    if (attributedDict != NULL) {
-        string = attributedDict[@"string"];
-    }
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: string];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: data[@"message"]];
     // if associateBody exists, we iterate through it
-    if (attributedDict != NULL) {
+    if (attributedDict != NULL && attributedDict != (NSDictionary*)[NSNull null]) {
+        attributedString = [[NSMutableAttributedString alloc] initWithString: attributedDict[@"string"]];
         NSArray *attrs = attributedDict[@"runs"];
         for(NSDictionary *dict in attrs)
         {
@@ -381,11 +384,11 @@ BlueBubblesHelper *plugin;
     }
     
     NSMutableAttributedString *subjectAttributedString = nil;
-    if ([data objectForKey:(@"subject")] != [NSNull null]) {
+    if (data[@"subject"] != [NSNull null] && [data[@"subject"] length] != 0) {
         subjectAttributedString = [[NSMutableAttributedString alloc] initWithString: data[@"subject"]];
     }
     NSString *effectId = nil;
-    if ([data objectForKey:(@"effectId")] != [NSNull null]) {
+    if (data[@"effectId"] != [NSNull null] && [data[@"effectId"] length] != 0) {
         effectId = data[@"effectId"];
     }
     
@@ -399,7 +402,7 @@ BlueBubblesHelper *plugin;
         }
     };
     
-    if ([data objectForKey:(@"selectedMessageGuid")] != [NSNull null]) {
+    if (data[@"selectedMessageGuid"] != [NSNull null] && [data[@"selectedMessageGuid"] length] != 0) {
         [BlueBubblesHelper getMessageItem:(chat) :(data[@"selectedMessageGuid"]) completionBlock:^(IMMessage *message) {
             IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
             NSObject *items = messageItem._newChatItems;
