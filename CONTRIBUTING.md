@@ -1,4 +1,7 @@
 Hey there, and welcome! We are always eager to have new contributors working on our projects. First and foremost, we recommend joining our Discord as that is the best place you can get in touch with the main developers to discuss new features, ideas, or changes you're planning to make. Now, on to the guide...
+
+# Contributing
+
 The Helper Bundle is quite challenging to get a hang of. The reason for this is because none of the internal iMessage Framework methods are commented or documented in any way. The only reasonable method of development is to make educated guesses and brute-force until you find something that works.
 As a result, we highly recommend that you have a working knowledge of Objective-C and/or reverse-engineering/tweak development before attempting to work on the bundle.
 
