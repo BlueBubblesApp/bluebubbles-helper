@@ -327,7 +327,7 @@ BlueBubblesHelper *plugin;
     // Send out the correct response over the tcp socket
     if(chat.lastIncomingMessage.isTypingMessage == YES) {
         if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"event": @"started-typing", @"guid": guid}];
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"data": @"started-typing", @"guid": guid}];
         }else{
             [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": guid}];
         }
@@ -335,7 +335,7 @@ BlueBubblesHelper *plugin;
         DLog(@"BLUEBUBBLESHELPER: %@ started typing", guid);
     } else {
         if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"event": @"stopped-typing", @"guid": guid}];
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"data": @"stopped-typing", @"guid": guid}];
         }else{
             [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
         }
