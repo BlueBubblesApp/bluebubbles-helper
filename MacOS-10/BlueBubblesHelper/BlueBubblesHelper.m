@@ -317,7 +317,7 @@ BlueBubblesHelper *plugin;
     }];
 }
 
-+(BOOL) isTyping: (NSString *)guid transaction:(NSString *) transaction {
++(BOOL) isTyping: (NSString *)guid{
     IMChat *chat = [BlueBubblesHelper getChat:guid];
     return chat.lastIncomingMessage.isTypingMessage;
 }
