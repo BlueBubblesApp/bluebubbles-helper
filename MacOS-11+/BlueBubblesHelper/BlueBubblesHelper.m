@@ -434,6 +434,21 @@ BlueBubblesHelper *plugin;
 
 @end
 
+ZKSwizzleInterface(BBH_IMChat, IMChat, NSObject)
+@implementation BBH_IMChat
+
+- (BOOL)_handleIncomingItem:(id)arg1 {
+    IMMessageItem* imMessage = arg1;
+    //Complete the normal functions like writing to database and everything
+    BOOL hasBeenHandled = ZKOrig(BOOL, arg1);
+    DLog(@"BLUEBUBBLESHELPER: Recieved New Message From Listener %@" ,[imMessage message]);
+    [[NetworkController sharedInstance] sendMessage: @{@"event": @"message-update", @"guid": [[imMessage message] guid]}];
+    return hasBeenHandled;
+
+}
+
+@end
+
 
 // Credit to w0lf
 // Handles all of the incoming typing events
