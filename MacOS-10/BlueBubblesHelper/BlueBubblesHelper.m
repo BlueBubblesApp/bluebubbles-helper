@@ -28,11 +28,6 @@
 #import "IMHandleRegistrar.h"
 #import "IMChatHistoryController.h"
 #import "IMChatItem.h"
-#import "IMFileTransferCenter.h"
-#import "IMFileTransfer.h"
-//#import "IMDPersistentAttachmentController.h"
-#import "IMDPersistence.h"
-#import "IMDaemonCore.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -109,57 +104,6 @@ BlueBubblesHelper *plugin;
     };
     NSDictionary *message = @{@"event": @"ping", @"message": @"Helper Connected!"};
     [controller sendMessage:message];
-//    DLog(@"BLUEBUBBLESHELPER: Got to init of attachment sending");
-//    IMChat *chat = [BlueBubblesHelper getChat: @"iMessage;-;e:justking100@gmail.com"];
-//    NSString *guid = [[IMFileTransferCenter sharedInstance] guidForNewOutgoingTransferWithLocalURL:([NSURL URLWithString:(@"file:///private/var/folders/0p/wjcdmqbn3rqdjg8_rmjbb7sh0000gn/T/com.apple.iChat/Messages/Transfers/IMItemsController.h")])];
-//    DLog(@"BLUEBUBBLESHELPER: File GUID  %@", guid);
-  
-//
-//    CFStringRef attachmentGUID = (__bridge
-//                            CFStringRef)guid;
-//    id  attachment = IMDAttachmentRecordCopyAttachmentForGUID(attachmentGUID);
-//    DLog(@"BLUEBUBBLESHELPER: Attachment is of type %@", attachment );
-//    IMFileTransfer *transfer = [[IMFileTransferCenter sharedInstance] transferForGUID:(guid)];
-//    NSArray *transfers = @[transfer];
-//    [[IMDPersistentAttachmentController sharedInstance] moveAttachmentsForTransfer:transfer completion:^(id comp){
-//
-//        DLog(@"BLUEBUBBLESHELPER: Move is is of type %@", comp );
-//        transfer.transferredFilename = @"IMItemsController.h";
-//        [[IMFileTransferCenter sharedInstance] registerTransferWithDaemon:(guid)];
-//        transfer.shouldForceArchive = true;
-//        [[IMFileTransferCenter sharedInstance] sendTransfer:(transfer)];
-//        [[IMDCKAttachmentSyncController sharedInstance] fetchAttachmentDataForTransfers:transfers highQuality:true useNonHSA2ManateeDatabase:false perTransferProgress:^(IMFileTransfer * _Nonnull transferr, float percentComplete, BOOL complete, NSError * _Nullable error) {
-//            DLog(@"BLUEBUBBLESHELPER: File Transfer Movement %@ %f %hhd %@", transferr,percentComplete,complete, error );
-//                } completion:^(NSError * _Nullable error, NSArray<IMFileTransfer *> *failedTransfers) {
-//                    DLog(@"BLUEBUBBLESHELPER: Completed Transfer %@ %@", error, failedTransfers );
-//                }];
-//        
-//
-//        IMFileTransfer *transfer2 = [[IMFileTransferCenter sharedInstance] transferForGUID:[transfer guid]];
-//        DLog(@"BLUEBUBBLESHELPER: Transfer 1 %@", transfer);
-//
-//
-//
-//
-//
-//    //    NSString *something = [[IMDPersistentAttachmentController sharedInstance] _persistentPathForTransfer:retrievedFT filename:@"IMItemsController.h"  highQuality:true] ;
-//
-//
-//
-//    //    DLog(@"BLUEBUBBLESHELPER: Attachment takes the arg%@", something  );
-//        if (transfer2 !=nil){
-//        DLog(@"BLUEBUBBLESHELPER: File Transfer Local Path:  %@" , [transfer2 localPath]);
-//            DLog(@"BLUEBUBBLESHELPER: File Transfer:  %@" , transfer2 );
-//        }else{
-//            DLog(@"BLUEBUBBLESHELPER: Unknown local path");
-//        }
-//        IMMessage *messageToSend = [[IMMessage alloc] init];
-//        messageToSend = [messageToSend initWithSender:(nil) fileTransfer:(transfer2)];
-//        messageToSend.flags = 8000;
-//        [chat sendMessage:(messageToSend)];
-//    }];
-
-
     
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
     // Quickly test a message event
