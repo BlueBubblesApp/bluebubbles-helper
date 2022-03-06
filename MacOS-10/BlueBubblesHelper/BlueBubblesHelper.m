@@ -208,7 +208,7 @@ BlueBubblesHelper *plugin;
         }
     } else if([event isEqualToString:@"check-typing-status"]) {
         if(data[@"chatGuid"] != [NSNull null]) {
-            [BlueBubblesHelper updateTypingStatus:data[@"chatGuid"] transaction:(transaction)];
+            [BlueBubblesHelper getTypingStatus:data[@"chatGuid"] transaction:(transaction)];
         }
     // If server tells us to change the display name
     } else if ([event isEqualToString:@"set-display-name"]) {
@@ -322,7 +322,7 @@ BlueBubblesHelper *plugin;
     return chat.lastIncomingMessage.isTypingMessage;
 }
 
-+(void) updateTypingStatus: (NSString *) guid transaction:(NSString *) transaction {
++(void) getTypingStatus: (NSString *) guid transaction:(NSString *) transaction {
     IMChat *chat = [BlueBubblesHelper getChat:guid];
     // Send out the correct response over the tcp socket
     if(chat.lastIncomingMessage.isTypingMessage == YES) {
@@ -395,16 +395,53 @@ BlueBubblesHelper *plugin;
 @end
 
 
-
+// Credit to mrsylerpowers
+// Handles all events
 ZKSwizzleInterface(BBH_IMChat, IMChat, NSObject)
 @implementation BBH_IMChat
 
 - (BOOL)_handleIncomingItem:(id)arg1 {
-    IMMessageItem* imMessage = arg1;
+    IMMessageItem* imMessageItem = arg1;
+    IMMessage *imMessage = [imMessageItem message];
+    //Complete the normal functions like writing to database and everything
+    BOOL isSystemMessage = [imMessageItem isSystemMessage];
+    if(isSystemMessage)
+    DLog(@"BLUEBUBBLESHELPER: Recieved System Message ");
+
+    BOOL isIncomingTypingOrCancel = [imMessageItem isIncomingTypingOrCancelTypingMessage];
+    BOOL isTypingMessageOrCancel  = [imMessageItem isTypingOrCancelTypingMessage];
+    if(isIncomingTypingOrCancel){
+        
+        BOOL incomingTypingMessage = [imMessageItem isIncomingTypingMessage];
+    if(incomingTypingMessage){
+        DLog(@"BLUEBUBBLESHELPER: Incoming Typing Message.....");
+        [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": [imMessage guid]}];
+    }else{
+        DLog(@"BLUEBUBBLESHELPER: Incoming Cancel Typing Message");
+        [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": [imMessage guid]}];
+        DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", [imMessage guid]);
+    }
+        
+    }
+    if (isTypingMessageOrCancel){
+        
+            BOOL cancelTypingMessage = [imMessageItem isCancelTypingMessage];
+        if(cancelTypingMessage){
+            DLog(@"BLUEBUBBLESHELPER: Cancel typing");
+            
+            [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": [imMessage guid]}];
+            DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", [imMessage guid]);
+        }else{
+            DLog(@"BLUEBUBBLESHELPER: Typing...");
+            [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": [imMessage guid]}];
+        }
+    }
     //Complete the normal functions like writing to database and everything
     BOOL hasBeenHandled = ZKOrig(BOOL, arg1);
-    DLog(@"BLUEBUBBLESHELPER: Recieved New Message From Listener %@" ,[imMessage message]);
-    [[NetworkController sharedInstance] sendMessage: @{@"event": @"message-update", @"guid": [[imMessage message] guid]}];
+    if (!(isTypingMessageOrCancel || isIncomingTypingOrCancel)){
+    DLog(@"BLUEBUBBLESHELPER: Recieved Message Update From Listener %@" ,[imMessageItem message]);
+    [[NetworkController sharedInstance] sendMessage: @{@"event": @"message-update", @"guid": [[imMessageItem message] guid]}];
+    }
     return hasBeenHandled;
 
 }
@@ -413,100 +450,100 @@ ZKSwizzleInterface(BBH_IMChat, IMChat, NSObject)
 
 // Credit to w0lf
 // Handles all of the incoming typing events
-ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
-@implementation BBH_IMMessageItem
+//ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
+//@implementation BBH_IMMessageItem
 
-- (BOOL)isCancelTypingMessage {
-    // isCancelTypingMessage seems to also have some timing issues and adding a delay would fix this
-    // But I would rather not rely on delays to have this program work properly
-    //
-    // We would rather that the typing message be cancelled prematurely rather
-    // than having the typing indicator stuck permanently
-    NSString *guid = [self getGuid];
+//- (BOOL)isCancelTypingMessage {
+//    // isCancelTypingMessage seems to also have some timing issues and adding a delay would fix this
+//    // But I would rather not rely on delays to have this program work properly
+//    //
+//    // We would rather that the typing message be cancelled prematurely rather
+//    // than having the typing indicator stuck permanently
+//    NSString *guid = [self getGuid];
+//
+//    if(guid != nil) {
+//
+//        if([self isLatestMessage]) {
+//            [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
+//            DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", guid);
+//        }
+//    }
+//    return ZKOrig(BOOL);
+//}
 
-    if(guid != nil) {
-
-        if([self isLatestMessage]) {
-            [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
-            DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", guid);
-        }
-    }
-    return ZKOrig(BOOL);
-}
-
-- (BOOL)isIncomingTypingMessage {
-    // We do this because the isIncomingTypingMessage seems to have some timing
-    // issues and will sometimes notify after the isCancelTypingMessage so we need to confirm
-    // that the sender actually is typing
-    [self updateTypingState];
-
-    // This is here to ensure that no infinite typing occurs
-    // If for whatever reason the isCancelTypingMessage does not occur,
-    // this should catch the error in 2 seconds
-    double delayInSeconds = 2.0;
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-        if(self != nil) {
-            NSString *guid = [self getGuid];
-            if(guid != nil) {
-                if([BlueBubblesHelper isTyping:guid] == NO) {
-                    [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
-                    DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", guid);
-                }
-            }
-        }
-
-    });
-
-    return ZKOrig(BOOL);
-}
+//- (BOOL)isIncomingTypingMessage {
+//    // We do this because the isIncomingTypingMessage seems to have some timing
+//    // issues and will sometimes notify after the isCancelTypingMessage so we need to confirm
+//    // that the sender actually is typing
+//    [self updateTypingState];
+//
+//    // This is here to ensure that no infinite typing occurs
+//    // If for whatever reason the isCancelTypingMessage does not occur,
+//    // this should catch the error in 2 seconds
+//    double delayInSeconds = 2.0;
+//    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+//    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+//        if(self != nil) {
+//            NSString *guid = [self getGuid];
+//            if(guid != nil) {
+//                if([BlueBubblesHelper isTyping:guid] == NO) {
+//                    [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
+//                    DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", guid);
+//                }
+//            }
+//        }
+//
+//    });
+//
+//    return ZKOrig(BOOL);
+//}
 
 // Check to see if this IMMessageItem matches the last IMChat's message
 // This helps to avoid spamming of the tcp socket
-- (BOOL) isLatestMessage {
-    NSString *guid = [self getGuid];
-    // Fetch the current IMChat to get the IMMessage
-    IMChat *chat = [BlueBubblesHelper getChat:guid];
-    IMMessageItem *item = (IMMessageItem*) self;
-    IMMessage *message = item.message;
-    if(message.isFromMe) return NO;
-
-    // If the IMChat's last message matches our own IMMessage, then we can proceed
-    // this should avoid spamming of the tcp socket
-    return chat.lastIncomingMessage.guid == message.guid;
-}
+//- (BOOL) isLatestMessage {
+//    NSString *guid = [self getGuid];
+//    // Fetch the current IMChat to get the IMMessage
+//    IMChat *chat = [BlueBubblesHelper getChat:guid];
+//    IMMessageItem *item = (IMMessageItem*) self;
+//    IMMessage *message = item.message;
+//    if(message.isFromMe) return NO;
+//
+//    // If the IMChat's last message matches our own IMMessage, then we can proceed
+//    // this should avoid spamming of the tcp socket
+//    return chat.lastIncomingMessage.guid == message.guid;
+//}
 
 // Update the typing state by checking the message state
-- (void) updateTypingState {
-    if(![self isLatestMessage]) return;
+//- (void) updateTypingState {
+//    if(![self isLatestMessage]) return;
+//
+//    NSString *guid = [self getGuid];
+//
+//    // If we failed to get the guid for whatever reason, then we can't do anything
+//    if(guid != nil) {
+//        [BlueBubblesHelper updateTypingStatus:guid transaction: nil];
+//    }
+//}
 
-    NSString *guid = [self getGuid];
-
-    // If we failed to get the guid for whatever reason, then we can't do anything
-    if(guid != nil) {
-        [BlueBubblesHelper updateTypingStatus:guid transaction: nil];
-    }
-}
-
-- (NSString *) getGuid {
-    IMMessageItem *item = (IMMessageItem*)self;
-    if(item == nil) return nil;
-    IMMessage *message = item.message;
-    if(message == nil) return nil;
-
-
-    // Get the guid of the message???
-    IMHandle *handle = message.sender;
-    if(handle == nil) return nil;
-    IMChat *chat = [[IMChatRegistry sharedInstance] existingChatForIMHandle: handle];
-    if(chat == nil) return nil;
-
-
-
-    return chat.guid;
-}
-
-@end
+//- (NSString *) getGuid {
+//    IMMessageItem *item = (IMMessageItem*)self;
+//    if(item == nil) return nil;
+//    IMMessage *message = item.message;
+//    if(message == nil) return nil;
+//
+//
+//    // Get the guid of the message???
+//    IMHandle *handle = message.sender;
+//    if(handle == nil) return nil;
+//    IMChat *chat = [[IMChatRegistry sharedInstance] existingChatForIMHandle: handle];
+//    if(chat == nil) return nil;
+//
+//
+//
+//    return chat.guid;
+//}
+//
+//@end
 
 //ZKSwizzleInterface(WBWT_IMChat, IMChat, NSObject)
 //@implementation WBWT_IMChat
