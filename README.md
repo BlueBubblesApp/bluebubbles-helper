@@ -17,7 +17,7 @@ This is the repo for the bundle containing code to perform various tasks not acc
 - Send mentions
 - Update pinned chats on the server Mac (requires MacOS 11, higher versions are currently unsupported)
 
-See the wiki for more details on how these were implemented.
+See [here](https://docs.bluebubbles.app/helper-bundle/imcore-documentation) for more details on how these were implemented.
 
 ### Support
 

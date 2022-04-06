@@ -208,7 +208,7 @@ BlueBubblesHelper *plugin;
         }
     } else if([event isEqualToString:@"check-typing-status"]) {
         if(data[@"chatGuid"] != [NSNull null]) {
-            [BlueBubblesHelper updateTypingStatus:data[@"chatGuid"]];
+            [BlueBubblesHelper updateTypingStatus:data[@"chatGuid"] transaction:(transaction)];
         }
     // If server tells us to change the display name
     } else if ([event isEqualToString:@"set-display-name"]) {
@@ -324,19 +324,28 @@ BlueBubblesHelper *plugin;
     }];
 }
 
-+(BOOL) isTyping: (NSString *)guid {
++(BOOL) isTyping: (NSString *)guid{
     IMChat *chat = [BlueBubblesHelper getChat:guid];
     return chat.lastIncomingMessage.isTypingMessage;
 }
 
-+(void) updateTypingStatus: (NSString *) guid {
++(void) updateTypingStatus: (NSString *) guid transaction:(NSString *) transaction {
     IMChat *chat = [BlueBubblesHelper getChat:guid];
     // Send out the correct response over the tcp socket
     if(chat.lastIncomingMessage.isTypingMessage == YES) {
-        [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": guid}];
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"data": @"started-typing", @"guid": guid}];
+        }else{
+            [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": guid}];
+        }
+        
         DLog(@"BLUEBUBBLESHELPER: %@ started typing", guid);
     } else {
-        [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"data": @"stopped-typing", @"guid": guid}];
+        }else{
+            [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
+        }
         DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", guid);
     }
 }
