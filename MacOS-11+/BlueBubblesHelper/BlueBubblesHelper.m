@@ -294,6 +294,13 @@ BlueBubblesHelper *plugin;
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": chat.guid}];
         }
+    // If server tells us to delete a chat
+    } else if ([event isEqualToString:@"delete-chat"]) {
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+        [[IMChatRegistry sharedInstance] _chat_remove:(chat)];
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
