@@ -142,7 +142,7 @@ BlueBubblesHelper *plugin;
     if([event isEqualToString:@"send-reaction"]) {
         DLog(@"BLUEBUBBLESHELPER: REACTION INCOMING %@", data.description);
 
-        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         if(chat != nil) {
             //Map the reaction type
             long long reactionLong = [BlueBubblesHelper parseReactionType:(data[@"reactionType"])];
@@ -186,28 +186,40 @@ BlueBubblesHelper *plugin;
     // If the server tells us to start typing
      if([event isEqualToString: @"start-typing"]) {
         // Get the IMChat instance for the guid specified in eventData
-        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         if(chat != nil) {
             // If the IMChat instance is not null, start typing
             [chat setLocalUserIsTyping:YES];
+
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
         }
 
     // If the server tells us to stop typing
     } else if([event isEqualToString:@"stop-typing"]) {
         // Get the IMChat instance for the guid specified in eventData
-        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         if(chat != nil) {
             // If the IMChat instance is not null, stop typing
             [chat setLocalUserIsTyping:NO];
+
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
         }
 
     // If the server tells us to mark a chat as read
     } else if([event isEqualToString:@"mark-chat-read"]) {
         // Get the IMChat instance for the guid specified in eventData
-        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         if(chat != nil) {
             // If the IMChat instance is not null, mark everything as read
             [chat markAllMessagesAsRead];
+
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
         }
     } else if([event isEqualToString:@"check-typing-status"]) {
         if(data[@"chatGuid"] != [NSNull null]) {
@@ -215,47 +227,97 @@ BlueBubblesHelper *plugin;
         }
     // If server tells us to change the display name
     } else if ([event isEqualToString:@"set-display-name"]) {
-        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+        if (data[@"newName"] == nil) {
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Provide a new name for the chat!"}];
+            }
+            return;
+        }
+
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         if(chat != nil) {
             // Set the display name
             [chat _setDisplayName:(data[@"newName"])];
+
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
         }
         DLog(@"BLUEBUBBLESHELPER: Setting display name of chat %@ to %@", data[@"chatGuid"], data[@"newName"]);
     // If the server tells us to add a participant
     } else if ([event isEqualToString:@"add-participant"]) {
-        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
+
+        if (data[@"address"] == nil) {
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Provide an address to add!"}];
+            }
+            return;
+        }
         NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
-        
+
         if (handles != nil) {
             IMAccountController *sharedAccountController = [IMAccountController sharedInstance];
             IMAccount *myAccount = [sharedAccountController mostLoggedInAccount];
             IMHandle *handle = [[IMHandle alloc] initWithAccount:(myAccount) ID:(data[@"address"]) alreadyCanonical:(YES)];
             handles = @[handle];
+        } else {
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to load handles for provided address!"}];
+            }
+            return;
         }
-        
+
         if(chat != nil && [chat canAddParticipants:(handles)]) {
             [chat inviteParticipantsToiMessageChat:(handles) reason:(0)];
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
             DLog(@"BLUEBUBBLESHELPER: Added participant to chat %@: %@", data[@"chatGuid"], data[@"address"]);
         } else {
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to add address to chat!"}];
+            }
             DLog(@"BLUEBUBBLESHELPER: Couldn't add participant to chat %@: %@", data[@"chatGuid"], data[@"address"]);
         }
     // If the server tells us to remove a participant
     } else if ([event isEqualToString:@"remove-participant"]) {
-        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
+
+        if (data[@"address"] == nil) {
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Provide an address to add!"}];
+            }
+            return;
+        }
         NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
-        
+
+        if (handles != nil) {
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to load handles for provided address!"}];
+            }
+            return;
+        }
+
         if(chat != nil && [chat canAddParticipants:(handles)]) {
             [chat removeParticipantsFromiMessageChat:(handles) reason:(0)];
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
             DLog(@"BLUEBUBBLESHELPER: Removed participant from chat %@: %@", data[@"chatGuid"], data[@"address"]);
         } else {
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to remove address from chat!"}];
+            }
             DLog(@"BLUEBUBBLESHELPER: Couldn't remove participant from chat %@: %@", data[@"chatGuid"], data[@"address"]);
         }
     // If the server tells us to send a message
     } else if ([event isEqualToString:@"send-message"]) {
         [BlueBubblesHelper sendMessage:(data) transaction:(transaction)];
     // If the server tells us to update the pinned status of a chat
+    // currently unused method
     } else if ([event isEqualToString:@"update-chat-pinned"]) {
-        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         if (!chat.isPinned) {
             NSArray* arr = [[[IMPinnedConversationsController sharedInstance] pinnedConversationIdentifierSet] array];
             NSMutableArray<NSString*>* chatArr = [[NSMutableArray alloc] initWithArray:(arr)];
@@ -272,10 +334,11 @@ BlueBubblesHelper *plugin;
             [controller setPinnedConversationIdentifiers:(finalArr) withUpdateReason:(@"contextMenu")];
         }
     // If the server tells us to create a chat
+    // currently unused method
     } else if ([event isEqualToString:@"create-chat"]) {
         IMAccountController *sharedAccountController = [IMAccountController sharedInstance];
         IMAccount *myAccount = [sharedAccountController mostLoggedInAccount];
-        
+
         NSMutableArray<IMHandle*> *handles = [[NSMutableArray alloc] initWithArray:(@[])];
         for (NSString* str in data[@"addresses"]) {
             NSArray<IMHandle*> *handlesToAdd = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(str)];
@@ -296,10 +359,13 @@ BlueBubblesHelper *plugin;
         }
     // If server tells us to delete a chat
     } else if ([event isEqualToString:@"delete-chat"]) {
-        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
-        [[IMChatRegistry sharedInstance] _chat_remove:(chat)];
-        if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
+
+        if (chat != nil) {
+            [[IMChatRegistry sharedInstance] _chat_remove:(chat)];
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
         }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
@@ -311,10 +377,19 @@ BlueBubblesHelper *plugin;
 // Retreive a IMChat instance from a given guid
 //
 // Uses the chat registry to get an existing instance of a chat based on the chat guid
-+(IMChat *) getChat: (NSString *) guid {
-    if(guid == nil) return nil;
++(IMChat *) getChat: (NSString *) guid :(NSString *) transaction {
+    if(guid == nil) {
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Provide a chat GUID!"}];
+        }
+        return nil;
+    }
 
     IMChat* imChat = [[IMChatRegistry sharedInstance] existingChatWithGUID: guid];
+
+    if (imChat == nil && transaction != nil) {
+        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Chat does not exist!"}];
+    }
     return imChat;
 }
 
@@ -346,12 +421,12 @@ BlueBubblesHelper *plugin;
 }
 
 +(BOOL) isTyping: (NSString *)guid {
-    IMChat *chat = [BlueBubblesHelper getChat:guid];
+    IMChat *chat = [BlueBubblesHelper getChat:guid :nil];
     return chat.lastIncomingMessage.isTypingMessage;
 }
 
 +(void) updateTypingStatus: (NSString *) guid {
-    IMChat *chat = [BlueBubblesHelper getChat:guid];
+    IMChat *chat = [BlueBubblesHelper getChat:guid :nil];
     // Send out the correct response over the tcp socket
     if(chat.lastIncomingMessage.isTypingMessage == YES) {
         [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": guid}];
@@ -363,13 +438,12 @@ BlueBubblesHelper *plugin;
 }
 
 +(void) sendMessage: (NSDictionary *) data transaction:(NSString *) transaction {
-    IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"]];
+    IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
     if (chat == nil) {
-        NSLog(@"BLUEBUBBLESHELPER: chat is null, aborting");
-        //TODO send socket error
+        DLog(@"BLUEBUBBLESHELPER: chat is null, aborting");
         return;
     }
-    
+
     // TODO make sure this is safe from exceptions
     // now we will deserialize the attributedBody if it exists
     NSDictionary *attributedDict = data[@"attributedBody"];
@@ -389,7 +463,7 @@ BlueBubblesHelper *plugin;
             [attributedString addAttributes:attrsDict range:range];
         }
     }
-    
+
     NSMutableAttributedString *subjectAttributedString = nil;
     if (data[@"subject"] != [NSNull null] && [data[@"subject"] length] != 0) {
         subjectAttributedString = [[NSMutableAttributedString alloc] initWithString: data[@"subject"]];
@@ -398,7 +472,7 @@ BlueBubblesHelper *plugin;
     if (data[@"effectId"] != [NSNull null] && [data[@"effectId"] length] != 0) {
         effectId = data[@"effectId"];
     }
-    
+
     void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier) {
         IMMessage *messageToSend = [[IMMessage alloc] init];
         messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
@@ -408,7 +482,7 @@ BlueBubblesHelper *plugin;
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
         }
     };
-    
+
     if (data[@"selectedMessageGuid"] != [NSNull null] && [data[@"selectedMessageGuid"] length] != 0) {
         [BlueBubblesHelper getMessageItem:(chat) :(data[@"selectedMessageGuid"]) completionBlock:^(IMMessage *message) {
             IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
@@ -497,7 +571,7 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
 - (BOOL) isLatestMessage {
     NSString *guid = [self getGuid];
     // Fetch the current IMChat to get the IMMessage
-    IMChat *chat = [BlueBubblesHelper getChat:guid];
+    IMChat *chat = [BlueBubblesHelper getChat:guid :nil];
     IMMessageItem *item = (IMMessageItem*) self;
     IMMessage *message = item.message;
     if(message.isFromMe) return NO;
