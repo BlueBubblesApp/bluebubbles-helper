@@ -288,7 +288,7 @@ BlueBubblesHelper *plugin;
         }
         NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
 
-        if (handles != nil) {
+        if (handles == nil) {
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to load handles for provided address!"}];
             }

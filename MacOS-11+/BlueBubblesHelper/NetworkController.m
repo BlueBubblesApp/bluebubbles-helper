@@ -33,12 +33,19 @@ static id sharedInstance = nil;
 
 #pragma mark - Public methods
 
+#define CLAMP(x, low, high) ({\
+  __typeof__(x) __x = (x); \
+  __typeof__(low) __low = (low);\
+  __typeof__(high) __high = (high);\
+  __x > __high ? __high : (__x < __low ? __low : __x);\
+  })
+
 - (void)connect {
     // we need to get the port to open the server on (to allow multiple users to use the bundle)
     // we'll base this off the users uid (a unique id for each user, starting from 501)
     // we'll subtract 501 to get an id starting at 0, incremented for each user
     // then we add this to the base port to get a unique port for the socket
-    int port = 45670 + getuid()-501;
+    int port = CLAMP(45670 + getuid()-501, 45670, 65535);
     DLog(@"BLUEBUBBLESHELPER: Connecting to socket on port %d", port);
     // connect to socket
     asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
