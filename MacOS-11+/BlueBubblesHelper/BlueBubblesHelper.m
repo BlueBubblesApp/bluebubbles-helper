@@ -138,51 +138,7 @@ BlueBubblesHelper *plugin;
     }
 
     DLog(@"BLUEBUBBLESHELPER: Message received: %@, %@", event, data);
-
-    if([event isEqualToString:@"send-reaction"]) {
-        DLog(@"BLUEBUBBLESHELPER: REACTION INCOMING %@", data.description);
-
-        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
-        if(chat != nil) {
-            //Map the reaction type
-            long long reactionLong = [BlueBubblesHelper parseReactionType:(data[@"reactionType"])];
-
-            // Get the messageItem
-            [BlueBubblesHelper getMessageItem:(chat) :(data[@"selectedMessageGuid"]) completionBlock:^(IMMessage *message) {
-                IMMessageItem *imMessage = (IMMessageItem *)message._imMessageItem;
-                NSObject *items = imMessage._newChatItems;
-                IMChatItem *item;
-                // sometimes items is an array so we need to account for that
-                if ([items isKindOfClass:[NSArray class]]) {
-                    for(IMChatItem* imci in (NSArray *)items) {
-                        if([imci._item.guid isEqualToString:(data[@"selectedMessageGuid"])]) {
-                            DLog(@"BLUEBUBBLESHELPER: %@", data[@"selectedMessageGuid"]);
-                            item = imci;
-                        }
-                    }
-                } else {
-                    item = (IMChatItem *)items;
-                }
-                //Build the message summary
-                NSDictionary *messageSummary = @{@"amc":@1,@"ams":[imMessage body].string};
-
-                DLog(@"BLUEBUBBLESHELPER: Reaction Long: %lld", reactionLong);
-                // Send the tapback
-                // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
-                NSData *dataenc = [[imMessage body].string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
-                NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
-                if ([encodevalue isEqualToString:@"\\ufffc"]) {
-                    [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(@{})];
-                } else {
-                    [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(messageSummary)];
-                }
-                if (transaction != nil) {
-                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
-                }
-                DLog(@"BLUEBUBBLESHELPER: sent reaction");
-            }];
-        }
-    }
+    
     // If the server tells us to start typing
      if([event isEqualToString: @"start-typing"]) {
         // Get the IMChat instance for the guid specified in eventData
@@ -311,8 +267,8 @@ BlueBubblesHelper *plugin;
             }
             DLog(@"BLUEBUBBLESHELPER: Couldn't remove participant from chat %@: %@", data[@"chatGuid"], data[@"address"]);
         }
-    // If the server tells us to send a message
-    } else if ([event isEqualToString:@"send-message"]) {
+    // If the server tells us to send a message or tapback
+    } else if ([event isEqualToString:@"send-message"] || [event isEqualToString:@"send-reaction"]) {
         [BlueBubblesHelper sendMessage:(data) transaction:(transaction)];
     // If the server tells us to update the pinned status of a chat
     // currently unused method
@@ -413,6 +369,24 @@ BlueBubblesHelper *plugin;
     return 0;
 }
 
++(NSString *) reactionToVerb:(NSString *)reactionType {
+    NSString *lowerCaseType = [reactionType lowercaseString];
+
+    if([@"love" isEqualToString:(lowerCaseType)]) return @"Loved an attachment";
+    if([@"like" isEqualToString:(lowerCaseType)]) return @"Liked an attachment";
+    if([@"dislike" isEqualToString:(lowerCaseType)]) return @"Disliked an attachment";
+    if([@"laugh" isEqualToString:(lowerCaseType)]) return @"Laughed at an attachment";
+    if([@"emphasize" isEqualToString:(lowerCaseType)]) return @"Emphasized an attachment";
+    if([@"question" isEqualToString:(lowerCaseType)]) return @"Questioned an attachment";
+    if([@"-love" isEqualToString:(lowerCaseType)]) return @"Removed a heart from an attachment";
+    if([@"-like" isEqualToString:(lowerCaseType)]) return @"Removed a like from an attachment";
+    if([@"-dislike" isEqualToString:(lowerCaseType)]) return @"Removed a dislike from an attachment";
+    if([@"-laugh" isEqualToString:(lowerCaseType)]) return @"Removed a laugh from an attachment";
+    if([@"-emphasize" isEqualToString:(lowerCaseType)]) return @"Removed an exclamation from an attachment";
+    if([@"-question" isEqualToString:(lowerCaseType)]) return @"Removed a question mark from an attachment";
+    return @"";
+}
+
 +(void) getMessageItem:(IMChat *)chat :(NSString *)actionMessageGuid completionBlock:(void (^)(IMMessage *message))block {
     [[IMChatHistoryController sharedInstance] loadMessageWithGUID:(actionMessageGuid) completionBlock:^(IMMessage *message) {
         DLog(@"BLUEBUBBLESHELPER: Got message for guid %@", actionMessageGuid);
@@ -443,13 +417,19 @@ BlueBubblesHelper *plugin;
         DLog(@"BLUEBUBBLESHELPER: chat is null, aborting");
         return;
     }
+    
+    // Tapbacks will not have message text, but messages sent must have some sort of text
+    NSString *message = data[@"message"];
+    if (message == nil) {
+        message = @"TEMP";
+    }
 
     // TODO make sure this is safe from exceptions
     // now we will deserialize the attributedBody if it exists
     NSDictionary *attributedDict = data[@"attributedBody"];
     // we'll create the NSMutableAttributedString with the associatedBody string if we can,
     // else we'll fall back to using the message text
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: data[@"message"]];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: message];
     // if associateBody exists, we iterate through it
     if (attributedDict != NULL && attributedDict != (NSDictionary*)[NSNull null]) {
         attributedString = [[NSMutableAttributedString alloc] initWithString: attributedDict[@"string"]];
@@ -473,10 +453,14 @@ BlueBubblesHelper *plugin;
         effectId = data[@"effectId"];
     }
 
-    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier) {
+    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSString*, long long*, NSRange, NSDictionary*) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSString *associatedMessageGuid, long long *reaction, NSRange range, NSDictionary *summaryInfo) {
         IMMessage *messageToSend = [[IMMessage alloc] init];
-        messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
-        messageToSend.threadIdentifier = threadIdentifier;
+        if (reaction == nil) {
+            messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
+            messageToSend.threadIdentifier = threadIdentifier;
+        } else {
+            messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(5) error:(nil) guid:(nil) subject:(nil) associatedMessageGUID:(associatedMessageGuid) associatedMessageType:*(reaction) associatedMessageRange:(range) messageSummaryInfo:(summaryInfo)];
+        }
         [chat sendMessage:(messageToSend)];
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
@@ -499,17 +483,36 @@ BlueBubblesHelper *plugin;
             } else {
                 item = (IMMessagePartChatItem *)items;
             }
-            NSString *identifier = @"";
-            // either reply to an existing thread or create a new thread
-            if (message.threadIdentifier != nil) {
-                identifier = message.threadIdentifier;
+            
+            if (data[@"reactionType"] != [NSNull null]) {
+                NSDictionary *messageSummary = @{@"amc":@1,@"ams":[messageItem body].string};
+                NSString *reaction = data[@"reactionType"];
+                long long reactionLong = [BlueBubblesHelper parseReactionType:(reaction)];
+                // Send the tapback
+                // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
+                NSData *dataenc = [[messageItem body].string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
+                NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
+                NSRange range = NSMakeRange(0, [messageItem body].string.length);
+                if ([encodevalue isEqualToString:@"\\ufffc"]) {
+                    // This is needed for a weird bug where sometimes the message preview is not generated correctly
+                    NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [BlueBubblesHelper reactionToVerb:(reaction)]];
+                    createMessage(newAttributedString, subjectAttributedString, effectId, nil, [messageItem guid], &reactionLong, range, @{});
+                } else {
+                    createMessage(attributedString, subjectAttributedString, effectId, nil, [messageItem guid], &reactionLong, range, messageSummary);
+                }
             } else {
-                identifier = IMCreateThreadIdentifierForMessagePartChatItem(item);
+                NSString *identifier = @"";
+                // either reply to an existing thread or create a new thread
+                if (message.threadIdentifier != nil) {
+                    identifier = message.threadIdentifier;
+                } else {
+                    identifier = IMCreateThreadIdentifierForMessagePartChatItem(item);
+                }
+                createMessage(attributedString, subjectAttributedString, effectId, identifier, nil, nil, NSMakeRange(0, 0), nil);
             }
-            createMessage(attributedString, subjectAttributedString, effectId, identifier);
         }];
     } else {
-        createMessage(attributedString, subjectAttributedString, effectId, nil);
+        createMessage(attributedString, subjectAttributedString, effectId, nil, nil, nil, NSMakeRange(0, 0), nil);
     }
 }
 
