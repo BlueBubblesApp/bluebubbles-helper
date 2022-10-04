@@ -7,6 +7,7 @@ This is the repo for the bundle containing code to perform various tasks not acc
 - Send reactions
 - Send and receive typing indicators
 - Mark chats read on the server Mac
+- Mark chats unread on the server Mac (requires MacOS 13+)
 - Create chats
 - Rename group chats
 - Add / remove participants from group chats
@@ -16,12 +17,14 @@ This is the repo for the bundle containing code to perform various tasks not acc
 - Send message with subject
 - Send mentions
 - Update pinned chats on the server Mac (requires MacOS 11, higher versions are currently unsupported)
+- Edit messages (requires MacOS 13+)
+- Unsend messages (requires MacOS 13+)
 
 See [here](https://docs.bluebubbles.app/helper-bundle/imcore-documentation) for more details on how these were implemented.
 
 ### Support
 
-The bundle has been tested on MacOS 10.13 (High Sierra) - MacOS 12 (Monterey). It could work on higher or lower MacOS versions, but we do not know for sure.
+The bundle has been tested on MacOS 10.13 (High Sierra) - MacOS 13 (Ventura). It could work on higher or lower MacOS versions, but we do not know for sure.
 
 Currently the bundle only works on Intel based Macs, but we are working towards M1 support.
 
