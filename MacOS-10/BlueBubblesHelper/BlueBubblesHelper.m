@@ -150,12 +150,7 @@ BlueBubblesHelper *plugin;
                 IMChatItem *item;
                 // sometimes items is an array so we need to account for that
                 if ([items isKindOfClass:[NSArray class]]) {
-                    for(IMChatItem* imci in (NSArray *)items) {
-                        if([[[imci _item] guid] isEqualToString:(data[@"selectedMessageGuid"])]) {
-                            DLog(@"BLUEBUBBLESHELPER: %@", data[@"selectedMessageGuid"]);
-                            item = imci;
-                        }
-                    }
+                    item = [(NSArray *)items objectAtIndex:([data[@"partIndex"] integerValue])];
                 } else {
                     item = (IMChatItem *)items;
                 }
