@@ -418,18 +418,18 @@ BlueBubblesHelper *plugin;
 +(NSString *) reactionToVerb:(NSString *)reactionType {
     NSString *lowerCaseType = [reactionType lowercaseString];
 
-    if([@"love" isEqualToString:(lowerCaseType)]) return @"Loved an attachment";
-    if([@"like" isEqualToString:(lowerCaseType)]) return @"Liked an attachment";
-    if([@"dislike" isEqualToString:(lowerCaseType)]) return @"Disliked an attachment";
-    if([@"laugh" isEqualToString:(lowerCaseType)]) return @"Laughed at an attachment";
-    if([@"emphasize" isEqualToString:(lowerCaseType)]) return @"Emphasized an attachment";
-    if([@"question" isEqualToString:(lowerCaseType)]) return @"Questioned an attachment";
-    if([@"-love" isEqualToString:(lowerCaseType)]) return @"Removed a heart from an attachment";
-    if([@"-like" isEqualToString:(lowerCaseType)]) return @"Removed a like from an attachment";
-    if([@"-dislike" isEqualToString:(lowerCaseType)]) return @"Removed a dislike from an attachment";
-    if([@"-laugh" isEqualToString:(lowerCaseType)]) return @"Removed a laugh from an attachment";
-    if([@"-emphasize" isEqualToString:(lowerCaseType)]) return @"Removed an exclamation from an attachment";
-    if([@"-question" isEqualToString:(lowerCaseType)]) return @"Removed a question mark from an attachment";
+    if([@"love" isEqualToString:(lowerCaseType)]) return @"Loved ";
+    if([@"like" isEqualToString:(lowerCaseType)]) return @"Liked ";
+    if([@"dislike" isEqualToString:(lowerCaseType)]) return @"Disliked ";
+    if([@"laugh" isEqualToString:(lowerCaseType)]) return @"Laughed at ";
+    if([@"emphasize" isEqualToString:(lowerCaseType)]) return @"Emphasized ";
+    if([@"question" isEqualToString:(lowerCaseType)]) return @"Questioned ";
+    if([@"-love" isEqualToString:(lowerCaseType)]) return @"Removed a heart from ";
+    if([@"-like" isEqualToString:(lowerCaseType)]) return @"Removed a like from ";
+    if([@"-dislike" isEqualToString:(lowerCaseType)]) return @"Removed a dislike from ";
+    if([@"-laugh" isEqualToString:(lowerCaseType)]) return @"Removed a laugh from ";
+    if([@"-emphasize" isEqualToString:(lowerCaseType)]) return @"Removed an exclamation from ";
+    if([@"-question" isEqualToString:(lowerCaseType)]) return @"Removed a question mark from ";
     return @"";
 }
 
@@ -535,11 +535,11 @@ BlueBubblesHelper *plugin;
                 NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
                 NSRange range = NSMakeRange(0, [messageItem body].string.length);
                 if ([encodevalue isEqualToString:@"\\ufffc"]) {
-                    // This is needed for a weird bug where sometimes the message preview is not generated correctly
-                    NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [BlueBubblesHelper reactionToVerb:(reaction)]];
+                    NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [[BlueBubblesHelper reactionToVerb:(reaction)] stringByAppendingString:(@"an attachment")]];
                     createMessage(newAttributedString, subjectAttributedString, effectId, nil, [messageItem guid], &reactionLong, range, @{});
                 } else {
-                    createMessage(attributedString, subjectAttributedString, effectId, nil, [messageItem guid], &reactionLong, range, messageSummary);
+                    NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [[BlueBubblesHelper reactionToVerb:(reaction)] stringByAppendingString:([NSString stringWithFormat:(@"“%@”"), [messageItem body].string])]];
+                    createMessage(newAttributedString, subjectAttributedString, effectId, nil, [messageItem guid], &reactionLong, range, messageSummary);
                 }
             } else {
                 NSString *identifier = @"";
