@@ -26,8 +26,6 @@ See [here](https://docs.bluebubbles.app/helper-bundle/imcore-documentation) for 
 
 The bundle has been tested on MacOS 10.13 (High Sierra) - MacOS 13 (Ventura). It could work on higher or lower MacOS versions, but we do not know for sure.
 
-Currently the bundle only works on Intel based Macs, but we are working towards M1 support.
-
 ### Build Yourself
 
 #### Pre-requirements:
