@@ -120,6 +120,7 @@
 @property(retain, nonatomic) NSString *lastAddressedHandleID; // @synthesize lastAddressedHandleID=_lastAddressedHandleID;
 @property(retain, nonatomic) NSArray *frequentReplies; // @synthesize frequentReplies=_frequentReplies;
 - (void)downloadPurgedAttachments;
+-(void)editMessage:(id)arg0 atPartIndex:(NSInteger)arg1 withNewPartText:(id)arg2 backwardCompatabilityText:(id)arg3 API_AVAILABLE(macos(13), ios(16.0), watchos(9.0));
 - (void)sendProgress:(id)arg1 progressDidChange:(float)arg2 sendingMessages:(id)arg3 sendCount:(unsigned long long)arg4 totalCount:(unsigned long long)arg5 finished:(BOOL)arg6;
 - (id)sendProgressDelegate;
 - (void)setSendProgressDelegate:(id)arg1;
@@ -168,9 +169,11 @@
 - (void)_setChatProperties:(id)arg1;
 - (BOOL)_isDuplicate:(id)arg1;
 - (void)resortMessages;
+- (void)retractMessagePart:(id)arg0 API_AVAILABLE(macos(13), ios(16.0), watchos(9.0));
 - (void)markAllMessagesAsRead;
 - (void)markMessagesAsRead:(NSArray<IMMessage*>*)arg1;
 - (void)markMessageAsRead:(id)arg1;
+- (void)markLastMessageAsUnread API_AVAILABLE(macos(13), ios(16.0), watchos(9.0));
 - (void)_setTimerForReadMessageCache;
 - (void)__clearReadMessageCache;
 - (void)updateMessage:(id)arg1 flags:(unsigned long long)arg2;
