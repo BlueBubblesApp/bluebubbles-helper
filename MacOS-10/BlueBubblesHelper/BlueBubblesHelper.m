@@ -147,25 +147,36 @@ BlueBubblesHelper *plugin;
             [BlueBubblesHelper getMessageItem:(chat) :(data[@"selectedMessageGuid"]) completionBlock:^(IMMessage *message) {
                 IMMessageItem *imMessage = (IMMessageItem *)message._imMessageItem;
                 NSObject *items = imMessage._newChatItems;
-                IMChatItem *item;
+                IMMessagePartChatItem *item;
                 // sometimes items is an array so we need to account for that
                 if ([items isKindOfClass:[NSArray class]]) {
                     item = [(NSArray *)items objectAtIndex:([data[@"partIndex"] integerValue])];
                 } else {
-                    item = (IMChatItem *)items;
+                    item = (IMMessagePartChatItem *)items;
                 }
-                //Build the message summary
-                NSDictionary *messageSummary = @{@"amc":@1,@"ams":[[imMessage message] plainBody]};
-
-                DLog(@"BLUEBUBBLESHELPER: Reaction Long: %lld", reactionLong);
-                // Send the tapback
-                // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
-                NSData *dataenc = [[[imMessage message] plainBody] dataUsingEncoding:NSNonLossyASCIIStringEncoding];
-                NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
-                if ([encodevalue isEqualToString:@"\\ufffc"]) {
-                    [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(@{})];
+                NSDictionary *messageSummary;
+                if (item != nil) {
+                    messageSummary = @{@"amc":@1,@"ams":item.text.string};
+                    // Send the tapback
+                    // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
+                    NSData *dataenc = [[item text].string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
+                    NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
+                    if ([encodevalue isEqualToString:@"\\ufffc"]) {
+                        [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(@{})];
+                    } else {
+                        [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(messageSummary)];
+                    }
                 } else {
-                    [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(messageSummary)];
+                    messageSummary = @{@"amc":@1,@"ams":message.text.string};
+                    // Send the tapback
+                    // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
+                    NSData *dataenc = [[message text].string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
+                    NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
+                    if ([encodevalue isEqualToString:@"\\ufffc"]) {
+                        [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(@{})];
+                    } else {
+                        [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(messageSummary)];
+                    }
                 }
                 if (transaction != nil) {
                     [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastMessage] guid]}];
