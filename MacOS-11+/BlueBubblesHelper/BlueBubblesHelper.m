@@ -418,18 +418,18 @@ BlueBubblesHelper *plugin;
 +(NSString *) reactionToVerb:(NSString *)reactionType {
     NSString *lowerCaseType = [reactionType lowercaseString];
 
-    if([@"love" isEqualToString:(lowerCaseType)]) return @"Loved an attachment";
-    if([@"like" isEqualToString:(lowerCaseType)]) return @"Liked an attachment";
-    if([@"dislike" isEqualToString:(lowerCaseType)]) return @"Disliked an attachment";
-    if([@"laugh" isEqualToString:(lowerCaseType)]) return @"Laughed at an attachment";
-    if([@"emphasize" isEqualToString:(lowerCaseType)]) return @"Emphasized an attachment";
-    if([@"question" isEqualToString:(lowerCaseType)]) return @"Questioned an attachment";
-    if([@"-love" isEqualToString:(lowerCaseType)]) return @"Removed a heart from an attachment";
-    if([@"-like" isEqualToString:(lowerCaseType)]) return @"Removed a like from an attachment";
-    if([@"-dislike" isEqualToString:(lowerCaseType)]) return @"Removed a dislike from an attachment";
-    if([@"-laugh" isEqualToString:(lowerCaseType)]) return @"Removed a laugh from an attachment";
-    if([@"-emphasize" isEqualToString:(lowerCaseType)]) return @"Removed an exclamation from an attachment";
-    if([@"-question" isEqualToString:(lowerCaseType)]) return @"Removed a question mark from an attachment";
+    if([@"love" isEqualToString:(lowerCaseType)]) return @"Loved ";
+    if([@"like" isEqualToString:(lowerCaseType)]) return @"Liked ";
+    if([@"dislike" isEqualToString:(lowerCaseType)]) return @"Disliked ";
+    if([@"laugh" isEqualToString:(lowerCaseType)]) return @"Laughed at ";
+    if([@"emphasize" isEqualToString:(lowerCaseType)]) return @"Emphasized ";
+    if([@"question" isEqualToString:(lowerCaseType)]) return @"Questioned ";
+    if([@"-love" isEqualToString:(lowerCaseType)]) return @"Removed a heart from ";
+    if([@"-like" isEqualToString:(lowerCaseType)]) return @"Removed a like from ";
+    if([@"-dislike" isEqualToString:(lowerCaseType)]) return @"Removed a dislike from ";
+    if([@"-laugh" isEqualToString:(lowerCaseType)]) return @"Removed a laugh from ";
+    if([@"-emphasize" isEqualToString:(lowerCaseType)]) return @"Removed an exclamation from ";
+    if([@"-question" isEqualToString:(lowerCaseType)]) return @"Removed a question mark from ";
     return @"";
 }
 
@@ -524,29 +524,48 @@ BlueBubblesHelper *plugin;
             } else {
                 item = (IMMessagePartChatItem *)items;
             }
-            
             if (data[@"reactionType"] != [NSNull null] && [data[@"reactionType"] length] != 0) {
-                NSDictionary *messageSummary = @{@"amc":@1,@"ams":[messageItem body].string};
                 NSString *reaction = data[@"reactionType"];
                 long long reactionLong = [BlueBubblesHelper parseReactionType:(reaction)];
-                // Send the tapback
-                // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
-                NSData *dataenc = [[messageItem body].string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
-                NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
-                NSRange range = NSMakeRange(0, [messageItem body].string.length);
-                if ([encodevalue isEqualToString:@"\\ufffc"]) {
-                    // This is needed for a weird bug where sometimes the message preview is not generated correctly
-                    NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [BlueBubblesHelper reactionToVerb:(reaction)]];
-                    createMessage(newAttributedString, subjectAttributedString, effectId, nil, [messageItem guid], &reactionLong, range, @{});
+                NSDictionary *messageSummary;
+                if (item != nil) {
+                    messageSummary = @{@"amc":@1,@"ams":item.text.string};
+                    // Send the tapback
+                    // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
+                    NSData *dataenc = [[item text].string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
+                    NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
+                    NSRange range = [[message text].string rangeOfString:[item text].string];
+                    if (range.location == NSNotFound) {
+                        range = NSMakeRange(0, [item text].string.length);
+                    }
+                    if ([encodevalue isEqualToString:@"\\ufffc"]) {
+                        NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [[BlueBubblesHelper reactionToVerb:(reaction)] stringByAppendingString:(@"an attachment")]];
+                        createMessage(newAttributedString, subjectAttributedString, effectId, nil, [NSString stringWithFormat:@"p:%@/%@", data[@"partIndex"], [message guid]], &reactionLong, range, @{});
+                    } else {
+                        NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [[BlueBubblesHelper reactionToVerb:(reaction)] stringByAppendingString:([NSString stringWithFormat:(@"“%@”"), [item text].string])]];
+                        createMessage(newAttributedString, subjectAttributedString, effectId, nil, [NSString stringWithFormat:@"p:%@/%@", data[@"partIndex"], [message guid]], &reactionLong, range, messageSummary);
+                    }
                 } else {
-                    createMessage(attributedString, subjectAttributedString, effectId, nil, [messageItem guid], &reactionLong, range, messageSummary);
+                    messageSummary = @{@"amc":@1,@"ams":message.text.string};
+                    // Send the tapback
+                    // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
+                    NSData *dataenc = [[message text].string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
+                    NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
+                    NSRange range = NSMakeRange(0, [message text].string.length);
+                    if ([encodevalue isEqualToString:@"\\ufffc"] || [encodevalue length] == 0) {
+                        NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [[BlueBubblesHelper reactionToVerb:(reaction)] stringByAppendingString:(@"an attachment")]];
+                        createMessage(newAttributedString, subjectAttributedString, effectId, nil, [message guid], &reactionLong, range, @{});
+                    } else {
+                        NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [[BlueBubblesHelper reactionToVerb:(reaction)] stringByAppendingString:([NSString stringWithFormat:(@"“%@”"), [message text].string])]];
+                        createMessage(newAttributedString, subjectAttributedString, effectId, nil, [message guid], &reactionLong, range, messageSummary);
+                    }
                 }
             } else {
                 NSString *identifier = @"";
                 // either reply to an existing thread or create a new thread
                 if (message.threadIdentifier != nil) {
                     identifier = message.threadIdentifier;
-                } else {
+                } else if (item != nil) {
                     identifier = IMCreateThreadIdentifierForMessagePartChatItem(item);
                 }
                 createMessage(attributedString, subjectAttributedString, effectId, identifier, nil, nil, NSMakeRange(0, 0), nil);
