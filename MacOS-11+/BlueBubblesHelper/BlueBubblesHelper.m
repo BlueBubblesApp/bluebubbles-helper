@@ -534,16 +534,12 @@ BlueBubblesHelper *plugin;
                     // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
                     NSData *dataenc = [[item text].string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
                     NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
-                    NSRange range = [[message text].string rangeOfString:[item text].string];
-                    if (range.location == NSNotFound) {
-                        range = NSMakeRange(0, [item text].string.length);
-                    }
                     if ([encodevalue isEqualToString:@"\\ufffc"]) {
                         NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [[BlueBubblesHelper reactionToVerb:(reaction)] stringByAppendingString:(@"an attachment")]];
-                        createMessage(newAttributedString, subjectAttributedString, effectId, nil, [NSString stringWithFormat:@"p:%@/%@", data[@"partIndex"], [message guid]], &reactionLong, range, @{});
+                        createMessage(newAttributedString, subjectAttributedString, effectId, nil, [NSString stringWithFormat:@"p:%@/%@", data[@"partIndex"], [message guid]], &reactionLong, [item messagePartRange], @{});
                     } else {
                         NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [[BlueBubblesHelper reactionToVerb:(reaction)] stringByAppendingString:([NSString stringWithFormat:(@"“%@”"), [item text].string])]];
-                        createMessage(newAttributedString, subjectAttributedString, effectId, nil, [NSString stringWithFormat:@"p:%@/%@", data[@"partIndex"], [message guid]], &reactionLong, range, messageSummary);
+                        createMessage(newAttributedString, subjectAttributedString, effectId, nil, [NSString stringWithFormat:@"p:%@/%@", data[@"partIndex"], [message guid]], &reactionLong, [item messagePartRange], messageSummary);
                     }
                 } else {
                     messageSummary = @{@"amc":@1,@"ams":message.text.string};
