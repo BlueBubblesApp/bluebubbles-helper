@@ -156,10 +156,14 @@ BlueBubblesHelper *plugin;
                 }
                 NSDictionary *messageSummary;
                 if (item != nil) {
-                    messageSummary = @{@"amc":@1,@"ams":item.text.string};
+                    NSAttributedString *text = [item text];
+                    if (text == nil) {
+                        text = [message text];
+                    }
+                    messageSummary = @{@"amc":@1,@"ams":text.string};
                     // Send the tapback
                     // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
-                    NSData *dataenc = [[item text].string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
+                    NSData *dataenc = [text.string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
                     NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
                     if ([encodevalue isEqualToString:@"\\ufffc"]) {
                         [chat sendMessageAcknowledgment:(reactionLong) forChatItem:(item) withMessageSummaryInfo:(@{})];
