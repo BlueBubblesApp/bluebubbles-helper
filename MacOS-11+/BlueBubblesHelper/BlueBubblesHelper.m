@@ -529,17 +529,25 @@ BlueBubblesHelper *plugin;
                 long long reactionLong = [BlueBubblesHelper parseReactionType:(reaction)];
                 NSDictionary *messageSummary;
                 if (item != nil) {
-                    messageSummary = @{@"amc":@1,@"ams":item.text.string};
+                    NSAttributedString *text = [item text];
+                    if (text == nil) {
+                        text = [message text];
+                    }
+                    messageSummary = @{@"amc":@1,@"ams":text.string};
                     // Send the tapback
                     // check if the body happens to be an object (ie an attachment) and send the tapback accordingly to show the proper summary
-                    NSData *dataenc = [[item text].string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
+                    NSData *dataenc = [text.string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
                     NSString *encodevalue = [[NSString alloc]initWithData:dataenc encoding:NSUTF8StringEncoding];
                     if ([encodevalue isEqualToString:@"\\ufffc"]) {
                         NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [[BlueBubblesHelper reactionToVerb:(reaction)] stringByAppendingString:(@"an attachment")]];
                         createMessage(newAttributedString, subjectAttributedString, effectId, nil, [NSString stringWithFormat:@"p:%@/%@", data[@"partIndex"], [message guid]], &reactionLong, [item messagePartRange], @{});
                     } else {
-                        NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [[BlueBubblesHelper reactionToVerb:(reaction)] stringByAppendingString:([NSString stringWithFormat:(@"“%@”"), [item text].string])]];
-                        createMessage(newAttributedString, subjectAttributedString, effectId, nil, [NSString stringWithFormat:@"p:%@/%@", data[@"partIndex"], [message guid]], &reactionLong, [item messagePartRange], messageSummary);
+                        NSMutableAttributedString *newAttributedString = [[NSMutableAttributedString alloc] initWithString: [[BlueBubblesHelper reactionToVerb:(reaction)] stringByAppendingString:([NSString stringWithFormat:(@"“%@”"), text.string])]];
+                        if ([item text] == nil) {
+                            createMessage(newAttributedString, subjectAttributedString, effectId, nil, [NSString stringWithFormat:@"bp:%@", [message guid]], &reactionLong, [item messagePartRange], messageSummary);
+                        } else {
+                            createMessage(newAttributedString, subjectAttributedString, effectId, nil, [NSString stringWithFormat:@"p:%@/%@", data[@"partIndex"], [message guid]], &reactionLong, [item messagePartRange], messageSummary);
+                        }
                     }
                 } else {
                     messageSummary = @{@"amc":@1,@"ams":message.text.string};
