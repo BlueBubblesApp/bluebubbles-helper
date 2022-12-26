@@ -13,6 +13,7 @@
 #import "IMTextMessagePartChatItem.h"
 #import "IMFileTransfer.h"
 #import "IMFileTransferCenter.h"
+#import "IMDPersistentAttachmentController.h"
 #import "IMHandle.h"
 #import "IMPerson.h"
 #import "IMAccount.h"
