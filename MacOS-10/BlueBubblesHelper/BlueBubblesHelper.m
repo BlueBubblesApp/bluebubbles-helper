@@ -425,15 +425,22 @@ BlueBubblesHelper *plugin;
     } else if ([event isEqualToString:@"send-attachment"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         NSString * filePath = data[@"filePath"];
-        if (chat != nil && filePath !=nil) {
+        if (chat != nil ) {
+            if ( filePath != nil && ![filePath isEqual: @""]){
 
-            NSString *effectId = nil;
-            if (data[@"effectId"] != [NSNull null] && [data[@"effectId"] length] != 0) {
-                effectId = data[@"effectId"];
+                NSString *effectId = nil;
+                if (data[@"effectId"] != [NSNull null] && [data[@"effectId"] length] != 0) {
+                    effectId = data[@"effectId"];
+                }
+
+                [BlueBubblesHelper sendFileTransferToChat:chat filePath:filePath effectId:effectId transaction:transaction];
+
+            } else {
+                if (transaction != nil) {
+                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"`filePath` can not be left blank"}];
+                }
+              DLog(@"BLUEBUBBLESHELPER: Unable to create file transfer: `filePath` can not be left blank ");
             }
-
-            [BlueBubblesHelper sendFileTransferToChat:chat filePath:filePath effectId:effectId transaction:transaction];
-
         }
 
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
