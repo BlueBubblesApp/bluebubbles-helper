@@ -434,9 +434,6 @@ BlueBubblesHelper *plugin;
 
             [BlueBubblesHelper sendFileTransferToChat:chat filePath:filePath effectId:effectId transaction:transaction];
 
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": chat.guid}];
-            }
         }
 
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
