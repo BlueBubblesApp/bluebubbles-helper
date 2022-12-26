@@ -96,51 +96,68 @@ BlueBubblesHelper *plugin;
         [plugin initializeNetworkController];
     });
 }
-
-+(IMFileTransfer *) prepareFileTransferForAttachment:(NSURL *) originalPath : (NSString *) filename {
-    // Creates the initil guid for the file transfer (invalid for sending)
+/**
+ Creates a new file transfer & moves file to attachment location
+ 
+ @param originalPath The url of the file to be transfered ( Must be in a location IMessage.app has permition to access )
+ @param filename The filename of the transfer to show in IMessage.app
+ @return The IMFileTransfer registered with IMessage.app or nil if unable to properly create file transfer
+ @warning The `originalpath` must be a URL that IMessage.app can access even with Full Disk Access some locations are off limits. One location that is safe is always safe is `~/Library/Messages`
+ */
++(IMFileTransfer *) prepareFileTransferForAttachment:(NSURL *) originalPath filename: (NSString *) filename {
+    // Creates the initial guid for the file transfer (invalid for sending)
     NSString*  transferInitGuid = [[IMFileTransferCenter sharedInstance] guidForNewOutgoingTransferWithLocalURL:originalPath];
-    DLog(@"BLUEBUBBLESHELPERF: New Transfer GUID %@ ", transferInitGuid);
+    
+    DLog(@"BLUEBUBBLESHELPER: New Transfer GUID %@ ", transferInitGuid);
+    
     // Creates the initial transfer object but does nothing atm
     IMFileTransfer * newTransfer = [[IMFileTransferCenter sharedInstance] transferForGUID:transferInitGuid];
-    DLog(@"BLUEBUBBLESHELPERF:  New Transfer %@", newTransfer);
-    // Place where attachments should be placed
+    
+    // Get location of where attachments should be placed
     NSString* persistantPath = [[IMDPersistentAttachmentController sharedInstance] _persistentPathForTransfer:newTransfer filename:filename highQuality:TRUE];
-    DLog(@"BLUEBUBBLESHELPERF:  New Attachment Path %@", persistantPath);
-    NSURL * persistantURL = [NSURL fileURLWithPath:persistantPath];
     
-    
-    NSError *folder_creation_error;
-    
-    NSDictionary * permisstions = @{NSFilePosixPermissions: [NSNumber numberWithShort:0777]};
-    NSFileManager *file_manager = [NSFileManager defaultManager];
-    // Create the attachment location
-    [file_manager createDirectoryAtURL:[persistantURL URLByDeletingLastPathComponent] withIntermediateDirectories:TRUE attributes:permisstions error:&folder_creation_error] ;
-    if(folder_creation_error){
-        DLog(@"BLUEBUBBLESHELPERF:  Failed to create folder: %@", folder_creation_error);
+    if (persistantPath){
+        
+        DLog(@"BLUEBUBBLESHELPER: New Attachment Path %@", persistantPath);
+        NSURL * persistantURL = [NSURL fileURLWithPath:persistantPath];
+        
+        NSError *folder_creation_error;
+        
+        NSFileManager *file_manager = [NSFileManager defaultManager];
+        // Create the attachment location
+        [file_manager createDirectoryAtURL:[persistantURL URLByDeletingLastPathComponent] withIntermediateDirectories:TRUE attributes:nil error:&folder_creation_error];
+        // Catastrophic if this error occurs ? At minimum the file wasn't moved and the path is wrong
+        if(folder_creation_error){
+            DLog(@"BLUEBUBBLESHELPER:  Failed to create folder: %@", folder_creation_error);
+            return nil;
+        }
+        
+        // Copy the file to the attachment location
+        NSError *file_move_error;
+
+        [file_manager copyItemAtURL:originalPath toURL:persistantURL error:&file_move_error];
+        
+        if(file_move_error){
+            // Catastrophic if this error occurs ? At minimum the file wasn't moved and the path is wrong
+            DLog(@"BLUEBUBBLESHELPER:  Failed to move file: %@", file_move_error);
+            return nil;
+        }
+        
+        // Say that we updated the transfers location
+        [[IMFileTransferCenter sharedInstance] retargetTransfer:[newTransfer guid] toPath:persistantPath];
+        
+        // Must manually update the local url inside of the transfer
+        newTransfer.localURL = persistantURL;
+            
     }
-    // Copy the file to the attachment location
-    NSError *file_move_error;
-    
-    [file_manager copyItemAtPath:[originalPath path] toPath:persistantPath error:&file_move_error];
-    
-    if(file_move_error){
-        DLog(@"BLUEBUBBLESHELPERF:  Failed to move file: %@", file_move_error);
-    }
-    
-    // Say that we updated the transfers location
-    [[IMFileTransferCenter sharedInstance] retargetTransfer:newTransfer toPath:persistantPath];
-    
-    // Must manually update the local url inside of the transfer
-    newTransfer.localURL = persistantURL;
-    
-    // Must manually say that this filename is a transfer
+    // Manually say the filename for the transfer
     newTransfer.transferredFilename = filename;
     
-    // Once this occurs file must be in correct location
-    [[IMFileTransferCenter sharedInstance] registerTransferWithDaemon:newTransfer];
+    // Add the File Transfer registry (Once this occurs file must be in correct location)
+    // *Warning* Can fail but gives only warning in console that failed
+    [[IMFileTransferCenter sharedInstance] registerTransferWithDaemon:[newTransfer guid]];
     
-    DLog(@"BLUEBUBBLESHELPERF: Transfer Registered With DAEMON %@", newTransfer);
+    DLog(@"BLUEBUBBLESHELPER: Transfer Registered With DAEMON %@", newTransfer);
     return newTransfer;
     
 }
@@ -393,6 +410,23 @@ BlueBubblesHelper *plugin;
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
         }
+    } else if ([event isEqualToString:@"send-attachment"]) {
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
+        NSString * filePath = data[@"filePath"];
+        if (chat != nil && filePath !=nil) {
+            
+            NSString *effectId = nil;
+            if (data[@"effectId"] != [NSNull null] && [data[@"effectId"] length] != 0) {
+                effectId = data[@"effectId"];
+            }
+            
+            [BlueBubblesHelper sendFileTransferToChat:chat filePath:filePath effectId:effectId transaction:transaction];
+            
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": chat.guid}];
+            }
+        }
+        
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
@@ -463,6 +497,35 @@ BlueBubblesHelper *plugin;
     }
 }
 
++(void) sendFileTransferToChat:(IMChat*)chat filePath:(NSString* )originFilePath  effectId:(NSString *) effectId transaction:(NSString*)transaction{
+    
+    
+    DLog(@"BLUEBUBBLESHELPER:  Starting to create file transfer");
+    NSURL * sendingFile = [NSURL fileURLWithPath:originFilePath];
+    IMFileTransfer * transfer = [self prepareFileTransferForAttachment:sendingFile filename:[sendingFile lastPathComponent]];
+    
+    if (transfer){
+
+        void (^createMessage)(NSString*, IMFileTransfer *) = ^(NSString *effectId,  IMFileTransfer *fileTransfer) {
+
+            IMMessage *messageToSend = [[IMMessage alloc] init];
+            messageToSend = [messageToSend initWithSender:(nil) fileTransfer:fileTransfer];
+            
+            messageToSend.expressiveSendStyleID = effectId;
+            [chat sendMessage:(messageToSend)];
+            DLog(@"BLUEBUBBLESHELPER: Sent Transfer: %@", transfer);
+
+        };
+        createMessage(effectId, transfer);
+        
+    }else{
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to create File Transfer: File copy error occurred"}];
+        }
+        DLog(@"BLUEBUBBLESHELPER: Unable to create file transfer ");
+    }
+}
+
 +(void) sendMessage: (NSDictionary *) data transaction:(NSString *) transaction {
     IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
     if (chat == nil) {
@@ -499,24 +562,39 @@ BlueBubblesHelper *plugin;
         effectId = data[@"effectId"];
     }
 
-    NSURL * sendingFile = [NSURL fileURLWithPath:@"/Users/justk/Documents/d-me-05682.jpg"];
-    IMFileTransfer * transfer = [self prepareFileTransferForAttachment:sendingFile :[sendingFile lastPathComponent]];
-    
-    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSArray *) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSArray *transferGUIDs) {
+ 
+    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier) {
         IMMessage *messageToSend = [[IMMessage alloc] init];
-        messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:transferGUIDs flags:(100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
+        messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
         [chat sendMessage:(messageToSend)];
 
     };
-    NSString *transferGUID =  [transfer guid];
-    NSArray *transferGUIDs = [NSArray arrayWithObjects: transferGUID, nil];
-    createMessage(attributedString, subjectAttributedString, effectId, nil, transferGUIDs);
+    
+    createMessage(attributedString, subjectAttributedString, effectId, nil);
+    
 
 }
 
 @end
-
-
+ZKSwizzleInterface(BBH_IMFileTransferCenter, IMFileTransferCenter, NSObject)
+@implementation BBH_IMFileTransferCenter
+- (void)registerTransferWithDaemon:(id)arg1{
+    IMFileTransfer * retrievedTransfer = [[IMFileTransferCenter sharedInstance] transferForGUID:arg1];
+    DLog(@"BLUEBUBBLESHELPERFT: Registering Transfer %@ %@ to Daemon ", arg1,retrievedTransfer );
+    ZKOrig(void, arg1);
+}
+- (void)assignTransfer:(id)arg1 toHandle:(id)arg2{
+    IMFileTransfer * retrievedTransfer = [[IMFileTransferCenter sharedInstance] transferForGUID:arg1];
+    DLog(@"BLUEBUBBLESHELPERFT: Assigned Transfer %@ to handle %@, obj: %@", arg1, arg2, retrievedTransfer);
+    ZKOrig(void, arg1, arg2);
+    DLog(@"BLUEBUBBLESHELPERFT: After Registered Still %@, %@ %hhd %hhd",retrievedTransfer, [retrievedTransfer otherPerson], [retrievedTransfer isIncoming], [retrievedTransfer wasRegisteredAsStandalone]);
+}
+- (void)assignTransfer:(id)arg1 toMessage:(id)arg2 account:(id)arg3{
+    IMFileTransfer * retrievedTransfer = [[IMFileTransferCenter sharedInstance] transferForGUID:arg1];
+    DLog(@"BLUEBUBBLESHELPERFT:  Assigned Transfer to Transfer %@, with the message %@, with the account %@, obj: %@", arg1, arg2,arg3 , retrievedTransfer);
+    ZKOrig(void, arg1, arg2, arg3);
+}
+@end
 // Credit to mrsylerpowers
 // Handles all events
 //ZKSwizzleInterface(BBH_IMChat, IMChat, NSObject)
@@ -571,63 +649,66 @@ BlueBubblesHelper *plugin;
 //@end
 
 
-//// Credit to mrsylerpowers
-//ZKSwizzleInterface(BBH_IMFileTransfer, IMFileTransfer, NSObject)
-//@implementation BBH_IMFileTransfer
-//
-//@end
-//// Handles all events
-//ZKSwizzleInterface(BBH_IMChat, IMChat, NSObject)
-//@implementation BBH_IMChat
-//
-//- (BOOL)_handleIncomingItem:(id)arg1 {
-//    IMMessageItem* imMessageItem = arg1;
-//    IMMessage *imMessage = [imMessageItem message];
-//    //Complete the normal functions like writing to database and everything
-//    BOOL isSystemMessage = [imMessageItem isSystemMessage];
-//    if(isSystemMessage)
-//    DLog(@"BLUEBUBBLESHELPER: Recieved System Message ");
-//
-//    BOOL isIncomingTypingOrCancel = [imMessageItem isIncomingTypingOrCancelTypingMessage];
-//    BOOL isTypingMessageOrCancel  = [imMessageItem isTypingOrCancelTypingMessage];
-//    if(isIncomingTypingOrCancel){
-//
-//        BOOL incomingTypingMessage = [imMessageItem isIncomingTypingMessage];
-//    if(incomingTypingMessage){
-//        DLog(@"BLUEBUBBLESHELPER: Incoming Typing Message.....");
-//        [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": [imMessage guid]}];
-//    }else{
-//        DLog(@"BLUEBUBBLESHELPER: Incoming Cancel Typing Message");
-//        [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": [imMessage guid]}];
-//        DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", [imMessage guid]);
-//    }
-//
-//    }
-//    if (isTypingMessageOrCancel){
-//
-//            BOOL cancelTypingMessage = [imMessageItem isCancelTypingMessage];
-//        if(cancelTypingMessage){
-//            DLog(@"BLUEBUBBLESHELPER: Cancel typing");
-//
-//            [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": [imMessage guid]}];
-//            DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", [imMessage guid]);
-//        }else{
-//            DLog(@"BLUEBUBBLESHELPER: Typing...");
-//            [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": [imMessage guid]}];
-//        }
-//    }
-//    //Complete the normal functions like writing to database and everything
-//    BOOL hasBeenHandled = ZKOrig(BOOL, arg1);
-//    if (!(isTypingMessageOrCancel || isIncomingTypingOrCancel)){
-//    DLog(@"BLUEBUBBLESHELPER: Recieved Message Update From Listener %@" ,[imMessageItem message]);
-//    DLog(@"BLUEBUBBLESHELPER: %@", [[imMessageItem message] fileTransferGUIDs]);
-//    [[NetworkController sharedInstance] sendMessage: @{@"event": @"message-update", @"guid": [[imMessageItem message] guid]}];
-//    }
-//    return hasBeenHandled;
-//
-//}
-//
-//@end
+// Credit to mrsylerpowers
+ZKSwizzleInterface(BBH_IMFileTransfer, IMFileTransfer, NSObject)
+@implementation BBH_IMFileTransfer
+
+@end
+// Handles all events
+ZKSwizzleInterface(BBH_IMChat, IMChat, NSObject)
+@implementation BBH_IMChat
+- (void)sendMessage:(id)arg1{
+    DLog(@"BLUEBUBBLESHELPERF: Here is what was sent %@ ", arg1);
+    ZKOrig(void, arg1);
+}
+- (BOOL)_handleIncomingItem:(id)arg1 {
+    IMMessageItem* imMessageItem = arg1;
+    IMMessage *imMessage = [imMessageItem message];
+    //Complete the normal functions like writing to database and everything
+    BOOL isSystemMessage = [imMessageItem isSystemMessage];
+    if(isSystemMessage)
+    DLog(@"BLUEBUBBLESHELPER: Recieved System Message ");
+
+    BOOL isIncomingTypingOrCancel = [imMessageItem isIncomingTypingOrCancelTypingMessage];
+    BOOL isTypingMessageOrCancel  = [imMessageItem isTypingOrCancelTypingMessage];
+    if(isIncomingTypingOrCancel){
+
+        BOOL incomingTypingMessage = [imMessageItem isIncomingTypingMessage];
+    if(incomingTypingMessage){
+        DLog(@"BLUEBUBBLESHELPER: Incoming Typing Message.....");
+        [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": [imMessage guid]}];
+    }else{
+        DLog(@"BLUEBUBBLESHELPER: Incoming Cancel Typing Message");
+        [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": [imMessage guid]}];
+        DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", [imMessage guid]);
+    }
+
+    }
+    if (isTypingMessageOrCancel){
+
+            BOOL cancelTypingMessage = [imMessageItem isCancelTypingMessage];
+        if(cancelTypingMessage){
+            DLog(@"BLUEBUBBLESHELPER: Cancel typing");
+
+            [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": [imMessage guid]}];
+            DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", [imMessage guid]);
+        }else{
+            DLog(@"BLUEBUBBLESHELPER: Typing...");
+            [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": [imMessage guid]}];
+        }
+    }
+    //Complete the normal functions like writing to database and everything
+    BOOL hasBeenHandled = ZKOrig(BOOL, arg1);
+    if (!(isTypingMessageOrCancel || isIncomingTypingOrCancel)){
+    DLog(@"BLUEBUBBLESHELPER: Recieved Message Update From Listener %@" ,[imMessageItem message]);
+    DLog(@"BLUEBUBBLESHELPER: %@", [[imMessageItem message] fileTransferGUIDs]);
+    [[NetworkController sharedInstance] sendMessage: @{@"event": @"message-update", @"guid": [[imMessageItem message] guid]}];
+    }
+    return hasBeenHandled;
+
+}
+
+@end
 
 // Credit to w0lf
 // Handles all of the incoming typing events
