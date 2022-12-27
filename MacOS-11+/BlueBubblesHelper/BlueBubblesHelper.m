@@ -305,7 +305,12 @@ BlueBubblesHelper *plugin;
             IMMessagePartChatItem *item;
             // sometimes items is an array so we need to account for that
             if ([items isKindOfClass:[NSArray class]]) {
-                item = [(NSArray *)items objectAtIndex:([data[@"partIndex"] integerValue])];
+                for (IMMessagePartChatItem *i in (NSArray *) items) {
+                    if ([i index] == [data[@"partIndex"] integerValue]) {
+                        item = i;
+                        break;
+                    }
+                }
             } else {
                 item = (IMMessagePartChatItem *)items;
             }
@@ -520,7 +525,12 @@ BlueBubblesHelper *plugin;
             IMMessagePartChatItem *item;
             // sometimes items is an array so we need to account for that
             if ([items isKindOfClass:[NSArray class]]) {
-                item = [(NSArray *)items objectAtIndex:([data[@"partIndex"] integerValue])];
+                for (IMMessagePartChatItem *i in (NSArray *) items) {
+                    if ([i index] == [data[@"partIndex"] integerValue]) {
+                        item = i;
+                        break;
+                    }
+                }
             } else {
                 item = (IMMessagePartChatItem *)items;
             }
