@@ -442,7 +442,28 @@ BlueBubblesHelper *plugin;
               DLog(@"BLUEBUBBLESHELPER: Unable to create file transfer: `filePath` can not be left blank ");
             }
         }
-
+    }else if ([event isEqualToString:@"new-transfer"]) {
+        NSString * filePath = data[@"filePath"];
+        
+            if ( filePath != nil && ![filePath isEqual: @""]){
+                NSURL * fileUrl = [NSURL fileURLWithPath:filePath];
+                IMFileTransfer* fileTransfer = [BlueBubblesHelper prepareFileTransferForAttachment:fileUrl filename:[fileUrl lastPathComponent]];
+                if (fileTransfer!=nil){
+                    if (transaction != nil) {
+                        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [fileTransfer guid]}];
+                    }
+                    DLog(@"BLUEBUBBLESHELPER: File Transfer registered: %@", [fileTransfer guid]);
+                }else {
+                    if (transaction != nil) {
+                        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to create file transfer file move error occured"}];
+                    }
+                }
+            }else {
+                if (transaction != nil) {
+                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"`filePath` can not be left blank"}];
+                }
+            }
+        
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
@@ -551,7 +572,9 @@ BlueBubblesHelper *plugin;
         DLog(@"BLUEBUBBLESHELPER: chat is null, aborting");
         return;
     }
-
+    
+    NSArray * fileTransfersGUIDs = data[@"fileTransferGUIDs"];
+    
     // TODO make sure this is safe from exceptions
     // now we will deserialize the attributedBody if it exists
     NSDictionary *attributedDict = data[@"attributedBody"];
@@ -581,16 +604,16 @@ BlueBubblesHelper *plugin;
         effectId = data[@"effectId"];
     }
 
-    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier) {
+    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSArray*) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSArray* fileTransfersGUIDs) {
         IMMessage *messageToSend = [[IMMessage alloc] init];
-        messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
+        messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(fileTransfersGUIDs) flags:(100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
         [chat sendMessage:(messageToSend)];
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastFinishedMessage] guid]}];
         }
     };
 
-    createMessage(attributedString, subjectAttributedString, effectId, nil);
+    createMessage(attributedString, subjectAttributedString, effectId, nil, fileTransfersGUIDs);
 }
 
 @end
