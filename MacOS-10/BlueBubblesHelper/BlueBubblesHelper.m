@@ -150,6 +150,12 @@ BlueBubblesHelper *plugin;
                 IMMessagePartChatItem *item;
                 // sometimes items is an array so we need to account for that
                 if ([items isKindOfClass:[NSArray class]]) {
+                    for (IMMessagePartChatItem *i in (NSArray *) items) {
+                        if ([i index] == [data[@"partIndex"] integerValue]) {
+                            item = i;
+                            break;
+                        }
+                    }
                     item = [(NSArray *)items objectAtIndex:([data[@"partIndex"] integerValue])];
                 } else {
                     item = (IMMessagePartChatItem *)items;
