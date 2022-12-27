@@ -426,43 +426,30 @@ BlueBubblesHelper *plugin;
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         NSString * filePath = data[@"filePath"];
         if (chat != nil ) {
-            if ( filePath != nil && ![filePath isEqual: @""]){
 
-                NSString *effectId = nil;
-                if (data[@"effectId"] != [NSNull null] && [data[@"effectId"] length] != 0) {
-                    effectId = data[@"effectId"];
-                }
-
-                [BlueBubblesHelper sendFileTransferToChat:chat filePath:filePath effectId:effectId transaction:transaction];
-
-            } else {
-                if (transaction != nil) {
-                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"`filePath` can not be left blank"}];
-                }
-              DLog(@"BLUEBUBBLESHELPER: Unable to create file transfer: `filePath` can not be left blank ");
+            NSString *effectId = nil;
+            if (data[@"effectId"] != [NSNull null] && [data[@"effectId"] length] != 0) {
+                effectId = data[@"effectId"];
             }
+
+            [BlueBubblesHelper sendFileTransferToChat:chat filePath:filePath effectId:effectId transaction:transaction];
+            
         }
     }else if ([event isEqualToString:@"new-transfer"]) {
         NSString * filePath = data[@"filePath"];
         
-            if ( filePath != nil && ![filePath isEqual: @""]){
-                NSURL * fileUrl = [NSURL fileURLWithPath:filePath];
-                IMFileTransfer* fileTransfer = [BlueBubblesHelper prepareFileTransferForAttachment:fileUrl filename:[fileUrl lastPathComponent]];
-                if (fileTransfer!=nil){
-                    if (transaction != nil) {
-                        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [fileTransfer guid]}];
-                    }
-                    DLog(@"BLUEBUBBLESHELPER: File Transfer registered: %@", [fileTransfer guid]);
-                }else {
-                    if (transaction != nil) {
-                        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to create file transfer file move error occured"}];
-                    }
-                }
-            }else {
-                if (transaction != nil) {
-                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"`filePath` can not be left blank"}];
-                }
+        NSURL * fileUrl = [NSURL fileURLWithPath:filePath];
+        IMFileTransfer* fileTransfer = [BlueBubblesHelper prepareFileTransferForAttachment:fileUrl filename:[fileUrl lastPathComponent]];
+        if (fileTransfer!=nil) {
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [fileTransfer guid]}];
             }
+            DLog(@"BLUEBUBBLESHELPER: File Transfer registered: %@", [fileTransfer guid]);
+        } else {
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to create file transfer file move error occured"}];
+            }
+        }
         
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
