@@ -11,6 +11,9 @@
 #import <Foundation/Foundation.h>
 
 #import "IMTextMessagePartChatItem.h"
+#import "IMFileTransfer.h"
+#import "IMFileTransferCenter.h"
+#import "IMDPersistentAttachmentController.h"
 #import "IMHandle.h"
 #import "IMPerson.h"
 #import "IMAccount.h"
@@ -89,6 +92,71 @@ BlueBubblesHelper *plugin;
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         [plugin initializeNetworkController];
     });
+}
+/**
+ Creates a new file transfer & moves file to attachment location
+
+ @param originalPath The url of the file to be transferred ( Must be in a location IMessage.app has permission to access )
+ @param filename The filename of the transfer to show in IMessage.app
+ @return The IMFileTransfer registered with IMessage.app or nil if unable to properly create file transfer
+ @warning The `originalPath` must be a URL that IMessage.app can access even with Full Disk Access some locations are off limits. One location that is safe is always safe is `~/Library/Messages`
+ */
++(IMFileTransfer *) prepareFileTransferForAttachment:(NSURL *) originalPath filename: (NSString *) filename {
+    // Creates the initial guid for the file transfer (invalid for sending)
+    NSString*  transferInitGuid = [[IMFileTransferCenter sharedInstance] guidForNewOutgoingTransferWithLocalURL:originalPath];
+
+    DLog(@"BLUEBUBBLESHELPER: New Transfer GUID %@ ", transferInitGuid);
+
+    // Creates the initial transfer object but does nothing atm
+    IMFileTransfer * newTransfer = [[IMFileTransferCenter sharedInstance] transferForGUID:transferInitGuid];
+
+    // Get location of where attachments should be placed
+    NSString* persistentPath = [[IMDPersistentAttachmentController sharedInstance] _persistentPathForTransfer:newTransfer filename:filename highQuality:TRUE];
+
+    if (persistentPath){
+
+        DLog(@"BLUEBUBBLESHELPER: New Attachment Path %@", persistentPath);
+        NSURL * persistentURL = [NSURL fileURLWithPath:persistentPath];
+
+        NSError *folder_creation_error;
+
+        NSFileManager *file_manager = [NSFileManager defaultManager];
+        // Create the attachment location
+        [file_manager createDirectoryAtURL:[persistentURL URLByDeletingLastPathComponent] withIntermediateDirectories:TRUE attributes:nil error:&folder_creation_error];
+        // Catastrophic if this error occurs ? At minimum the file wasn't moved and the path is wrong
+        if(folder_creation_error){
+            DLog(@"BLUEBUBBLESHELPER:  Failed to create folder: %@", folder_creation_error);
+            return nil;
+        }
+
+        // Copy the file to the attachment location
+        NSError *file_move_error;
+
+        [file_manager copyItemAtURL:originalPath toURL:persistentURL error:&file_move_error];
+
+        if(file_move_error){
+            // Catastrophic if this error occurs ? At minimum the file wasn't moved and the path is wrong
+            DLog(@"BLUEBUBBLESHELPER:  Failed to move file: %@", file_move_error);
+            return nil;
+        }
+
+        // Say that we updated the transfers location
+        [[IMFileTransferCenter sharedInstance] retargetTransfer:[newTransfer guid] toPath:persistentPath];
+
+        // Must manually update the local url inside of the transfer
+        newTransfer.localURL = persistentURL;
+
+    }
+    // Manually say the filename for the transfer
+    newTransfer.transferredFilename = filename;
+
+    // Add the File Transfer registry (Once this occurs file must be in correct location)
+    // *Warning* Can fail but gives only warning in console that failed
+    [[IMFileTransferCenter sharedInstance] registerTransferWithDaemon:[newTransfer guid]];
+
+    DLog(@"BLUEBUBBLESHELPER: Transfer Registered With DAEMON %@", newTransfer);
+    return newTransfer;
+
 }
 
 // Private method to initialize all the things required by the plugin to communicate with the main
@@ -360,6 +428,35 @@ BlueBubblesHelper *plugin;
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
         }
+    } else if ([event isEqualToString:@"send-attachment"]) {
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
+        NSString * filePath = data[@"filePath"];
+        if (chat != nil ) {
+
+            NSString *effectId = nil;
+            if (data[@"effectId"] != [NSNull null] && [data[@"effectId"] length] != 0) {
+                effectId = data[@"effectId"];
+            }
+
+            [BlueBubblesHelper sendFileTransferToChat:chat filePath:filePath effectId:effectId transaction:transaction];
+            
+        }
+    }else if ([event isEqualToString:@"new-transfer"]) {
+        NSString * filePath = data[@"filePath"];
+        
+        NSURL * fileUrl = [NSURL fileURLWithPath:filePath];
+        IMFileTransfer* fileTransfer = [BlueBubblesHelper prepareFileTransferForAttachment:fileUrl filename:[fileUrl lastPathComponent]];
+        if (fileTransfer!=nil) {
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [fileTransfer guid]}];
+            }
+            DLog(@"BLUEBUBBLESHELPER: File Transfer registered: %@", [fileTransfer guid]);
+        } else {
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to create file transfer file move error occured"}];
+            }
+        }
+        
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
@@ -430,13 +527,47 @@ BlueBubblesHelper *plugin;
     }
 }
 
++(void) sendFileTransferToChat:(IMChat*)chat filePath:(NSString* )originFilePath  effectId:(NSString *) effectId transaction:(NSString*)transaction{
+
+
+    DLog(@"BLUEBUBBLESHELPER:  Starting to create file transfer");
+    NSURL * sendingFile = [NSURL fileURLWithPath:originFilePath];
+    IMFileTransfer * transfer = [self prepareFileTransferForAttachment:sendingFile filename:[sendingFile lastPathComponent]];
+
+    if (transfer){
+
+        void (^createMessage)(NSString*, IMFileTransfer *) = ^(NSString *effectId,  IMFileTransfer *fileTransfer) {
+
+            IMMessage *messageToSend = [[IMMessage alloc] init];
+            messageToSend = [messageToSend initWithSender:(nil) fileTransfer:fileTransfer];
+
+            messageToSend.expressiveSendStyleID = effectId;
+            [chat sendMessage:(messageToSend)];
+            DLog(@"BLUEBUBBLESHELPER: Sent Transfer: %@", transfer);
+            if (transaction != nil) {
+                  [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastFinishedMessage] guid]}];
+            }
+
+        };
+        createMessage(effectId, transfer);
+
+    }else{
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to create File Transfer: File copy error occurred"}];
+        }
+        DLog(@"BLUEBUBBLESHELPER: Unable to create file transfer ");
+    }
+}
+
 +(void) sendMessage: (NSDictionary *) data transaction:(NSString *) transaction {
     IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
     if (chat == nil) {
         DLog(@"BLUEBUBBLESHELPER: chat is null, aborting");
         return;
     }
-
+    
+    NSArray * fileTransfersGUIDs = data[@"fileTransferGUIDs"];
+    
     // TODO make sure this is safe from exceptions
     // now we will deserialize the attributedBody if it exists
     NSDictionary *attributedDict = data[@"attributedBody"];
@@ -466,16 +597,16 @@ BlueBubblesHelper *plugin;
         effectId = data[@"effectId"];
     }
 
-    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier) {
+    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSArray*) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSArray* fileTransfersGUIDs) {
         IMMessage *messageToSend = [[IMMessage alloc] init];
-        messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
+        messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(fileTransfersGUIDs) flags:(100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
         [chat sendMessage:(messageToSend)];
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastFinishedMessage] guid]}];
         }
     };
 
-    createMessage(attributedString, subjectAttributedString, effectId, nil);
+    createMessage(attributedString, subjectAttributedString, effectId, nil, fileTransfersGUIDs);
 }
 
 @end
