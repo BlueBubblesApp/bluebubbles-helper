@@ -12,6 +12,8 @@
 		93B28EA9257399C00056DAD4 /* ChatDisplayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EA8257399C00056DAD4 /* ChatDisplayController.m */; };
 		93B28EAD25739A430056DAD4 /* SelectorHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EAC25739A430056DAD4 /* SelectorHelper.m */; };
 		93FD993A2568E7360060D430 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
+		A68E87E228C3B18900882823 /* IMSharedUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A68E87E128C3B18900882823 /* IMSharedUtilities.framework */; };
+		A69A83E027D18385007BB936 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69A83DF27D18385007BB936 /* IMDPersistence.framework */; };
 		FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */; };
 		FBCE4EC1201C0F4D002F8A61 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCE4EC0201C0F4D002F8A61 /* Foundation.framework */; };
 		FBCE4ECC201C0F4D002F8A61 /* ZKSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCE4ECB201C0F4D002F8A61 /* ZKSwizzle.m */; };
@@ -57,8 +59,11 @@
 		A64B88A72712352000BAD446 /* TUConversationManagerDelegate-Protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TUConversationManagerDelegate-Protocol.h"; sourceTree = "<group>"; };
 		A64B88B62714A2A200BAD446 /* IMHandleRegistrar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMHandleRegistrar.h; sourceTree = "<group>"; };
 		A64B88B82715011200BAD446 /* IMCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMCore.h; sourceTree = "<group>"; };
-		A6A0F8A72731A705000128FA /* IMFileTransferCenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransferCenter.h; sourceTree = "<group>"; };
-		A6A0F8A82731A733000128FA /* IMFileTransfer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransfer.h; sourceTree = "<group>"; };
+		A68E87DF28C3B01F00882823 /* IMFileTransfer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransfer.h; sourceTree = "<group>"; };
+		A68E87E028C3B04500882823 /* IMFileTransferCenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransferCenter.h; sourceTree = "<group>"; };
+		A68E87E128C3B18900882823 /* IMSharedUtilities.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMSharedUtilities.framework; path = ../../../../../System/Library/PrivateFrameworks/IMSharedUtilities.framework; sourceTree = "<group>"; };
+		A69A83DE27D18092007BB936 /* IMDPersistentAttachmentController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMDPersistentAttachmentController.h; sourceTree = "<group>"; };
+		A69A83DF27D18385007BB936 /* IMDPersistence.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMDPersistence.framework; path = ../../../../../System/Library/PrivateFrameworks/IMDPersistence.framework; sourceTree = "<group>"; };
 		A6E1F4CF27166012000A0EF6 /* IMPinnedConversationsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMPinnedConversationsController.h; sourceTree = "<group>"; };
 		B6E17DF925EE5FA4CB129B31 /* Pods-BlueBubblesHelper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.debug.xcconfig"; sourceTree = "<group>"; };
 		BFA22E41EA07AA1C37D1B255 /* Pods-BlueBubblesHelper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.release.xcconfig"; sourceTree = "<group>"; };
@@ -85,6 +90,8 @@
 				FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */,
 				93AC09C62565E4150000C60C /* IMCore.framework in Frameworks */,
 				FBCE4EC1201C0F4D002F8A61 /* Foundation.framework in Frameworks */,
+				A68E87E228C3B18900882823 /* IMSharedUtilities.framework in Frameworks */,
+				A69A83E027D18385007BB936 /* IMDPersistence.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,6 +146,8 @@
 		FBCE4EBD201C0F4D002F8A61 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A68E87E128C3B18900882823 /* IMSharedUtilities.framework */,
+				A69A83DF27D18385007BB936 /* IMDPersistence.framework */,
 				93AC09C52565E4150000C60C /* IMCore.framework */,
 				FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */,
 				FBCE4EC0201C0F4D002F8A61 /* Foundation.framework */,
@@ -219,8 +228,9 @@
 				A64B88B62714A2A200BAD446 /* IMHandleRegistrar.h */,
 				A64B88B82715011200BAD446 /* IMCore.h */,
 				A6E1F4CF27166012000A0EF6 /* IMPinnedConversationsController.h */,
-				A6A0F8A72731A705000128FA /* IMFileTransferCenter.h */,
-				A6A0F8A82731A733000128FA /* IMFileTransfer.h */,
+				A69A83DE27D18092007BB936 /* IMDPersistentAttachmentController.h */,
+				A68E87DF28C3B01F00882823 /* IMFileTransfer.h */,
+				A68E87E028C3B04500882823 /* IMFileTransferCenter.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";
