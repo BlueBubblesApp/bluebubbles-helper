@@ -423,12 +423,42 @@ BlueBubblesHelper *plugin;
                 } range:NSMakeRange(0, 1)];
                 [attributedString appendAttributedString:attachmentStr];
             } else {
-                NSMutableAttributedString *messageStr = [[NSMutableAttributedString alloc] initWithString: dict[@"text"]];
-                [messageStr addAttributes:@{
-                    @"__kIMBaseWritingDirectionAttributeName": @"-1",
-                    @"__kIMMessagePartAttributeName": [NSNumber numberWithInt:index],
-                } range:NSMakeRange(0, [[messageStr string] length])];
-                [attributedString appendAttributedString:messageStr];
+                if (dict[@"mention"] != [NSNull null] && [dict[@"mention"] length] != 0) {
+                    NSMutableAttributedString *beforeStr = [[NSMutableAttributedString alloc] initWithString: [(NSString *) dict[@"text"] substringWithRange:NSMakeRange(0, [[dict[@"range"] firstObject] integerValue])]];
+                    [beforeStr addAttributes:@{
+                        @"__kIMBaseWritingDirectionAttributeName": @"-1",
+                        @"__kIMMessagePartAttributeName": [NSNumber numberWithInt:index],
+                    } range:NSMakeRange(0, [[beforeStr string] length])];
+                    NSMutableAttributedString *mentionStr = [[NSMutableAttributedString alloc] initWithString: [(NSString *) dict[@"text"] substringWithRange:NSMakeRange([[dict[@"range"] firstObject] integerValue], [[dict[@"range"] lastObject] integerValue])]];
+                    [mentionStr addAttributes:@{
+                        @"__kIMBaseWritingDirectionAttributeName": @"-1",
+                        @"__kIMMentionConfirmedMention": dict[@"mention"],
+                        @"__kIMMessagePartAttributeName": [NSNumber numberWithInt:index],
+                    } range:NSMakeRange(0, [[mentionStr string] length])];
+                    NSUInteger begin = [[dict[@"range"] firstObject] integerValue] + [[dict[@"range"] lastObject] integerValue];
+                    NSUInteger end = [dict[@"text"] length] - begin;
+                    NSMutableAttributedString *afterStr = [[NSMutableAttributedString alloc] initWithString: [(NSString *) dict[@"text"] substringWithRange:NSMakeRange(begin, end)]];
+                    [afterStr addAttributes:@{
+                        @"__kIMBaseWritingDirectionAttributeName": @"-1",
+                        @"__kIMMessagePartAttributeName": [NSNumber numberWithInt:index],
+                    } range:NSMakeRange(0, [[afterStr string] length])];
+                    if ([[beforeStr string] length] != 0) {
+                        [attributedString appendAttributedString:beforeStr];
+                    }
+                    if ([[mentionStr string] length] != 0) {
+                        [attributedString appendAttributedString:mentionStr];
+                    }
+                    if ([[afterStr string] length] != 0) {
+                        [attributedString appendAttributedString:afterStr];
+                    }
+                } else {
+                    NSMutableAttributedString *messageStr = [[NSMutableAttributedString alloc] initWithString: dict[@"text"]];
+                    [messageStr addAttributes:@{
+                        @"__kIMBaseWritingDirectionAttributeName": @"-1",
+                        @"__kIMMessagePartAttributeName": [NSNumber numberWithInt:index],
+                    } range:NSMakeRange(0, [[messageStr string] length])];
+                    [attributedString appendAttributedString:messageStr];
+                }
             }
             index++;
         }
