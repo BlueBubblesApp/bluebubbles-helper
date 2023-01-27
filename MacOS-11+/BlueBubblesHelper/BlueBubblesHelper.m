@@ -376,20 +376,6 @@ BlueBubblesHelper *plugin;
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
         }
-    // If the server tells us to create a new transfer
-    } else if ([event isEqualToString:@"new-transfer"]) {
-        NSString * filePath = data[@"filePath"];
-        NSURL * fileUrl = [NSURL fileURLWithPath:filePath];
-        IMFileTransfer* fileTransfer = [BlueBubblesHelper prepareFileTransferForAttachment:fileUrl filename:[fileUrl lastPathComponent]];
-        
-        if (fileTransfer != nil) {
-            DLog(@"BLUEBUBBLESHELPER: File Transfer registered: %@", [fileTransfer guid]);
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [fileTransfer guid]}];
-            }
-        } else if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to create file transfer file move error occured"}];
-        }
     // If the server tells us to send a single attachment
     } else if ([event isEqualToString:@"send-attachment"]) {
         NSString *filePath = data[@"filePath"];
@@ -400,7 +386,7 @@ BlueBubblesHelper *plugin;
             @"__kIMBaseWritingDirectionAttributeName": @"-1",
             @"__kIMFileTransferGUIDAttributeName": fileTransfer.guid,
             @"__kIMFilenameAttributeName": [fileUrl lastPathComponent],
-            @"__kIMMessagePartAttributeName": [NSNumber numberWithInt:index],
+            @"__kIMMessagePartAttributeName": @0,
         } range:NSMakeRange(0, 1)];
         [BlueBubblesHelper sendMessage:(data) transfers:@[[fileTransfer guid]] attributedString:attachmentStr transaction:(transaction)];
     // If the server tells us to send a single attachment
@@ -632,7 +618,7 @@ BlueBubblesHelper *plugin;
     
     BOOL isAudioMessage = false;
     if (data[@"isAudioMessage"] != [NSNull null]) {
-        isAudioMessage = data[@"isAudioMessage"];
+        isAudioMessage = [data[@"isAudioMessage"] integerValue] == 1;
     }
 
     void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSString*, long long*, NSRange, NSDictionary*, NSArray*, BOOL) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSString *associatedMessageGuid, long long *reaction, NSRange range, NSDictionary *summaryInfo, NSArray *transferGUIDs, BOOL isAudioMessage) {
