@@ -630,7 +630,7 @@ BlueBubblesHelper *plugin;
     SOAccountAliasController * account = notification.object;
 
     NSArray* currentAliases = [BlueBubblesHelper getVettedAliases];
-    DLog(@"BLUEBUBBLESHELPERFT: Aliases Changed %@", currentAliases);
+    DLog(@"BLUEBUBBLESHELPERF: Aliases Changed %@", currentAliases);
     [[NetworkController sharedInstance] sendMessage: @{@"event": @"aliases-updated", @"aliases": currentAliases}];
 
 
