@@ -624,7 +624,7 @@ BlueBubblesHelper *plugin;
 }
 /**
  Internal reaction to notifications about aliases
- @param notification the object inside of the notification will allways be a IMAccount
+ @param notification the object inside of the notification will always be a SOAccountAliasController
  */
 +(void)_aliasesChanged:  (NSNotification *)notification{
     SOAccountAliasController * account = notification.object;
