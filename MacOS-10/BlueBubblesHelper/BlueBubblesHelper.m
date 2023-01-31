@@ -439,7 +439,7 @@ BlueBubblesHelper *plugin;
             index++;
         }
         [BlueBubblesHelper sendMessage:(data) transfers:[transfers copy] attributedString:attributedString transaction:(transaction)];
-    } else if ([event isEqualToString:@"vetted-alias"]) {
+    } else if ([event isEqualToString:@"vetted-aliases"]) {
 
         NSArray* aliasNames = [BlueBubblesHelper getVettedAliases];
 
