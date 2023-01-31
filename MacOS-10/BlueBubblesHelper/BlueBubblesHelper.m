@@ -31,6 +31,9 @@
 #import "IMHandleRegistrar.h"
 #import "IMChatHistoryController.h"
 #import "IMChatItem.h"
+#import "SocialAppsCore/SOAccountRegistrationController.h"
+#import "SocialAppsCore/SOAccountAliasController.h"
+#import "SocialAppsCore/SOAccountAlias.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -436,6 +439,60 @@ BlueBubblesHelper *plugin;
             index++;
         }
         [BlueBubblesHelper sendMessage:(data) transfers:[transfers copy] attributedString:attributedString transaction:(transaction)];
+    } else if ([event isEqualToString:@"vetted-alias"]) {
+
+        NSArray* aliasNames = [BlueBubblesHelper getVettedAliases];
+
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": aliasNames}];
+        }
+
+    } else if ([event isEqualToString:@"register-alias-listener"]) {
+
+        [BlueBubblesHelper registerListenerForActiveAliasChanged];
+
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        }
+
+    } else if ([event isEqualToString:@"deactivate-alias"]) {
+
+        NSString * alias = data[@"alias"];
+
+        BOOL successfulDeactivation = [BlueBubblesHelper deactivateAliasForName:alias];
+
+        if (successfulDeactivation){
+
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
+
+        } else {
+
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to deactivate alias"}];
+            }
+
+        }
+    } else if ([event isEqualToString:@"activate-alias"]) {
+
+        NSString * alias = data[@"alias"];
+
+        BOOL successfulActivation = [BlueBubblesHelper activateAliasForName:alias];
+
+        if (successfulActivation){
+
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
+
+        } else {
+
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to activate alias"}];
+            }
+
+        }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
@@ -556,6 +613,129 @@ BlueBubblesHelper *plugin;
     [[IMFileTransferCenter sharedInstance] registerTransferWithDaemon:[newTransfer guid]];
     DLog(@"BLUEBUBBLESHELPER: Transfer registered successfully!");
     return newTransfer;
+}
+
+/**
+ Starts the listener for alias status changes
+ */
++(void) registerListenerForActiveAliasChanged {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_aliasesChanged:) name:@"IMAccountAliasesChangedNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_aliasesChanged:) name:@"SOAccountAliasesChangedNotification_Private" object:nil];
+}
+/**
+ Internal reaction to notifications about aliases
+ @param notification the object inside of the notification will allways be a IMAccount
+ */
++(void)_aliasesChanged:  (NSNotification *)notification{
+    SOAccountAliasController * account = notification.object;
+
+    NSArray* currentAliases = [BlueBubblesHelper getVettedAliases];
+    DLog(@"BLUEBUBBLESHELPERFT: Aliases Changed %@", currentAliases);
+    [[NetworkController sharedInstance] sendMessage: @{@"event": @"aliases-updated", @"aliases": currentAliases}];
+
+
+}
+
+/**
+ Get the account enabled state
+ @return True if the account enabled state is 4 or false if else or not signed in
+ */
++(BOOL) isAccountEnabled {
+    SOAccountRegistrationController* registrationController = [SOAccountRegistrationController registrationController];
+
+    if (registrationController!=NULL && [registrationController isSignedIn]){
+
+        long long enabledState = [registrationController enabledState];
+        NSLog(@"BLUEBUBBLESHELPER: Account Enabled State %lld", enabledState);
+        return enabledState == 4;
+
+    } else {
+        return FALSE;
+    }
+
+    return [registrationController isSignedIn];
+}
+
+/**
+  Gets the active alias associated with the signed account
+  @return The active alias's names if not logged in returns a empty list
+  */
++(NSArray *) getVettedAliases {
+
+    if ([self isAccountEnabled]) {
+        SOAccountRegistrationController* registrationController = [SOAccountRegistrationController registrationController];
+        SOAccountAliasController * aliasController = [registrationController aliasController];
+
+        NSArray* activeAliases = [aliasController vettedAliases];
+        NSLog(@"BLUEBUBBLESHELPER: Vetted Aliases %@", activeAliases);
+
+
+        NSMutableArray *returnedAliases = [[NSMutableArray  alloc] init];
+
+        for (SOAccountAlias* alias in activeAliases) {
+
+            [returnedAliases addObject:@{@"name":[alias name],@"active":[NSNumber numberWithBool:[alias active]]}];
+        }
+
+        return returnedAliases;
+
+    } else {
+
+        DLog(@"BLUEBUBBLESHELPER: Can't get aliases account not enabled");
+        return @[];
+
+    }
+
+}
+
+/**
+ Deactivates Alias
+ */
++(BOOL) deactivateAliasForName:(NSString * ) aliasName {
+
+    if ([self isAccountEnabled]) {
+
+    SOAccountRegistrationController* registrationController = [SOAccountRegistrationController registrationController];
+    SOAccountAliasController * aliasController = [registrationController aliasController];
+        @try {
+            SOAccountAlias * aliasToDisable = [aliasController aliasForName:aliasName];
+            DLog(@"BLUEBUBBLESHELPER: Deactivating Alias %@", aliasToDisable);
+            [aliasController deactivateAliases:@[aliasToDisable]];
+            return true;
+        } @catch (NSException *exception) {
+            DLog(@"BLUEBUBBLESHELPER: No alias found with name %@", aliasName);
+            return false;
+        }
+    } else {
+
+        DLog(@"BLUEBUBBLESHELPER: Can't disable alias, account not enabled");
+        return false;
+    }
+}
+
+/**
+ Activate Alias
+ */
++(BOOL) activateAliasForName:(NSString * ) aliasName {
+
+    if ([self isAccountEnabled]) {
+
+    SOAccountRegistrationController* registrationController = [SOAccountRegistrationController registrationController];
+    SOAccountAliasController * aliasController = [registrationController aliasController];
+        @try {
+            SOAccountAlias * aliasToActivate = [aliasController aliasForName:aliasName];
+            DLog(@"BLUEBUBBLESHELPER: Activating Alias %@", aliasToActivate);
+            [aliasToActivate activate];
+            return true;
+        } @catch (NSException *exception) {
+            DLog(@"BLUEBUBBLESHELPER: No alias found with name %@", aliasName);
+            return false;
+        }
+    } else {
+
+        DLog(@"BLUEBUBBLESHELPER: Can't activate alias, account not enabled");
+        return false;
+    }
 }
 
 +(void) sendMessage: (NSDictionary *) data transfers: (NSArray *) transfers attributedString:(NSMutableAttributedString *) attributedString transaction:(NSString *) transaction {
