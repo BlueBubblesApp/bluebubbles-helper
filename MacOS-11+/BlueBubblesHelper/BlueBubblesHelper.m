@@ -23,8 +23,6 @@
 #import "IMChatRegistry.h"
 #import "NetworkController.h"
 #import "Logging.h"
-#import "ChatDisplayController.h"
-#import "SelectorHelper.h"
 #import "IMHandleRegistrar.h"
 #import "IMCore.h"
 #import "IMChatHistoryController.h"
@@ -32,6 +30,7 @@
 #import "IMDPersistentAttachmentController.h"
 #import "IMFileTransfer.h"
 #import "IMFileTransferCenter.h"
+#import "ZKSwizzle.h"
 
 
 @interface BlueBubblesHelper : NSObject

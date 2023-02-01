@@ -9,9 +9,17 @@
 /* Begin PBXBuildFile section */
 		93AC09C62565E4150000C60C /* IMCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93AC09C52565E4150000C60C /* IMCore.framework */; };
 		93AC09CC2565E45F0000C60C /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
-		93B28EA9257399C00056DAD4 /* ChatDisplayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EA8257399C00056DAD4 /* ChatDisplayController.m */; };
-		93B28EAD25739A430056DAD4 /* SelectorHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EAC25739A430056DAD4 /* SelectorHelper.m */; };
 		93FD993A2568E7360060D430 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
+		A62991D02972104E00B7E663 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A62991CF2972104E00B7E663 /* AppKit.framework */; };
+		A62991D12972106200B7E663 /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
+		A62991D22972106500B7E663 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
+		A62991D52972107400B7E663 /* ZKSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCE4ECB201C0F4D002F8A61 /* ZKSwizzle.m */; };
+		A62991D7297210A500B7E663 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A62991D6297210A500B7E663 /* Foundation.framework */; };
+		A62991D8297210D900B7E663 /* IMCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93AC09C52565E4150000C60C /* IMCore.framework */; };
+		A62991D9297210EB00B7E663 /* IMSharedUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A68E87E128C3B18900882823 /* IMSharedUtilities.framework */; };
+		A62991DA297210F700B7E663 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69A83DF27D18385007BB936 /* IMDPersistence.framework */; };
+		A6490A0E2984697C002B0E1D /* PrefixHeader.pch in Resources */ = {isa = PBXBuildFile; fileRef = FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */; };
+		A6490A14298AC750002B0E1D /* SOAccountAlias.h in Headers */ = {isa = PBXBuildFile; fileRef = A6490A13298AC750002B0E1D /* SOAccountAlias.h */; };
 		A68E87E228C3B18900882823 /* IMSharedUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A68E87E128C3B18900882823 /* IMSharedUtilities.framework */; };
 		A69A83E027D18385007BB936 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69A83DF27D18385007BB936 /* IMDPersistence.framework */; };
 		FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */; };
@@ -21,11 +29,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper DyLib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71554C06257B2E4600296B93 /* IMChatHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMChatHistoryController.h; sourceTree = "<group>"; };
 		71554C0F257B58F100296B93 /* IMTranscriptChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMTranscriptChatItem.h; sourceTree = "<group>"; };
 		71554C17257B609B00296B93 /* IMTextMessagePartChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMTextMessagePartChatItem.h; sourceTree = "<group>"; };
 		71554C19257B616400296B93 /* IMMessagePartChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMMessagePartChatItem.h; sourceTree = "<group>"; };
 		71554C1B257B618400296B93 /* IMMessageChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMMessageChatItem.h; sourceTree = "<group>"; };
+		73A680493E241D577C4F4AA6 /* Pods-BlueBubblesHelper DyLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.release.xcconfig"; sourceTree = "<group>"; };
 		9316AE94257600E8002AE8EE /* IMMessageItem-IMChat_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMMessageItem-IMChat_Internal.h"; sourceTree = "<group>"; };
 		9316AE962576029C002AE8EE /* IMChatRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChatRegistry.h; sourceTree = "<group>"; };
 		9316AE98257606EC002AE8EE /* IMChat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChat.h; sourceTree = "<group>"; };
@@ -33,13 +43,16 @@
 		93AC09C52565E4150000C60C /* IMCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMCore.framework; path = ../../../../../System/Library/PrivateFrameworks/IMCore.framework; sourceTree = "<group>"; };
 		93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlueBubblesHelper.m; sourceTree = "<group>"; };
 		93B28EA5257399450056DAD4 /* Logging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
-		93B28EA7257399A70056DAD4 /* ChatDisplayController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChatDisplayController.h; sourceTree = "<group>"; };
-		93B28EA8257399C00056DAD4 /* ChatDisplayController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ChatDisplayController.m; sourceTree = "<group>"; };
-		93B28EAB25739A2A0056DAD4 /* SelectorHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectorHelper.h; sourceTree = "<group>"; };
-		93B28EAC25739A430056DAD4 /* SelectorHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectorHelper.m; sourceTree = "<group>"; };
 		93DFDC5D2568DFD4009551D2 /* IMMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMMessage.h; sourceTree = "<group>"; };
 		93FD99392568E7360060D430 /* NetworkController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkController.m; sourceTree = "<group>"; };
 		93FD993D2568E7500060D430 /* NetworkController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetworkController.h; sourceTree = "<group>"; };
+		A62991CB29720FAC00B7E663 /* libBlueBubblesHelper DyLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libBlueBubblesHelper DyLib.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A62991CF2972104E00B7E663 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		A62991D6297210A500B7E663 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		A6490A13298AC750002B0E1D /* SOAccountAlias.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SOAccountAlias.h; sourceTree = "<group>"; };
+		A6490A15298AC777002B0E1D /* SOAccountAliasController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SOAccountAliasController.h; sourceTree = "<group>"; };
+		A6490A16298AC7B6002B0E1D /* SOAccountRegistrationController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SOAccountRegistrationController.h; sourceTree = "<group>"; };
+		A6490A17298AC8AF002B0E1D /* IMAccount-AliasAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMAccount-AliasAdditions.h"; sourceTree = "<group>"; };
 		A64B888C2712316900BAD446 /* IMItemsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMItemsController.h; sourceTree = "<group>"; };
 		A64B888E271231DA00BAD446 /* IMItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMItem.h; sourceTree = "<group>"; };
 		A64B888F2712320500BAD446 /* IMRemoteObjectCoding.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMRemoteObjectCoding.h; sourceTree = "<group>"; };
@@ -66,6 +79,7 @@
 		A69A83DF27D18385007BB936 /* IMDPersistence.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMDPersistence.framework; path = ../../../../../System/Library/PrivateFrameworks/IMDPersistence.framework; sourceTree = "<group>"; };
 		A6E1F4CF27166012000A0EF6 /* IMPinnedConversationsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMPinnedConversationsController.h; sourceTree = "<group>"; };
 		B6E17DF925EE5FA4CB129B31 /* Pods-BlueBubblesHelper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.debug.xcconfig"; sourceTree = "<group>"; };
+		BF508DC152B4C503FFDF6B1E /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.debug.xcconfig"; sourceTree = "<group>"; };
 		BFA22E41EA07AA1C37D1B255 /* Pods-BlueBubblesHelper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.release.xcconfig"; sourceTree = "<group>"; };
 		F08C69D03543C5A2D76B772F /* libPods-BlueBubblesHelper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBCE4EBB201C0F4D002F8A61 /* BlueBubblesHelper.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BlueBubblesHelper.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -83,6 +97,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		A62991C929720FAC00B7E663 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A62991DA297210F700B7E663 /* IMDPersistence.framework in Frameworks */,
+				A62991D9297210EB00B7E663 /* IMSharedUtilities.framework in Frameworks */,
+				A62991D8297210D900B7E663 /* IMCore.framework in Frameworks */,
+				A62991D7297210A500B7E663 /* Foundation.framework in Frameworks */,
+				A62991D02972104E00B7E663 /* AppKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FBCE4EB8201C0F4D002F8A61 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -103,17 +129,10 @@
 			children = (
 				B6E17DF925EE5FA4CB129B31 /* Pods-BlueBubblesHelper.debug.xcconfig */,
 				BFA22E41EA07AA1C37D1B255 /* Pods-BlueBubblesHelper.release.xcconfig */,
+				BF508DC152B4C503FFDF6B1E /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */,
+				73A680493E241D577C4F4AA6 /* Pods-BlueBubblesHelper DyLib.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		93B28EA0257398E40056DAD4 /* Overrides */ = {
-			isa = PBXGroup;
-			children = (
-				93B28EA7257399A70056DAD4 /* ChatDisplayController.h */,
-				93B28EA8257399C00056DAD4 /* ChatDisplayController.m */,
-			);
-			name = Overrides;
 			sourceTree = "<group>";
 		};
 		93FD99382568E7230060D430 /* Networking */ = {
@@ -123,6 +142,17 @@
 				93FD993D2568E7500060D430 /* NetworkController.h */,
 			);
 			name = Networking;
+			sourceTree = "<group>";
+		};
+		A6490A12298AC724002B0E1D /* SocialAppsCore */ = {
+			isa = PBXGroup;
+			children = (
+				A6490A13298AC750002B0E1D /* SOAccountAlias.h */,
+				A6490A15298AC777002B0E1D /* SOAccountAliasController.h */,
+				A6490A16298AC7B6002B0E1D /* SOAccountRegistrationController.h */,
+				A6490A17298AC8AF002B0E1D /* IMAccount-AliasAdditions.h */,
+			);
+			path = SocialAppsCore;
 			sourceTree = "<group>";
 		};
 		FBCE4EB2201C0F4D002F8A61 = {
@@ -139,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				FBCE4EBB201C0F4D002F8A61 /* BlueBubblesHelper.bundle */,
+				A62991CB29720FAC00B7E663 /* libBlueBubblesHelper DyLib.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -146,12 +177,15 @@
 		FBCE4EBD201C0F4D002F8A61 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A62991D6297210A500B7E663 /* Foundation.framework */,
+				A62991CF2972104E00B7E663 /* AppKit.framework */,
 				A68E87E128C3B18900882823 /* IMSharedUtilities.framework */,
 				A69A83DF27D18385007BB936 /* IMDPersistence.framework */,
 				93AC09C52565E4150000C60C /* IMCore.framework */,
 				FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */,
 				FBCE4EC0201C0F4D002F8A61 /* Foundation.framework */,
 				F08C69D03543C5A2D76B772F /* libPods-BlueBubblesHelper.a */,
+				2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -159,7 +193,7 @@
 		FBCE4EC2201C0F4D002F8A61 /* BlueBubblesHelper */ = {
 			isa = PBXGroup;
 			children = (
-				93B28EA0257398E40056DAD4 /* Overrides */,
+				A6490A12298AC724002B0E1D /* SocialAppsCore */,
 				93FD99382568E7230060D430 /* Networking */,
 				FBCE4EDB201C264F002F8A61 /* IMCore */,
 				FBCE4EC9201C0F4D002F8A61 /* ZKSwizzle */,
@@ -175,8 +209,6 @@
 				FBCE4EC4201C0F4D002F8A61 /* Info.plist */,
 				FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */,
 				93B28EA5257399450056DAD4 /* Logging.h */,
-				93B28EAB25739A2A0056DAD4 /* SelectorHelper.h */,
-				93B28EAC25739A430056DAD4 /* SelectorHelper.m */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -237,7 +269,38 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		A62991C729720FAC00B7E663 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A6490A14298AC750002B0E1D /* SOAccountAlias.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		A62991CA29720FAC00B7E663 /* BlueBubblesHelper DyLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A62991CE29720FAC00B7E663 /* Build configuration list for PBXNativeTarget "BlueBubblesHelper DyLib" */;
+			buildPhases = (
+				A56C609B1DF77BC2D39B2EDF /* [CP] Check Pods Manifest.lock */,
+				A62991C729720FAC00B7E663 /* Headers */,
+				A62991C829720FAC00B7E663 /* Sources */,
+				A62991C929720FAC00B7E663 /* Frameworks */,
+				A6490A0D29846973002B0E1D /* Resources */,
+				A6490A0F29846A3A002B0E1D /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "BlueBubblesHelper DyLib";
+			productName = "BlueBubblesHelper DyLib";
+			productReference = A62991CB29720FAC00B7E663 /* libBlueBubblesHelper DyLib.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 		FBCE4EBA201C0F4D002F8A61 /* BlueBubblesHelper */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FBCE4ED1201C0F4D002F8A61 /* Build configuration list for PBXNativeTarget "BlueBubblesHelper" */;
@@ -246,7 +309,7 @@
 				FBCE4EB7201C0F4D002F8A61 /* Sources */,
 				FBCE4EB8201C0F4D002F8A61 /* Frameworks */,
 				FBCE4EB9201C0F4D002F8A61 /* Resources */,
-				A64B88AC2712494A00BAD446 /* ShellScript */,
+				A64B88AC2712494A00BAD446 /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -266,6 +329,10 @@
 				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = BlueBubbleMessaging;
 				TargetAttributes = {
+					A62991CA29720FAC00B7E663 = {
+						CreatedOnToolsVersion = 14.1;
+						ProvisioningStyle = Automatic;
+					};
 					FBCE4EBA201C0F4D002F8A61 = {
 						CreatedOnToolsVersion = 9.0.1;
 						ProvisioningStyle = Automatic;
@@ -285,11 +352,20 @@
 			projectRoot = "";
 			targets = (
 				FBCE4EBA201C0F4D002F8A61 /* BlueBubblesHelper */,
+				A62991CA29720FAC00B7E663 /* BlueBubblesHelper DyLib */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		A6490A0D29846973002B0E1D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A6490A0E2984697C002B0E1D /* PrefixHeader.pch in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FBCE4EB9201C0F4D002F8A61 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -323,7 +399,29 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A64B88AC2712494A00BAD446 /* ShellScript */ = {
+		A56C609B1DF77BC2D39B2EDF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-BlueBubblesHelper DyLib-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A6490A0F29846A3A002B0E1D /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -338,19 +436,45 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
+		};
+		A64B88AC2712494A00BAD446 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
 			shellScript = "codesign --deep -s \"-\" /Library/Application\\ Support/MacEnhance/Plugins/BlueBubblesHelper.bundle\nkillall Messages\nsleep 1\nopen -b com.apple.MobileSMS\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		A62991C829720FAC00B7E663 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A62991D52972107400B7E663 /* ZKSwizzle.m in Sources */,
+				A62991D22972106500B7E663 /* NetworkController.m in Sources */,
+				A62991D12972106200B7E663 /* BlueBubblesHelper.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FBCE4EB7201C0F4D002F8A61 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				93B28EAD25739A430056DAD4 /* SelectorHelper.m in Sources */,
 				93FD993A2568E7360060D430 /* NetworkController.m in Sources */,
 				FBCE4ECC201C0F4D002F8A61 /* ZKSwizzle.m in Sources */,
-				93B28EA9257399C00056DAD4 /* ChatDisplayController.m in Sources */,
 				93AC09CC2565E45F0000C60C /* BlueBubblesHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -358,6 +482,56 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		A62991CC29720FAC00B7E663 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF508DC152B4C503FFDF6B1E /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
+				CODE_SIGN_STYLE = Automatic;
+				DSTROOT = /;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				INSTALL_PATH = /Users/tanay/Desktop/test;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited) $(SYSTEM_LIBRARY_DIR)/PrivateFrameworks";
+			};
+			name = Debug;
+		};
+		A62991CD29720FAC00B7E663 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 73A680493E241D577C4F4AA6 /* Pods-BlueBubblesHelper DyLib.release.xcconfig */;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
+				CODE_SIGN_STYLE = Automatic;
+				DSTROOT = /;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				INSTALL_PATH = /Users/tanay/Desktop/test;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited) $(SYSTEM_LIBRARY_DIR)/PrivateFrameworks";
+			};
+			name = Release;
+		};
 		FBCE4ECF201C0F4D002F8A61 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -541,6 +715,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A62991CE29720FAC00B7E663 /* Build configuration list for PBXNativeTarget "BlueBubblesHelper DyLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A62991CC29720FAC00B7E663 /* Debug */,
+				A62991CD29720FAC00B7E663 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		FBCE4EB6201C0F4D002F8A61 /* Build configuration list for PBXProject "BlueBubblesHelper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
