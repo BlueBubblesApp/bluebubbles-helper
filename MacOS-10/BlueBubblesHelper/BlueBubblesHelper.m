@@ -165,7 +165,6 @@ BlueBubblesHelper *plugin;
                             break;
                         }
                     }
-                    item = [(NSArray *)items objectAtIndex:([data[@"partIndex"] integerValue])];
                 } else {
                     item = (IMMessagePartChatItem *)items;
                 }
