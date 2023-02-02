@@ -111,6 +111,9 @@ BlueBubblesHelper *plugin;
     NSDictionary *message = @{@"event": @"ping", @"message": @"Helper Connected!"};
     [controller sendMessage:message];
 
+    // Register Alias Changed Listener
+    [BlueBubblesHelper registerListenerForActiveAliasChanged];
+
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
     // Quickly test a message event
     //     [self handleMessage:controller message:@"{\"action\":\"send-message\",\"data\":{\"chatGuid\":\"iMessage;-;elliotnash@gmail.com\",\"subject\":\"\",\"message\":\"Elliot\",\"attributedBody\":{\"runs\":[{\"attributes\":{\"__kIMMessagePartAttributeName\":0,\"__kIMMentionConfirmedMention\":\"elliotnash@gmail.com\"},\"range\":[0,6]}],\"string\":\"Elliot\"},\"effectsId\":\"com.apple.MobileSMS.expressivesend.impact\",\"selectedMessageGuid\":null}}"];
@@ -445,14 +448,6 @@ BlueBubblesHelper *plugin;
 
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": aliasNames}];
-        }
-
-    } else if ([event isEqualToString:@"register-alias-listener"]) {
-
-        [BlueBubblesHelper registerListenerForActiveAliasChanged];
-
-        if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
         }
 
     } else if ([event isEqualToString:@"deactivate-alias"]) {
