@@ -20,6 +20,11 @@
 		A62991DA297210F700B7E663 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69A83DF27D18385007BB936 /* IMDPersistence.framework */; };
 		A6490A0E2984697C002B0E1D /* PrefixHeader.pch in Resources */ = {isa = PBXBuildFile; fileRef = FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */; };
 		A6490A14298AC750002B0E1D /* SOAccountAlias.h in Headers */ = {isa = PBXBuildFile; fileRef = A6490A13298AC750002B0E1D /* SOAccountAlias.h */; };
+		A6490A19298AC986002B0E1D /* SocialAppsCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6490A18298AC986002B0E1D /* SocialAppsCore.framework */; };
+		A6490A1A298AC9B8002B0E1D /* SocialAppsCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6490A18298AC986002B0E1D /* SocialAppsCore.framework */; };
+		A6490A1C298DC81C002B0E1D /* VettedAliasDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = A6490A1B298DC81C002B0E1D /* VettedAliasDictionary.m */; };
+		A6490A1D298DC81C002B0E1D /* VettedAliasDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = A6490A1B298DC81C002B0E1D /* VettedAliasDictionary.m */; };
+		A6490A1F298DCC35002B0E1D /* VettedAliasDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = A6490A1E298DCC35002B0E1D /* VettedAliasDictionary.h */; };
 		A68E87E228C3B18900882823 /* IMSharedUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A68E87E128C3B18900882823 /* IMSharedUtilities.framework */; };
 		A69A83E027D18385007BB936 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69A83DF27D18385007BB936 /* IMDPersistence.framework */; };
 		FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */; };
@@ -53,6 +58,9 @@
 		A6490A15298AC777002B0E1D /* SOAccountAliasController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SOAccountAliasController.h; sourceTree = "<group>"; };
 		A6490A16298AC7B6002B0E1D /* SOAccountRegistrationController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SOAccountRegistrationController.h; sourceTree = "<group>"; };
 		A6490A17298AC8AF002B0E1D /* IMAccount-AliasAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMAccount-AliasAdditions.h"; sourceTree = "<group>"; };
+		A6490A18298AC986002B0E1D /* SocialAppsCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocialAppsCore.framework; path = ../../../../../System/Library/PrivateFrameworks/SocialAppsCore.framework; sourceTree = "<group>"; };
+		A6490A1B298DC81C002B0E1D /* VettedAliasDictionary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VettedAliasDictionary.m; sourceTree = "<group>"; };
+		A6490A1E298DCC35002B0E1D /* VettedAliasDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VettedAliasDictionary.h; sourceTree = "<group>"; };
 		A64B888C2712316900BAD446 /* IMItemsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMItemsController.h; sourceTree = "<group>"; };
 		A64B888E271231DA00BAD446 /* IMItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMItem.h; sourceTree = "<group>"; };
 		A64B888F2712320500BAD446 /* IMRemoteObjectCoding.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMRemoteObjectCoding.h; sourceTree = "<group>"; };
@@ -101,6 +109,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A6490A1A298AC9B8002B0E1D /* SocialAppsCore.framework in Frameworks */,
 				A62991DA297210F700B7E663 /* IMDPersistence.framework in Frameworks */,
 				A62991D9297210EB00B7E663 /* IMSharedUtilities.framework in Frameworks */,
 				A62991D8297210D900B7E663 /* IMCore.framework in Frameworks */,
@@ -113,6 +122,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A6490A19298AC986002B0E1D /* SocialAppsCore.framework in Frameworks */,
 				FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */,
 				93AC09C62565E4150000C60C /* IMCore.framework in Frameworks */,
 				FBCE4EC1201C0F4D002F8A61 /* Foundation.framework in Frameworks */,
@@ -177,6 +187,7 @@
 		FBCE4EBD201C0F4D002F8A61 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A6490A18298AC986002B0E1D /* SocialAppsCore.framework */,
 				A62991D6297210A500B7E663 /* Foundation.framework */,
 				A62991CF2972104E00B7E663 /* AppKit.framework */,
 				A68E87E128C3B18900882823 /* IMSharedUtilities.framework */,
@@ -209,6 +220,8 @@
 				FBCE4EC4201C0F4D002F8A61 /* Info.plist */,
 				FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */,
 				93B28EA5257399450056DAD4 /* Logging.h */,
+				A6490A1B298DC81C002B0E1D /* VettedAliasDictionary.m */,
+				A6490A1E298DCC35002B0E1D /* VettedAliasDictionary.h */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -275,6 +288,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A6490A14298AC750002B0E1D /* SOAccountAlias.h in Headers */,
+				A6490A1F298DCC35002B0E1D /* VettedAliasDictionary.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -465,6 +479,7 @@
 			files = (
 				A62991D52972107400B7E663 /* ZKSwizzle.m in Sources */,
 				A62991D22972106500B7E663 /* NetworkController.m in Sources */,
+				A6490A1D298DC81C002B0E1D /* VettedAliasDictionary.m in Sources */,
 				A62991D12972106200B7E663 /* BlueBubblesHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -475,6 +490,7 @@
 			files = (
 				93FD993A2568E7360060D430 /* NetworkController.m in Sources */,
 				FBCE4ECC201C0F4D002F8A61 /* ZKSwizzle.m in Sources */,
+				A6490A1C298DC81C002B0E1D /* VettedAliasDictionary.m in Sources */,
 				93AC09CC2565E45F0000C60C /* BlueBubblesHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

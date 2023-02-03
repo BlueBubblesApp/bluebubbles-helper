@@ -31,6 +31,10 @@
 #import "IMFileTransfer.h"
 #import "IMFileTransferCenter.h"
 #import "ZKSwizzle.h"
+#import "SOAccountRegistrationController.h"
+#import "SOAccountAliasController.h"
+#import "SOAccountAlias.h"
+#import "VettedAliasDictionary.h"
 
 
 @interface BlueBubblesHelper : NSObject
@@ -38,6 +42,7 @@
 @end
 
 BlueBubblesHelper *plugin;
+NSMutableArray* vettedAliases;
 
 
 @implementation BlueBubblesHelper
@@ -110,10 +115,30 @@ BlueBubblesHelper *plugin;
     NSDictionary *message = @{@"event": @"ping", @"message": @"Helper Connected!"};
     [controller sendMessage:message];
     
+    // initialize vetted alias cache and start alias listener
+//    vettedAliases = [BlueBubblesHelper getVettedAliases];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_aliasesChanged:) name:@"IMAccountAliasesChangedNotification" object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_aliasesChanged:) name:@"SOAccountAliasesChangedNotification_Private" object:nil];
+    
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
     // Quickly test a message event
-//     [self handleMessage:controller message:@"{\"action\":\"send-message\",\"data\":{\"chatGuid\":\"iMessage;-;elliotnash@gmail.com\",\"subject\":\"\",\"message\":\"Elliot\",\"attributedBody\":{\"runs\":[{\"attributes\":{\"__kIMMessagePartAttributeName\":0,\"__kIMMentionConfirmedMention\":\"elliotnash@gmail.com\"},\"range\":[0,6]}],\"string\":\"Athena\"},\"effectsId\":\"com.apple.MobileSMS.expressivesend.impact\",\"selectedMessageGuid\":null}}"];
-//    [self handleMessage:controller message:@"{\"action\":\"send-message\",\"data\":{\"attributedBody\":null,\"chatGuid\":\"iMessage;-;elliotnash@gmail.com\",\"subject\":\"\",\"message\":\"Start Message\",\"effectId\":null,\"selectedMessageGuid\":null}}"];
+    // [self handleMessage:controller message:@"{\"action\":\"send-multipart\",\"data\":{\"chatGuid\":\"iMessage;-;tanay@neotia.in\",\"subject\":\"SUBJECT\",\"parts\":[{\"text\":\"PART 1\",\"mention\":\"tanay@neotia.in\",\"range\":[0,4]},{\"text\":\"PART 3\"}],\"effectId\":\"com.apple.MobileSMS.expressivesend.impact\",\"selectedMessageGuid\":null}}"];
+    // [self handleMessage:controller message:@"{\"action\":\"send-attachment\",\"data\":{\"filePath\":\"/Users/tanay/Library/Messages/Attachments/BlueBubbles/1668779053637.jpg\",\"chatGuid\":\"iMessage;-;zshames2@icloud.com\",\"isAudioMessage\":0}}"];
+}
+
+/**
+ Internal reaction to notifications about aliases
+ @param notification the object inside of the notification will always be a SOAccountAliasController
+ */
++(void) _aliasesChanged: (NSNotification*) notification {
+    NSArray* newAliases = [BlueBubblesHelper getVettedAliases];
+    NSSet *setCurrent = [NSSet setWithArray:vettedAliases];
+    NSSet *setUpdated = [NSSet setWithArray:newAliases];
+    NSMutableSet *difference = [setUpdated mutableCopy];
+    [difference minusSet:setCurrent];
+    NSArray *finalAliases = [difference valueForKey:@"dictionary"];
+    DLog(@"BLUEBUBBLESHELPER: Aliases Changed %@", finalAliases);
+    [[NetworkController sharedInstance] sendMessage: @{@"event": @"aliases-updated", @"aliases": finalAliases}];
 }
 
 // Run when receiving a new message from the tcp socket
@@ -448,6 +473,46 @@ BlueBubblesHelper *plugin;
             index++;
         }
         [BlueBubblesHelper sendMessage:(data) transfers:[transfers copy] attributedString:attributedString transaction:(transaction)];
+    // If the server tells us to get the vetted aliases
+    } else if ([event isEqualToString:@"vetted-aliases"]) {
+        vettedAliases = [BlueBubblesHelper getVettedAliases];
+
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": vettedAliases}];
+        }
+    } else if ([event isEqualToString:@"deactivate-alias"] || [event isEqualToString:@"activate-alias"]) {
+        BOOL activate = [event isEqualToString:@"activate-alias"];
+        NSString* alias = data[@"alias"];
+        
+        BOOL result = false;
+        if ([BlueBubblesHelper isAccountEnabled]) {
+            SOAccountAliasController* aliasController = [[SOAccountRegistrationController registrationController] aliasController];
+            
+            @try {
+                SOAccountAlias* accountAlias = [aliasController aliasForName:alias];
+                
+                DLog(@"BLUEBUBBLESHELPER: Modifying alias state: %@", accountAlias);
+                if (activate) {
+                    [accountAlias activate];
+                } else {
+                    [aliasController deactivateAliases:@[accountAlias]];
+                }
+                
+                result = true;
+            } @catch (NSException *exception) {
+                DLog(@"BLUEBUBBLESHELPER: No alias found with name %@", alias);
+            }
+        } else {
+            DLog(@"BLUEBUBBLESHELPER: Can't modify aliases, account not enabled");
+        }
+    
+        if (transaction != nil) {
+            if (result) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            } else {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to modify alias"}];
+            }
+        }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
@@ -703,6 +768,51 @@ BlueBubblesHelper *plugin;
         }];
     } else {
         createMessage(attributedString, subjectAttributedString, effectId, nil, nil, nil, NSMakeRange(0, 0), nil, transfers, isAudioMessage);
+    }
+}
+
+/**
+ Get the account enabled state
+ @return True if the account enabled state is 4 or false if else or not signed in
+ */
++(BOOL) isAccountEnabled {
+//    SOAccountRegistrationController *registrationController = [SOAccountRegistrationController registrationController];
+//
+//    if (registrationController != NULL && [registrationController isSignedIn]) {
+//        long long enabledState = [registrationController enabledState];
+//        NSLog(@"BLUEBUBBLESHELPER: Account Enabled State %lld", enabledState);
+//        return enabledState == 4;
+//    } else {
+//        return FALSE;
+//    }
+//
+//    return [registrationController isSignedIn];
+    return FALSE;
+}
+
+/**
+  Gets the active alias associated with the signed account
+  @return The active alias's names if not logged in returns a empty list
+  */
++(NSMutableArray *) getVettedAliases {
+    if ([self isAccountEnabled]) {
+        SOAccountAliasController* aliasController = [[SOAccountRegistrationController registrationController] aliasController];
+
+        NSArray* activeAliases = [aliasController vettedAliases];
+        NSLog(@"BLUEBUBBLESHELPER: Vetted Aliases %@", activeAliases);
+
+        NSMutableArray* returnedAliases = [[NSMutableArray alloc] init];
+        for (SOAccountAlias* alias in activeAliases) {
+            [returnedAliases addObject:[[VettedAliasDictionary alloc] initWithDictionary:@{
+                @"name": [alias name],
+                @"active": [NSNumber numberWithBool:[alias active]]
+            }]];
+        }
+
+        return returnedAliases;
+    } else {
+        DLog(@"BLUEBUBBLESHELPER: Can't get aliases - account not enabled");
+        return [[NSMutableArray alloc] initWithArray:@[]];
     }
 }
 

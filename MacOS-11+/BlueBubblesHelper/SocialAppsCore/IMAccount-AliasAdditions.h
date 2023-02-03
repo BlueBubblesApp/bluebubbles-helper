@@ -4,8 +4,6 @@
 //     class-dump is Copyright (C) 1997-1998, 2000-2001, 2004-2014 by Steve Nygard.
 //
 
-#import <IMCore/IMAccount.h>
-
 @interface IMAccount (AliasAdditions)
 - (id)loginName;
 - (id)phoneNumberAlias;
