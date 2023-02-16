@@ -750,10 +750,8 @@ BlueBubblesHelper *plugin;
     }
 
     NSMutableAttributedString *subjectAttributedString = nil;
-    BOOL subject = false;
     if (data[@"subject"] != [NSNull null] && [data[@"subject"] length] != 0) {
         subjectAttributedString = [[NSMutableAttributedString alloc] initWithString: data[@"subject"]];
-        subject = true;
     }
     NSString *effectId = nil;
     if (data[@"effectId"] != [NSNull null] && [data[@"effectId"] length] != 0) {
@@ -765,7 +763,7 @@ BlueBubblesHelper *plugin;
         isAudioMessage = [data[@"isAudioMessage"] integerValue] == 1;
     }
 
-    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSArray*, BOOL, BOOL) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSArray *transferGUIDs, BOOL isAudioMessage, BOOL subject) {
+    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSArray*, BOOL, BOOL) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSArray *transferGUIDs, BOOL isAudioMessage) {
         IMMessage *messageToSend = [[IMMessage alloc] init];
         messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(transferGUIDs) flags:(isAudioMessage ? 0x300005 : (subject ? 0x10000d : 0x100005)) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
         [chat sendMessage:(messageToSend)];
@@ -774,7 +772,7 @@ BlueBubblesHelper *plugin;
         }
     };
 
-    createMessage(attributedString, subjectAttributedString, effectId, nil, transfers, isAudioMessage, subject);
+    createMessage(attributedString, subjectAttributedString, effectId, nil, transfers, isAudioMessage);
 }
 
 @end
