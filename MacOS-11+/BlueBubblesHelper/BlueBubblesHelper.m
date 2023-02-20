@@ -705,8 +705,9 @@ NSMutableArray* vettedAliases;
             if ([items isKindOfClass:[NSArray class]]) {
                 for (IMMessagePartChatItem *i in (NSArray *) items) {
                     // IMAggregateAttachmentMessagePartChatItem is a photo gallery and has subparts
-                    // Only available Monterey+
-                    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && [i isKindOfClass:[IMAggregateAttachmentMessagePartChatItem class]]) {
+                    // Only available Monterey+, use reference to class loaded at runtime to avoid crashes on Big Sur
+                    Class cls = NSClassFromString(@"IMAggregateAttachmentMessagePartChatItem");
+                    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && [i isKindOfClass:cls]) {
                         IMAggregateAttachmentMessagePartChatItem *aggregate = i;
                         for (IMMessagePartChatItem *i2 in [aggregate aggregateAttachmentParts]) {
                             if ([i2 index] == [data[@"partIndex"] integerValue]) {
