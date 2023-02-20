@@ -30,12 +30,8 @@
 #import "IMDPersistentAttachmentController.h"
 #import "IMFileTransfer.h"
 #import "IMFileTransferCenter.h"
+#import "IMAggregateAttachmentMessagePartChatItem.h"
 #import "ZKSwizzle.h"
-#import "SOAccountRegistrationController.h"
-#import "SOAccountAliasController.h"
-#import "SOAccountAlias.h"
-#import "VettedAliasDictionary.h"
-
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -86,8 +82,9 @@ NSMutableArray* vettedAliases;
     plugin = [BlueBubblesHelper sharedInstance];
 
     // Get OS version for debugging purposes
-    NSUInteger osx_ver = [[NSProcessInfo processInfo] operatingSystemVersion].minorVersion;
-    DLog(@"BLUEBUBBLESHELPER: %@ loaded into %@ on macOS 10.%ld", [self class], [[NSBundle mainBundle] bundleIdentifier], (long)osx_ver);
+    NSUInteger major = [[NSProcessInfo processInfo] operatingSystemVersion].majorVersion;
+    NSUInteger minor = [[NSProcessInfo processInfo] operatingSystemVersion].minorVersion;
+    DLog(@"BLUEBUBBLESHELPER: %@ loaded into %@ on macOS %ld.%ld", [self class], [[NSBundle mainBundle] bundleIdentifier], (long)major, (long)minor);
 
     DLog(@"BLUEBUBBLESHELPER: Initializing Connection in 5 seconds");
 
@@ -481,38 +478,38 @@ NSMutableArray* vettedAliases;
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": vettedAliases}];
         }
     } else if ([event isEqualToString:@"deactivate-alias"] || [event isEqualToString:@"activate-alias"]) {
-        BOOL activate = [event isEqualToString:@"activate-alias"];
-        NSString* alias = data[@"alias"];
-        
-        BOOL result = false;
-        if ([BlueBubblesHelper isAccountEnabled]) {
-            SOAccountAliasController* aliasController = [[SOAccountRegistrationController registrationController] aliasController];
-            
-            @try {
-                SOAccountAlias* accountAlias = [aliasController aliasForName:alias];
-                
-                DLog(@"BLUEBUBBLESHELPER: Modifying alias state: %@", accountAlias);
-                if (activate) {
-                    [accountAlias activate];
-                } else {
-                    [aliasController deactivateAliases:@[accountAlias]];
-                }
-                
-                result = true;
-            } @catch (NSException *exception) {
-                DLog(@"BLUEBUBBLESHELPER: No alias found with name %@", alias);
-            }
-        } else {
-            DLog(@"BLUEBUBBLESHELPER: Can't modify aliases, account not enabled");
-        }
-    
-        if (transaction != nil) {
-            if (result) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
-            } else {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to modify alias"}];
-            }
-        }
+//        BOOL activate = [event isEqualToString:@"activate-alias"];
+//        NSString* alias = data[@"alias"];
+//
+//        BOOL result = false;
+//        if ([BlueBubblesHelper isAccountEnabled]) {
+//            SOAccountAliasController* aliasController = [[SOAccountRegistrationController registrationController] aliasController];
+//
+//            @try {
+//                SOAccountAlias* accountAlias = [aliasController aliasForName:alias];
+//
+//                DLog(@"BLUEBUBBLESHELPER: Modifying alias state: %@", accountAlias);
+//                if (activate) {
+//                    [accountAlias activate];
+//                } else {
+//                    [aliasController deactivateAliases:@[accountAlias]];
+//                }
+//
+//                result = true;
+//            } @catch (NSException *exception) {
+//                DLog(@"BLUEBUBBLESHELPER: No alias found with name %@", alias);
+//            }
+//        } else {
+//            DLog(@"BLUEBUBBLESHELPER: Can't modify aliases, account not enabled");
+//        }
+//
+//        if (transaction != nil) {
+//            if (result) {
+//                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+//            } else {
+//                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to modify alias"}];
+//            }
+//        }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
@@ -707,9 +704,21 @@ NSMutableArray* vettedAliases;
             // sometimes items is an array so we need to account for that
             if ([items isKindOfClass:[NSArray class]]) {
                 for (IMMessagePartChatItem *i in (NSArray *) items) {
-                    if ([i index] == [data[@"partIndex"] integerValue]) {
-                        item = i;
-                        break;
+                    // IMAggregateAttachmentMessagePartChatItem is a photo gallery and has subparts
+                    // Only available Monterey+
+                    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && [i isKindOfClass:[IMAggregateAttachmentMessagePartChatItem class]]) {
+                        IMAggregateAttachmentMessagePartChatItem *aggregate = i;
+                        for (IMMessagePartChatItem *i2 in [aggregate aggregateAttachmentParts]) {
+                            if ([i2 index] == [data[@"partIndex"] integerValue]) {
+                                item = i2;
+                                break;
+                            }
+                        }
+                    } else {
+                        if ([i index] == [data[@"partIndex"] integerValue]) {
+                            item = i;
+                            break;
+                        }
                     }
                 }
             } else {
@@ -795,25 +804,26 @@ NSMutableArray* vettedAliases;
   @return The active alias's names if not logged in returns a empty list
   */
 +(NSMutableArray *) getVettedAliases {
-    if ([self isAccountEnabled]) {
-        SOAccountAliasController* aliasController = [[SOAccountRegistrationController registrationController] aliasController];
-
-        NSArray* activeAliases = [aliasController vettedAliases];
-        NSLog(@"BLUEBUBBLESHELPER: Vetted Aliases %@", activeAliases);
-
-        NSMutableArray* returnedAliases = [[NSMutableArray alloc] init];
-        for (SOAccountAlias* alias in activeAliases) {
-            [returnedAliases addObject:[[VettedAliasDictionary alloc] initWithDictionary:@{
-                @"name": [alias name],
-                @"active": [NSNumber numberWithBool:[alias active]]
-            }]];
-        }
-
-        return returnedAliases;
-    } else {
-        DLog(@"BLUEBUBBLESHELPER: Can't get aliases - account not enabled");
-        return [[NSMutableArray alloc] initWithArray:@[]];
-    }
+//    if ([self isAccountEnabled]) {
+//        SOAccountAliasController* aliasController = [[SOAccountRegistrationController registrationController] aliasController];
+//
+//        NSArray* activeAliases = [aliasController vettedAliases];
+//        NSLog(@"BLUEBUBBLESHELPER: Vetted Aliases %@", activeAliases);
+//
+//        NSMutableArray* returnedAliases = [[NSMutableArray alloc] init];
+//        for (SOAccountAlias* alias in activeAliases) {
+//            [returnedAliases addObject:[[VettedAliasDictionary alloc] initWithDictionary:@{
+//                @"name": [alias name],
+//                @"active": [NSNumber numberWithBool:[alias active]]
+//            }]];
+//        }
+//
+//        return returnedAliases;
+//    } else {
+//        DLog(@"BLUEBUBBLESHELPER: Can't get aliases - account not enabled");
+//        return [[NSMutableArray alloc] initWithArray:@[]];
+//    }
+    return [[NSMutableArray alloc] initWithArray:@[]];
 }
 
 @end
