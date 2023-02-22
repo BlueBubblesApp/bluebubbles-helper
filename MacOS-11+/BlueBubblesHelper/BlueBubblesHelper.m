@@ -64,14 +64,14 @@ NSMutableArray* vettedAliases;
         if (strLen > stepLog) {
         for (int i=1; i <= countInt; i++) {
             NSString *character = [logString substringWithRange:NSMakeRange((i*stepLog)-stepLog, stepLog)];
-            NSLog(@"BLUEBUBBLESHELPER: %@", character);
+            DLog("BLUEBUBBLESHELPER: %{public}@", character);
 
         }
         NSString *character = [logString substringWithRange:NSMakeRange((countInt*stepLog), strLen-(countInt*stepLog))];
-        NSLog(@"BLUEBUBBLESHELPER: %@", character);
+            DLog("BLUEBUBBLESHELPER: %{public}@", character);
         } else {
 
-        NSLog(@"BLUEBUBBLESHELPER: %@", logString);
+            DLog("BLUEBUBBLESHELPER: %{public}@", logString);
         }
 
 }
@@ -84,9 +84,9 @@ NSMutableArray* vettedAliases;
     // Get OS version for debugging purposes
     NSUInteger major = [[NSProcessInfo processInfo] operatingSystemVersion].majorVersion;
     NSUInteger minor = [[NSProcessInfo processInfo] operatingSystemVersion].minorVersion;
-    DLog(@"BLUEBUBBLESHELPER: %@ loaded into %@ on macOS %ld.%ld", [self class], [[NSBundle mainBundle] bundleIdentifier], (long)major, (long)minor);
+    DLog("BLUEBUBBLESHELPER: %{public}@ loaded into %{public}@ on macOS %ld.%ld", [self class], [[NSBundle mainBundle] bundleIdentifier], (long)major, (long)minor);
 
-    DLog(@"BLUEBUBBLESHELPER: Initializing Connection in 5 seconds");
+    DLog("BLUEBUBBLESHELPER: Initializing Connection in 5 seconds");
 
     // I delay here for 5 seconds because there is a strange bug where
     // the plugin will spam think that a user starts and stops typing.
@@ -134,7 +134,7 @@ NSMutableArray* vettedAliases;
     NSMutableSet *difference = [setUpdated mutableCopy];
     [difference minusSet:setCurrent];
     NSArray *finalAliases = [difference valueForKey:@"dictionary"];
-    DLog(@"BLUEBUBBLESHELPER: Aliases Changed %@", finalAliases);
+    DLog("BLUEBUBBLESHELPER: Aliases Changed %{public}@", finalAliases);
     [[NetworkController sharedInstance] sendMessage: @{@"event": @"aliases-updated", @"aliases": finalAliases}];
 }
 
@@ -146,7 +146,7 @@ NSMutableArray* vettedAliases;
     if(range.location != NSNotFound){
      message = [message substringWithRange:NSMakeRange(0, range.location + 1)];
     }
-    DLog(@"BLUEBUBBLESHELPER: Received raw json: %@", message);
+    DLog("BLUEBUBBLESHELPER: Received raw json: %{public}@", message);
     NSError *error;
     NSData *jsonData = [message dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&error];
@@ -161,7 +161,7 @@ NSMutableArray* vettedAliases;
         transaction = dictionary[@"transactionId"];
     }
 
-    DLog(@"BLUEBUBBLESHELPER: Message received: %@, %@", event, data);
+    DLog("BLUEBUBBLESHELPER: Message received: %{public}@, %{public}@", event, data);
     
     // If the server tells us to start typing
      if([event isEqualToString: @"start-typing"]) {
@@ -235,7 +235,7 @@ NSMutableArray* vettedAliases;
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
         }
-        DLog(@"BLUEBUBBLESHELPER: Setting display name of chat %@ to %@", data[@"chatGuid"], data[@"newName"]);
+        DLog("BLUEBUBBLESHELPER: Setting display name of chat %{public}@ to %{public}@", data[@"chatGuid"], data[@"newName"]);
     // If the server tells us to add a participant
     } else if ([event isEqualToString:@"add-participant"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
@@ -265,12 +265,12 @@ NSMutableArray* vettedAliases;
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
-            DLog(@"BLUEBUBBLESHELPER: Added participant to chat %@: %@", data[@"chatGuid"], data[@"address"]);
+            DLog("BLUEBUBBLESHELPER: Added participant to chat %{public}@: %{public}@", data[@"chatGuid"], data[@"address"]);
         } else {
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to add address to chat!"}];
             }
-            DLog(@"BLUEBUBBLESHELPER: Couldn't add participant to chat %@: %@", data[@"chatGuid"], data[@"address"]);
+            DLog("BLUEBUBBLESHELPER: Couldn't add participant to chat %{public}@: %{public}@", data[@"chatGuid"], data[@"address"]);
         }
     // If the server tells us to remove a participant
     } else if ([event isEqualToString:@"remove-participant"]) {
@@ -296,12 +296,12 @@ NSMutableArray* vettedAliases;
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
-            DLog(@"BLUEBUBBLESHELPER: Removed participant from chat %@: %@", data[@"chatGuid"], data[@"address"]);
+            DLog("BLUEBUBBLESHELPER: Removed participant from chat %{public}@: %{public}@", data[@"chatGuid"], data[@"address"]);
         } else {
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to remove address from chat!"}];
             }
-            DLog(@"BLUEBUBBLESHELPER: Couldn't remove participant from chat %@: %@", data[@"chatGuid"], data[@"address"]);
+            DLog("BLUEBUBBLESHELPER: Couldn't remove participant from chat %{public}@: %{public}@", data[@"chatGuid"], data[@"address"]);
         }
     // If the server tells us to send a message or tapback
     } else if ([event isEqualToString:@"send-message"] || [event isEqualToString:@"send-reaction"]) {
@@ -488,7 +488,7 @@ NSMutableArray* vettedAliases;
 //            @try {
 //                SOAccountAlias* accountAlias = [aliasController aliasForName:alias];
 //
-//                DLog(@"BLUEBUBBLESHELPER: Modifying alias state: %@", accountAlias);
+//                DLog("BLUEBUBBLESHELPER: Modifying alias state: %{public}@", accountAlias);
 //                if (activate) {
 //                    [accountAlias activate];
 //                } else {
@@ -497,10 +497,10 @@ NSMutableArray* vettedAliases;
 //
 //                result = true;
 //            } @catch (NSException *exception) {
-//                DLog(@"BLUEBUBBLESHELPER: No alias found with name %@", alias);
+//                DLog("BLUEBUBBLESHELPER: No alias found with name %{public}@", alias);
 //            }
 //        } else {
-//            DLog(@"BLUEBUBBLESHELPER: Can't modify aliases, account not enabled");
+//            DLog("BLUEBUBBLESHELPER: Can't modify aliases, account not enabled");
 //        }
 //
 //        if (transaction != nil) {
@@ -512,7 +512,7 @@ NSMutableArray* vettedAliases;
 //        }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
-        DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
+        DLog("BLUEBUBBLESHELPER: Not implemented %{public}@", event);
     }
 
 }
@@ -539,7 +539,7 @@ NSMutableArray* vettedAliases;
 +(long long) parseReactionType:(NSString *)reactionType {
     NSString *lowerCaseType = [reactionType lowercaseString];
 
-    DLog(@"BLUEBUBBLESHELPER: %@", lowerCaseType);
+    DLog("BLUEBUBBLESHELPER: %{public}@", lowerCaseType);
 
     if([@"love" isEqualToString:(lowerCaseType)]) return 2000;
     if([@"like" isEqualToString:(lowerCaseType)]) return 2001;
@@ -576,7 +576,7 @@ NSMutableArray* vettedAliases;
 
 +(void) getMessageItem:(IMChat *)chat :(NSString *)actionMessageGuid completionBlock:(void (^)(IMMessage *message))block {
     [[IMChatHistoryController sharedInstance] loadMessageWithGUID:(actionMessageGuid) completionBlock:^(IMMessage *message) {
-        DLog(@"BLUEBUBBLESHELPER: Got message for guid %@", actionMessageGuid);
+        DLog("BLUEBUBBLESHELPER: Got message for guid %{public}@", actionMessageGuid);
         block(message);
     }];
 }
@@ -591,10 +591,10 @@ NSMutableArray* vettedAliases;
     // Send out the correct response over the tcp socket
     if(chat.lastIncomingMessage.isTypingMessage == YES) {
         [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": guid}];
-        DLog(@"BLUEBUBBLESHELPER: %@ started typing", guid);
+        DLog("BLUEBUBBLESHELPER: %{public}@ started typing", guid);
     } else {
         [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
-        DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", guid);
+        DLog("BLUEBUBBLESHELPER: %{public}@ stopped typing", guid);
     }
 }
 
@@ -608,13 +608,13 @@ NSMutableArray* vettedAliases;
 +(IMFileTransfer *) prepareFileTransferForAttachment:(NSURL *) originalPath filename:(NSString *) filename {
     // Creates the initial guid for the file transfer (cannot use for sending)
     NSString *transferInitGuid = [[IMFileTransferCenter sharedInstance] guidForNewOutgoingTransferWithLocalURL:originalPath useLegacyGuid:YES];
-    DLog(@"BLUEBUBBLESHELPER: Transfer GUID: %@", transferInitGuid);
+    DLog("BLUEBUBBLESHELPER: Transfer GUID: %{public}@", transferInitGuid);
 
     // Creates the initial transfer object
     IMFileTransfer *newTransfer = [[IMFileTransferCenter sharedInstance] transferForGUID:transferInitGuid];
     // Get location of where attachments should be placed
     NSString *persistentPath = [[IMDPersistentAttachmentController sharedInstance] _persistentPathForTransfer:newTransfer filename:filename highQuality:TRUE chatGUID:nil storeAtExternalPath:TRUE];
-    DLog(@"BLUEBUBBLESHELPER: Requested persistent path: %@", persistentPath);
+    DLog("BLUEBUBBLESHELPER: Requested persistent path: %{public}@", persistentPath);
 
     if (persistentPath) {
         NSError *folder_creation_error;
@@ -625,7 +625,7 @@ NSMutableArray* vettedAliases;
         [[NSFileManager defaultManager] createDirectoryAtURL:[persistentURL URLByDeletingLastPathComponent] withIntermediateDirectories:TRUE attributes:nil error:&folder_creation_error];
         // Handle error and exit
         if (folder_creation_error) {
-            DLog(@"BLUEBUBBLESHELPER:  Failed to create folder: %@", folder_creation_error);
+            DLog("BLUEBUBBLESHELPER:  Failed to create folder: %{public}@", folder_creation_error);
             return nil;
         }
 
@@ -633,7 +633,7 @@ NSMutableArray* vettedAliases;
         [[NSFileManager defaultManager] copyItemAtURL:originalPath toURL:persistentURL error:&file_move_error];
         // Handle error and exit
         if (file_move_error) {
-            DLog(@"BLUEBUBBLESHELPER:  Failed to move file: %@", file_move_error);
+            DLog("BLUEBUBBLESHELPER:  Failed to move file: %{public}@", file_move_error);
             return nil;
         }
 
@@ -646,7 +646,7 @@ NSMutableArray* vettedAliases;
     // Register the transfer (The file must be in correct location before this)
     // *Warning* Can fail but gives only warning in console that failed
     [[IMFileTransferCenter sharedInstance] registerTransferWithDaemon:[newTransfer guid]];
-    DLog(@"BLUEBUBBLESHELPER: Transfer registered successfully!");
+    DLog("BLUEBUBBLESHELPER: Transfer registered successfully!");
     return newTransfer;
 }
 
@@ -654,7 +654,7 @@ NSMutableArray* vettedAliases;
 +(void) sendMessage: (NSDictionary *) data transfers: (NSArray *) transfers attributedString:(NSMutableAttributedString *) attributedString transaction:(NSString *) transaction {
     IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
     if (chat == nil) {
-        DLog(@"BLUEBUBBLESHELPER: chat is null, aborting");
+        DLog("BLUEBUBBLESHELPER: chat is null, aborting");
         return;
     }
     
@@ -786,11 +786,15 @@ NSMutableArray* vettedAliases;
  @return True if the account enabled state is 4 or false if else or not signed in
  */
 +(BOOL) isAccountEnabled {
+//
+//    DLog("BLUEBUBBLESHELPER: Registration Controller Trying To Load");
 //    SOAccountRegistrationController *registrationController = [SOAccountRegistrationController registrationController];
+//
+//    DLog("BLUEBUBBLESHELPER: Registration Controller %{public}@", registrationController);
 //
 //    if (registrationController != NULL && [registrationController isSignedIn]) {
 //        long long enabledState = [registrationController enabledState];
-//        NSLog(@"BLUEBUBBLESHELPER: Account Enabled State %lld", enabledState);
+//        DLog( "BLUEBUBBLESHELPER: Account Enabled State %{public}lld", enabledState);
 //        return enabledState == 4;
 //    } else {
 //        return FALSE;
@@ -809,19 +813,19 @@ NSMutableArray* vettedAliases;
 //        SOAccountAliasController* aliasController = [[SOAccountRegistrationController registrationController] aliasController];
 //
 //        NSArray* activeAliases = [aliasController vettedAliases];
-//        NSLog(@"BLUEBUBBLESHELPER: Vetted Aliases %@", activeAliases);
+//        DLog("BLUEBUBBLESHELPER: Vetted Aliases %{public}@", activeAliases);
 //
 //        NSMutableArray* returnedAliases = [[NSMutableArray alloc] init];
 //        for (SOAccountAlias* alias in activeAliases) {
-//            [returnedAliases addObject:[[VettedAliasDictionary alloc] initWithDictionary:@{
+//            [returnedAliases addObject:@{
 //                @"name": [alias name],
 //                @"active": [NSNumber numberWithBool:[alias active]]
-//            }]];
+//            }];
 //        }
 //
 //        return returnedAliases;
 //    } else {
-//        DLog(@"BLUEBUBBLESHELPER: Can't get aliases - account not enabled");
+//        DLog("BLUEBUBBLESHELPER: Can't get aliases - account not enabled");
 //        return [[NSMutableArray alloc] initWithArray:@[]];
 //    }
     return [[NSMutableArray alloc] initWithArray:@[]];
@@ -847,7 +851,7 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
 
         if([self isLatestMessage]) {
             [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
-            DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", guid);
+            DLog("BLUEBUBBLESHELPER: %{public}@ stopped typing", guid);
         }
     }
     return ZKOrig(BOOL);
@@ -870,7 +874,7 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
             if(guid != nil) {
                 if([BlueBubblesHelper isTyping:guid] == NO) {
                     [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
-                    DLog(@"BLUEBUBBLESHELPER: %@ stopped typing", guid);
+                    DLog("BLUEBUBBLESHELPER: %{public}@ stopped typing", guid);
                 }
             }
         }
@@ -930,30 +934,30 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
 //ZKSwizzleInterface(WBWT_IMChat, IMChat, NSObject)
 //@implementation WBWT_IMChat
 //-(void)_setDisplayName:(id)arg1 {
-//    DLog(@"BLUEBUBBLESHELPER: %@", [arg1 className]);
+//    DLog("BLUEBUBBLESHELPER: %{public}@", [arg1 className]);
 //}
 //@end
 //
 //-(void)sendMessageAcknowledgment:(long long)arg1 forChatItem:(id)arg2 withAssociatedMessageInfo:(id)arg3 withGuid:(id)arg4 {
-//    DLog(@"BLUEBUBBLESHELPER: sending reaction 1");
+//    DLog("BLUEBUBBLESHELPER: sending reaction 1");
 //    return;
 //}
 //
 //-(void)sendMessageAcknowledgment:(long long)arg1 forChatItem:(id)arg2 withAssociatedMessageInfo:(id)arg3 {
-//    DLog(@"BLUEBUBBLESHELPER: sending reaction 2");
+//    DLog("BLUEBUBBLESHELPER: sending reaction 2");
 //    return;
 //}
 //
 //-(void)sendMessageAcknowledgment:(long long)arg1 forChatItem:(id)arg2 withMessageSummaryInfo:(id)arg3 withGuid:(id)arg4 {
-//    DLog(@"BLUEBUBBLESHELPER: sending reaction 3");
+//    DLog("BLUEBUBBLESHELPER: sending reaction 3");
 //    return;
 //}
 //
 //-(void)sendMessageAcknowledgment:(long long)arg1 forChatItem:(id)arg2 withMessageSummaryInfo:(id)arg3 {
-//    DLog(@"BLUEBUBBLESHELPER: sending reaction 4");
-//    DLog(@"BLUEBUBBLESHELPER: %lld", arg1);
-//    DLog(@"BLUEBUBBLESHELPER: %@", arg2);
-//    DLog(@"BLUEBUBBLESHELPER: %@", arg3);
+//    DLog("BLUEBUBBLESHELPER: sending reaction 4");
+//    DLog("BLUEBUBBLESHELPER: %lld", arg1);
+//    DLog("BLUEBUBBLESHELPER: %{public}@", arg2);
+//    DLog("BLUEBUBBLESHELPER: %{public}@", arg3);
 //
 //
 //    return;
@@ -971,7 +975,7 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
 //     IMMessage[from=(null); msg-subject=(null); account:(null); flags=5; subject='(null)' text='(null)' messageID: 0 GUID:'79045C8B-1E6E-480B-8819-37E36C517578' sortID: 0 date:'627629508.210384' date-delivered:'0.000000' date-read:'0.000000' date-played:'0.000000' empty: NO finished: YES sent: NO read: NO delivered: NO audio: NO played: NO from-me: YES emote: NO dd-results: NO dd-scanned: NO error: (null) associatedMessageGUID: p:0/0C14634E-563D-408C-B9D4-805FEF7ADC7B associatedMessageType: 2001 balloonBundleID: (null) expressiveSendStyleID: (null) timeExpressiveSendStylePlayed: 0.000000 bizIntent:(null) locale:(null), ]
 //
 //     */
-//    DLog(@"BLUEBUBBLESHELPER: sendMessage %@", arg1);
+//    DLog("BLUEBUBBLESHELPER: sendMessage %{public}@", arg1);
 //    ZKOrig(void, arg1);
 //}
 //
@@ -1010,7 +1014,7 @@ ZKSwizzleInterface(BBH_IMMessageItem, IMMessageItem, NSObject)
 //
 //- (void)_updateTimeRead:(id)arg1 {
 //    ZKOrig(void, arg1);
-//    DLog(@"typeStatus : _updateTimeRead");
+//    DLog("typeStatus : _updateTimeRead");
 //}
 //
 //@end
