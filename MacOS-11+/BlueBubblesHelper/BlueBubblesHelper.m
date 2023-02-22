@@ -86,8 +86,13 @@ NSMutableArray* vettedAliases;
     NSUInteger minor = [[NSProcessInfo processInfo] operatingSystemVersion].minorVersion;
     DLog("BLUEBUBBLESHELPER: %{public}@ loaded into %{public}@ on macOS %ld.%ld", [self class], [[NSBundle mainBundle] bundleIdentifier], (long)major, (long)minor);
 
-    DLog("BLUEBUBBLESHELPER: Initializing Connection...");
-    [plugin initializeNetworkController];
+    if ([[self className] isEqualToString:@"com.apple.MobileSMS"]) {
+        DLog("BLUEBUBBLESHELPER: Initializing Connection...");
+        [plugin initializeNetworkController];
+    } else {
+        DLog("BLUEBUBBLESHELPER: Injected into non-iMessage process, aborting.");
+        return;
+    }
 }
 
 // Private method to initialize all the things required by the plugin to communicate with the main
