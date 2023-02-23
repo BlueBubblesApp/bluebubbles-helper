@@ -84,13 +84,13 @@ NSMutableArray* vettedAliases;
     // Get OS version for debugging purposes
     NSUInteger major = [[NSProcessInfo processInfo] operatingSystemVersion].majorVersion;
     NSUInteger minor = [[NSProcessInfo processInfo] operatingSystemVersion].minorVersion;
-    DLog("BLUEBUBBLESHELPER: %{public}@ loaded into %{public}@ on macOS %ld.%ld", [self class], [[NSBundle mainBundle] bundleIdentifier], (long)major, (long)minor);
+    DLog("BLUEBUBBLESHELPER: %{public}@ loaded into %{public}@ on macOS %ld.%ld", [self className], [[NSBundle mainBundle] bundleIdentifier], (long)major, (long)minor);
 
-    if ([[self className] isEqualToString:@"com.apple.MobileSMS"]) {
+    if ([[[NSBundle mainBundle] bundleIdentifier] isEqualToString:@"com.apple.MobileSMS"]) {
         DLog("BLUEBUBBLESHELPER: Initializing Connection...");
         [plugin initializeNetworkController];
     } else {
-        DLog("BLUEBUBBLESHELPER: Injected into non-iMessage process, aborting.");
+        DLog("BLUEBUBBLESHELPER: Injected into non-iMessage process %@, aborting.", [[NSBundle mainBundle] bundleIdentifier]);
         return;
     }
 }
