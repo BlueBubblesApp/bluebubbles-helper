@@ -73,6 +73,10 @@
 		A64B88A72712352000BAD446 /* TUConversationManagerDelegate-Protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TUConversationManagerDelegate-Protocol.h"; sourceTree = "<group>"; };
 		A64B88B62714A2A200BAD446 /* IMHandleRegistrar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMHandleRegistrar.h; sourceTree = "<group>"; };
 		A64B88B82715011200BAD446 /* IMCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMCore.h; sourceTree = "<group>"; };
+		A68C7FF729B025C7001002B6 /* IMTranscriptPluginChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMTranscriptPluginChatItem.h; sourceTree = "<group>"; };
+		A68C7FFD29B0344A001002B6 /* ETiOSMacBalloonPluginDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ETiOSMacBalloonPluginDataSource.h; sourceTree = "<group>"; };
+		A68C7FFE29B03EC5001002B6 /* HWiOSMacBalloonDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HWiOSMacBalloonDataSource.h; sourceTree = "<group>"; };
+		A68C7FFF29B05DCE001002B6 /* IMPluginChatItemProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMPluginChatItemProtocol.h; sourceTree = "<group>"; };
 		A68E87DF28C3B01F00882823 /* IMFileTransfer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransfer.h; sourceTree = "<group>"; };
 		A68E87E028C3B04500882823 /* IMFileTransferCenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransferCenter.h; sourceTree = "<group>"; };
 		A68E87E128C3B18900882823 /* IMSharedUtilities.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMSharedUtilities.framework; path = ../../../../../System/Library/PrivateFrameworks/IMSharedUtilities.framework; sourceTree = "<group>"; };
@@ -259,6 +263,10 @@
 				A68E87E028C3B04500882823 /* IMFileTransferCenter.h */,
 				A6E7318229A3D37000AAED78 /* IMAggregateAttachmentMessagePartChatItem.h */,
 				A6E7318329A3D49600AAED78 /* IMAttachmentMessagePartChatItem.h */,
+				A68C7FF729B025C7001002B6 /* IMTranscriptPluginChatItem.h */,
+				A68C7FFF29B05DCE001002B6 /* IMPluginChatItemProtocol.h */,
+				A68C7FFD29B0344A001002B6 /* ETiOSMacBalloonPluginDataSource.h */,
+				A68C7FFE29B03EC5001002B6 /* HWiOSMacBalloonDataSource.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";

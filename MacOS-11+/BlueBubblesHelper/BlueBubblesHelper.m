@@ -32,9 +32,17 @@
 #import "IMFileTransferCenter.h"
 #import "IMAggregateAttachmentMessagePartChatItem.h"
 #import "ZKSwizzle.h"
+#import "IMTranscriptPluginChatItem.h"
+#import "ETiOSMacBalloonPluginDataSource.h"
+#import "HWiOSMacBalloonDataSource.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
+@end
+
+// This can be used to dump the methods of any class
+@interface NSObject (Private)
+- (NSString*)_methodDescription;
 @end
 
 BlueBubblesHelper *plugin;
@@ -528,6 +536,37 @@ NSMutableArray* vettedAliases;
 //                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to modify alias"}];
 //            }
 //        }
+    // If the server wants to get media for a balloon bundle item
+    } else if ([event isEqualToString:@"balloon-bundle-media-path"]) {
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
+        
+        [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
+            IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
+            NSObject *items = messageItem._newChatItems;
+            // balloon items will only be an IMTranscriptPluginChatItem
+            if ([items isKindOfClass:[IMTranscriptPluginChatItem class]]) {
+                IMTranscriptPluginChatItem *item = (IMTranscriptPluginChatItem *) items;
+                NSObject *temp = [item dataSource];
+                // The data source is this weird class, no idea what framework its from. Class methods dumped via _methodDescription on cls
+                Class digitalTouchClass = NSClassFromString(@"ETiOSMacBalloonPluginDataSource");
+                Class handwrittenClass = NSClassFromString(@"HWiOSMacBalloonDataSource");
+                if ([temp isKindOfClass:digitalTouchClass]) {
+                    ETiOSMacBalloonPluginDataSource *digitalTouch = (ETiOSMacBalloonPluginDataSource *)[item dataSource];
+                    // Force iMessage to generate the .mov and return the path
+                    [digitalTouch generateMedia:^() {
+                        DLog("BLUEBUBBLESHELPER: Digital Touch generated!");
+                        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"path": [digitalTouch assetURL]}];
+                    }];
+                } else if ([temp isKindOfClass:handwrittenClass]) {
+                    HWiOSMacBalloonDataSource *digitalTouch = (HWiOSMacBalloonDataSource *)[item dataSource];
+                    CGSize size = [digitalTouch sizeThatFits:CGSizeMake(300, 300)];
+                    [digitalTouch generateImageForSize:size completionHandler:^(NSObject *path) {
+                        DLog("BLUEBUBBLESHELPER: Handwritten Message generated!");
+                        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"path": path}];
+                    }];
+                }
+            }
+        }];
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog("BLUEBUBBLESHELPER: Not implemented %{public}@", event);
