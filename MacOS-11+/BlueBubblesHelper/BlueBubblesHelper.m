@@ -567,6 +567,12 @@ NSMutableArray* vettedAliases;
                 }
             }
         }];
+    // If the server requests us to update the group photo
+    } else if ([event isEqualToString:@"update-group-photo"]) {
+        NSURL * fileUrl = [NSURL fileURLWithPath: data[@"filePath"]];
+        IMFileTransfer* fileTransfer = [BlueBubblesHelper prepareFileTransferForAttachment:fileUrl filename:[fileUrl lastPathComponent]];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :nil];
+        [chat sendGroupPhotoUpdate:([fileTransfer guid])];
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog("BLUEBUBBLESHELPER: Not implemented %{public}@", event);
