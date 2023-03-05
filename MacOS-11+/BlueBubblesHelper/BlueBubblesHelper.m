@@ -573,6 +573,16 @@ NSMutableArray* vettedAliases;
         IMFileTransfer* fileTransfer = [BlueBubblesHelper prepareFileTransferForAttachment:fileUrl filename:[fileUrl lastPathComponent]];
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :nil];
         [chat sendGroupPhotoUpdate:([fileTransfer guid])];
+    // If server tells us to leave a chat
+    } else if ([event isEqualToString:@"leave-chat"]) {
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
+
+        if (chat != nil && [chat canLeaveChat]) {
+            [chat leaveiMessageGroup];
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
+        }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog("BLUEBUBBLESHELPER: Not implemented %{public}@", event);
