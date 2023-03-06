@@ -368,6 +368,7 @@
 - (void)_setRenderingDataDictionary:(id)arg1;
 - (id)_renderingDataDictionary;
 - (void)markChatItemAsPlayedExpressiveSend:(id)arg1;
+- (void)markChatItemAsNotifyRecipient:(id)arg0; API_AVAILABLE(macos(12), ios(14.0), watchos(7.0));
 - (void)_markItemAsPlayed:(id)arg1;
 - (void)markChatItemAsPlayed:(id)arg1;
 - (void)markChatItemAsSaved:(id)arg1;

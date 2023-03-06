@@ -601,6 +601,27 @@ NSMutableArray* vettedAliases;
                 }
             }];
         }
+    } else if ([event isEqualToString:@"notify-anyways"]) {
+        IMChat *chat = [BlueBubblesHelper getChat:data[@"chatGuid"] :transaction];
+        
+        [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
+            IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
+            NSObject *items = messageItem._newChatItems;
+            IMMessagePartChatItem *item;
+            // sometimes items is an array so we need to account for that
+            if ([items isKindOfClass:[NSArray class]]) {
+                item = [(NSArray*) items firstObject];
+            } else {
+                item = (IMMessagePartChatItem *)items;
+            }
+            
+            if (item != nil) {
+                [chat markChatItemAsNotifyRecipient:item];
+                if (transaction != nil) {
+                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+                }
+            }
+        }];
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog("BLUEBUBBLESHELPER: Not implemented %{public}@", event);
