@@ -573,6 +573,9 @@ NSMutableArray* vettedAliases;
         IMFileTransfer* fileTransfer = [BlueBubblesHelper prepareFileTransferForAttachment:fileUrl filename:[fileUrl lastPathComponent]];
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :nil];
         [chat sendGroupPhotoUpdate:([fileTransfer guid])];
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        }
     // If server tells us to leave a chat
     } else if ([event isEqualToString:@"leave-chat"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
