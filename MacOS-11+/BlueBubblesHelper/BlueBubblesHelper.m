@@ -35,6 +35,7 @@
 #import "IMTranscriptPluginChatItem.h"
 #import "ETiOSMacBalloonPluginDataSource.h"
 #import "HWiOSMacBalloonDataSource.h"
+#import "IMHandleAvailabilityManager.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -585,6 +586,20 @@ NSMutableArray* vettedAliases;
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
+        }
+    // If the server asks us to check the focus status of a user
+    } else if ([event isEqualToString:@"check-focus-status"]) {
+        NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
+        IMHandleAvailabilityManager *manager = [IMHandleAvailabilityManager sharedInstance];
+        if ([handles firstObject] != nil) {
+            [manager _fetchUpdatedStatusForHandle:([handles firstObject]) completion:^() {
+                NSInteger *status = [manager availabilityForHandle:([handles firstObject])];
+                DLog("BLUEBUBBLESHELPER: Found status %{public}ld for %{public}@", (long)status, data[@"address"]);
+                if (transaction != nil) {
+                    BOOL silenced = status > 0;
+                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"silenced": [NSNumber numberWithBool:silenced]}];
+                }
+            }];
         }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {

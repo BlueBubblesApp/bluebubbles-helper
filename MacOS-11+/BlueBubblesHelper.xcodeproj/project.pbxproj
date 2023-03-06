@@ -77,6 +77,7 @@
 		A68C7FFD29B0344A001002B6 /* ETiOSMacBalloonPluginDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ETiOSMacBalloonPluginDataSource.h; sourceTree = "<group>"; };
 		A68C7FFE29B03EC5001002B6 /* HWiOSMacBalloonDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HWiOSMacBalloonDataSource.h; sourceTree = "<group>"; };
 		A68C7FFF29B05DCE001002B6 /* IMPluginChatItemProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMPluginChatItemProtocol.h; sourceTree = "<group>"; };
+		A68C800029B0F19C001002B6 /* IMHandleAvailabilityManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMHandleAvailabilityManager.h; sourceTree = "<group>"; };
 		A68E87DF28C3B01F00882823 /* IMFileTransfer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransfer.h; sourceTree = "<group>"; };
 		A68E87E028C3B04500882823 /* IMFileTransferCenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransferCenter.h; sourceTree = "<group>"; };
 		A68E87E128C3B18900882823 /* IMSharedUtilities.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMSharedUtilities.framework; path = ../../../../../System/Library/PrivateFrameworks/IMSharedUtilities.framework; sourceTree = "<group>"; };
@@ -267,6 +268,7 @@
 				A68C7FFF29B05DCE001002B6 /* IMPluginChatItemProtocol.h */,
 				A68C7FFD29B0344A001002B6 /* ETiOSMacBalloonPluginDataSource.h */,
 				A68C7FFE29B03EC5001002B6 /* HWiOSMacBalloonDataSource.h */,
+				A68C800029B0F19C001002B6 /* IMHandleAvailabilityManager.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";
