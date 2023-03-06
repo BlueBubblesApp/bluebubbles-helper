@@ -572,7 +572,7 @@ NSMutableArray* vettedAliases;
     } else if ([event isEqualToString:@"update-group-photo"]) {
         NSURL * fileUrl = [NSURL fileURLWithPath: data[@"filePath"]];
         IMFileTransfer* fileTransfer = [BlueBubblesHelper prepareFileTransferForAttachment:fileUrl filename:[fileUrl lastPathComponent]];
-        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :nil];
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         [chat sendGroupPhotoUpdate:([fileTransfer guid])];
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
