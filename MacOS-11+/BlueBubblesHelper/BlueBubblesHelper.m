@@ -555,15 +555,21 @@ NSMutableArray* vettedAliases;
                     ETiOSMacBalloonPluginDataSource *digitalTouch = (ETiOSMacBalloonPluginDataSource *)[item dataSource];
                     // Force iMessage to generate the .mov and return the path
                     [digitalTouch generateMedia:^() {
-                        DLog("BLUEBUBBLESHELPER: Digital Touch generated!");
-                        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"path": [digitalTouch assetURL]}];
+                        NSString *path = [(NSURL *)[digitalTouch assetURL] absoluteString];
+                        DLog("BLUEBUBBLESHELPER: Digital Touch generated! %@", path);
+                        if (transaction != nil) {
+                            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"path": path}];
+                        }
                     }];
                 } else if ([temp isKindOfClass:handwrittenClass]) {
                     HWiOSMacBalloonDataSource *digitalTouch = (HWiOSMacBalloonDataSource *)[item dataSource];
                     CGSize size = [digitalTouch sizeThatFits:CGSizeMake(300, 300)];
-                    [digitalTouch generateImageForSize:size completionHandler:^(NSObject *path) {
-                        DLog("BLUEBUBBLESHELPER: Handwritten Message generated!");
-                        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"path": path}];
+                    [digitalTouch generateImageForSize:size completionHandler:^(NSObject *url) {
+                        NSString *path = [(NSURL *)url absoluteString];
+                        DLog("BLUEBUBBLESHELPER: Handwritten Message generated! %@", path);
+                        if (transaction != nil) {
+                            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"path": path}];
+                        }
                     }];
                 }
             }
