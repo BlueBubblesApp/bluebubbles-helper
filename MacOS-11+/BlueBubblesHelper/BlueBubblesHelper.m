@@ -576,10 +576,14 @@ NSMutableArray* vettedAliases;
         }];
     // If the server requests us to update the group photo
     } else if ([event isEqualToString:@"update-group-photo"]) {
-        NSURL * fileUrl = [NSURL fileURLWithPath: data[@"filePath"]];
-        IMFileTransfer* fileTransfer = [BlueBubblesHelper prepareFileTransferForAttachment:fileUrl filename:[fileUrl lastPathComponent]];
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
-        [chat sendGroupPhotoUpdate:([fileTransfer guid])];
+        if (data[@"filePath"] == [NSNull null]) {
+            [chat sendGroupPhotoUpdate:nil];
+        } else {
+            NSURL * fileUrl = [NSURL fileURLWithPath: data[@"filePath"]];
+            IMFileTransfer* fileTransfer = [BlueBubblesHelper prepareFileTransferForAttachment:fileUrl filename:[fileUrl lastPathComponent]];
+            [chat sendGroupPhotoUpdate:([fileTransfer guid])];
+        }
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
         }
