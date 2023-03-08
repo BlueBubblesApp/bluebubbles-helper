@@ -590,10 +590,11 @@ NSMutableArray* vettedAliases;
     // If the server asks us to check the focus status of a user
     } else if ([event isEqualToString:@"check-focus-status"]) {
         NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
-        IMHandleAvailabilityManager *manager = [IMHandleAvailabilityManager sharedInstance];
-        if ([handles firstObject] != nil) {
-            [manager _fetchUpdatedStatusForHandle:([handles firstObject]) completion:^() {
-                NSInteger *status = [manager availabilityForHandle:([handles firstObject])];
+        // Use reference to class since it doesn't exist on Big Sur
+        Class cls = NSClassFromString(@"IMHandleAvailabilityManager");
+        if ([handles firstObject] != nil && cls != nil) {
+            [[cls sharedInstance] _fetchUpdatedStatusForHandle:([handles firstObject]) completion:^() {
+                NSInteger *status = [[cls sharedInstance] availabilityForHandle:([handles firstObject])];
                 DLog("BLUEBUBBLESHELPER: Found status %{public}ld for %{public}@", (long)status, data[@"address"]);
                 if (transaction != nil) {
                     BOOL silenced = status > 0;
