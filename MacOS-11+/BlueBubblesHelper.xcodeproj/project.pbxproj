@@ -19,9 +19,6 @@
 		A62991D9297210EB00B7E663 /* IMSharedUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A68E87E128C3B18900882823 /* IMSharedUtilities.framework */; };
 		A62991DA297210F700B7E663 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69A83DF27D18385007BB936 /* IMDPersistence.framework */; };
 		A6490A0E2984697C002B0E1D /* PrefixHeader.pch in Resources */ = {isa = PBXBuildFile; fileRef = FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */; };
-		A6490A14298AC750002B0E1D /* SOAccountAlias.h in Headers */ = {isa = PBXBuildFile; fileRef = A6490A13298AC750002B0E1D /* SOAccountAlias.h */; };
-		A6490A19298AC986002B0E1D /* SocialAppsCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6490A18298AC986002B0E1D /* SocialAppsCore.framework */; };
-		A6490A1A298AC9B8002B0E1D /* SocialAppsCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6490A18298AC986002B0E1D /* SocialAppsCore.framework */; };
 		A6490A1C298DC81C002B0E1D /* VettedAliasDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = A6490A1B298DC81C002B0E1D /* VettedAliasDictionary.m */; };
 		A6490A1D298DC81C002B0E1D /* VettedAliasDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = A6490A1B298DC81C002B0E1D /* VettedAliasDictionary.m */; };
 		A6490A1F298DCC35002B0E1D /* VettedAliasDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = A6490A1E298DCC35002B0E1D /* VettedAliasDictionary.h */; };
@@ -54,10 +51,6 @@
 		A62991CB29720FAC00B7E663 /* libBlueBubblesHelper DyLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libBlueBubblesHelper DyLib.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A62991CF2972104E00B7E663 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		A62991D6297210A500B7E663 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		A6490A13298AC750002B0E1D /* SOAccountAlias.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SOAccountAlias.h; sourceTree = "<group>"; };
-		A6490A15298AC777002B0E1D /* SOAccountAliasController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SOAccountAliasController.h; sourceTree = "<group>"; };
-		A6490A16298AC7B6002B0E1D /* SOAccountRegistrationController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SOAccountRegistrationController.h; sourceTree = "<group>"; };
-		A6490A17298AC8AF002B0E1D /* IMAccount-AliasAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMAccount-AliasAdditions.h"; sourceTree = "<group>"; };
 		A6490A18298AC986002B0E1D /* SocialAppsCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocialAppsCore.framework; path = ../../../../../System/Library/PrivateFrameworks/SocialAppsCore.framework; sourceTree = "<group>"; };
 		A6490A1B298DC81C002B0E1D /* VettedAliasDictionary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VettedAliasDictionary.m; sourceTree = "<group>"; };
 		A6490A1E298DCC35002B0E1D /* VettedAliasDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VettedAliasDictionary.h; sourceTree = "<group>"; };
@@ -80,12 +73,19 @@
 		A64B88A72712352000BAD446 /* TUConversationManagerDelegate-Protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TUConversationManagerDelegate-Protocol.h"; sourceTree = "<group>"; };
 		A64B88B62714A2A200BAD446 /* IMHandleRegistrar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMHandleRegistrar.h; sourceTree = "<group>"; };
 		A64B88B82715011200BAD446 /* IMCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMCore.h; sourceTree = "<group>"; };
+		A68C7FF729B025C7001002B6 /* IMTranscriptPluginChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMTranscriptPluginChatItem.h; sourceTree = "<group>"; };
+		A68C7FFD29B0344A001002B6 /* ETiOSMacBalloonPluginDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ETiOSMacBalloonPluginDataSource.h; sourceTree = "<group>"; };
+		A68C7FFE29B03EC5001002B6 /* HWiOSMacBalloonDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HWiOSMacBalloonDataSource.h; sourceTree = "<group>"; };
+		A68C7FFF29B05DCE001002B6 /* IMPluginChatItemProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMPluginChatItemProtocol.h; sourceTree = "<group>"; };
+		A68C800029B0F19C001002B6 /* IMHandleAvailabilityManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMHandleAvailabilityManager.h; sourceTree = "<group>"; };
 		A68E87DF28C3B01F00882823 /* IMFileTransfer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransfer.h; sourceTree = "<group>"; };
 		A68E87E028C3B04500882823 /* IMFileTransferCenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransferCenter.h; sourceTree = "<group>"; };
 		A68E87E128C3B18900882823 /* IMSharedUtilities.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMSharedUtilities.framework; path = ../../../../../System/Library/PrivateFrameworks/IMSharedUtilities.framework; sourceTree = "<group>"; };
 		A69A83DE27D18092007BB936 /* IMDPersistentAttachmentController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMDPersistentAttachmentController.h; sourceTree = "<group>"; };
 		A69A83DF27D18385007BB936 /* IMDPersistence.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMDPersistence.framework; path = ../../../../../System/Library/PrivateFrameworks/IMDPersistence.framework; sourceTree = "<group>"; };
 		A6E1F4CF27166012000A0EF6 /* IMPinnedConversationsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMPinnedConversationsController.h; sourceTree = "<group>"; };
+		A6E7318229A3D37000AAED78 /* IMAggregateAttachmentMessagePartChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMAggregateAttachmentMessagePartChatItem.h; sourceTree = "<group>"; };
+		A6E7318329A3D49600AAED78 /* IMAttachmentMessagePartChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMAttachmentMessagePartChatItem.h; sourceTree = "<group>"; };
 		B6E17DF925EE5FA4CB129B31 /* Pods-BlueBubblesHelper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.debug.xcconfig"; sourceTree = "<group>"; };
 		BF508DC152B4C503FFDF6B1E /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.debug.xcconfig"; sourceTree = "<group>"; };
 		BFA22E41EA07AA1C37D1B255 /* Pods-BlueBubblesHelper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.release.xcconfig"; sourceTree = "<group>"; };
@@ -109,7 +109,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A6490A1A298AC9B8002B0E1D /* SocialAppsCore.framework in Frameworks */,
 				A62991DA297210F700B7E663 /* IMDPersistence.framework in Frameworks */,
 				A62991D9297210EB00B7E663 /* IMSharedUtilities.framework in Frameworks */,
 				A62991D8297210D900B7E663 /* IMCore.framework in Frameworks */,
@@ -122,7 +121,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A6490A19298AC986002B0E1D /* SocialAppsCore.framework in Frameworks */,
 				FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */,
 				93AC09C62565E4150000C60C /* IMCore.framework in Frameworks */,
 				FBCE4EC1201C0F4D002F8A61 /* Foundation.framework in Frameworks */,
@@ -152,17 +150,6 @@
 				93FD993D2568E7500060D430 /* NetworkController.h */,
 			);
 			name = Networking;
-			sourceTree = "<group>";
-		};
-		A6490A12298AC724002B0E1D /* SocialAppsCore */ = {
-			isa = PBXGroup;
-			children = (
-				A6490A13298AC750002B0E1D /* SOAccountAlias.h */,
-				A6490A15298AC777002B0E1D /* SOAccountAliasController.h */,
-				A6490A16298AC7B6002B0E1D /* SOAccountRegistrationController.h */,
-				A6490A17298AC8AF002B0E1D /* IMAccount-AliasAdditions.h */,
-			);
-			path = SocialAppsCore;
 			sourceTree = "<group>";
 		};
 		FBCE4EB2201C0F4D002F8A61 = {
@@ -204,7 +191,6 @@
 		FBCE4EC2201C0F4D002F8A61 /* BlueBubblesHelper */ = {
 			isa = PBXGroup;
 			children = (
-				A6490A12298AC724002B0E1D /* SocialAppsCore */,
 				93FD99382568E7230060D430 /* Networking */,
 				FBCE4EDB201C264F002F8A61 /* IMCore */,
 				FBCE4EC9201C0F4D002F8A61 /* ZKSwizzle */,
@@ -276,6 +262,13 @@
 				A69A83DE27D18092007BB936 /* IMDPersistentAttachmentController.h */,
 				A68E87DF28C3B01F00882823 /* IMFileTransfer.h */,
 				A68E87E028C3B04500882823 /* IMFileTransferCenter.h */,
+				A6E7318229A3D37000AAED78 /* IMAggregateAttachmentMessagePartChatItem.h */,
+				A6E7318329A3D49600AAED78 /* IMAttachmentMessagePartChatItem.h */,
+				A68C7FF729B025C7001002B6 /* IMTranscriptPluginChatItem.h */,
+				A68C7FFF29B05DCE001002B6 /* IMPluginChatItemProtocol.h */,
+				A68C7FFD29B0344A001002B6 /* ETiOSMacBalloonPluginDataSource.h */,
+				A68C7FFE29B03EC5001002B6 /* HWiOSMacBalloonDataSource.h */,
+				A68C800029B0F19C001002B6 /* IMHandleAvailabilityManager.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";
@@ -287,7 +280,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A6490A14298AC750002B0E1D /* SOAccountAlias.h in Headers */,
 				A6490A1F298DCC35002B0E1D /* VettedAliasDictionary.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -668,7 +660,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 15;
 				DEPLOYMENT_LOCATION = YES;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DSTROOT = /;
@@ -683,7 +675,7 @@
 				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.0.11;
+				MARKETING_VERSION = 0.0.13;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -704,7 +696,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 15;
 				DEPLOYMENT_LOCATION = YES;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DSTROOT = /;
@@ -719,7 +711,7 @@
 				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.0.11;
+				MARKETING_VERSION = 0.0.13;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
