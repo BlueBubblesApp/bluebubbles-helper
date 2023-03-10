@@ -39,6 +39,11 @@
 + (instancetype)sharedInstance;
 @end
 
+// This can be used to dump the methods of any class
+@interface NSObject (Private)
+- (NSString*)_methodDescription;
+@end
+
 BlueBubblesHelper *plugin;
 
 
@@ -486,6 +491,16 @@ BlueBubblesHelper *plugin;
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to activate alias"}];
             }
 
+        }
+    // If server tells us to leave a chat
+    } else if ([event isEqualToString:@"leave-chat"]) {
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
+
+        if (chat != nil && [chat canLeaveChat]) {
+            [chat leaveiMessageGroup];
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
         }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
