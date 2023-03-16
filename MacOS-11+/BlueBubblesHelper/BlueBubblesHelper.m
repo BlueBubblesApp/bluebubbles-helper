@@ -953,14 +953,14 @@ ZKSwizzleInterface(BBH_IMChat, IMChat, NSObject)
     BOOL hasBeenHandled = ZKOrig(BOOL, arg1);
     NSString *guid = (NSString *)ZKHookIvar(self, NSString*, "_guid");
     if (guid != nil) {
-        // check if incoming item is a typing indicator or not, and update the status accordingly
-        if ([item isIncomingTypingMessage]) {
+        // check if incoming item is a typing indicator or not, and update the status accordingly. check if the class responds to the selector to avoid crashes
+        if ([item respondsToSelector:@selector(isIncomingTypingMessage)] && [item isIncomingTypingMessage]) {
             [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": guid}];
             DLog("BLUEBUBBLESHELPER: %{public}@ started typing", guid);
-        } else if ([item isCancelTypingMessage]) {
+        } else if ([item respondsToSelector:@selector(isCancelTypingMessage)] && [item isCancelTypingMessage]) {
             [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
             DLog("BLUEBUBBLESHELPER: %{public}@ stopped typing", guid);
-        } else if ([[item message] isTypingMessage] == NO) {
+        } else if ([item respondsToSelector:@selector(isTypingMessage)] && [[item message] isTypingMessage] == NO) {
             [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
             DLog("BLUEBUBBLESHELPER: %{public}@ stopped typing", guid);
         }
