@@ -587,7 +587,13 @@ BlueBubblesHelper *plugin;
     // Creates the initial transfer object
     IMFileTransfer *newTransfer = [[IMFileTransferCenter sharedInstance] transferForGUID:transferInitGuid];
     // Get location of where attachments should be placed
-    NSString *persistentPath = [[IMDPersistentAttachmentController sharedInstance] _persistentPathForTransfer:newTransfer filename:filename highQuality:TRUE];
+    NSString *persistentPath;
+    if ([[NSProcessInfo processInfo] operatingSystemVersion].minorVersion == 12) {
+        // Use a different method on macOS Sierra (10.12)
+        persistentPath = [[IMDPersistentAttachmentController sharedInstance] _persistentPathForTransfer:newTransfer filename:filename highQuality:TRUE];
+    } else {
+        persistentPath = [[IMDPersistentAttachmentController sharedInstance] _persistentPathForTransfer:newTransfer];
+    }
     DLog(@"BLUEBUBBLESHELPER: Requested persistent path: %@", persistentPath);
 
     if (persistentPath) {
