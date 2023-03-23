@@ -12,6 +12,7 @@
 
 + (id)sharedInstance;
 - (BOOL)cleanseOrphanedFileTransfers;
+- (id)_persistentPathForTransfer:(id)arg1; // 10.12 only
 - (id)_persistentPathForTransfer:(id)arg1 filename:(id)arg2 highQuality:(BOOL)arg3;
 - (BOOL)_deleteAttachmentForTransfer:(id)arg1 highQuality:(BOOL)arg2;
 - (BOOL)deleteAttachmentsForTransfer:(id)arg1;
