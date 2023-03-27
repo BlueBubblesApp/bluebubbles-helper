@@ -441,8 +441,8 @@ NSMutableArray* vettedAliases;
     } else if ([event isEqualToString:@"send-multipart"]) {
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: @""];
         NSMutableArray<NSString*> *transfers = [[NSMutableArray alloc] init];
-        NSUInteger index = 0;
         for (NSDictionary *dict in data[@"parts"]) {
+            NSUInteger index = [dict[@"partIndex"] integerValue];
             if (dict[@"filePath"] != [NSNull null] && [dict[@"filePath"] length] != 0) {
                 NSString *filePath = dict[@"filePath"];
                 NSURL * fileUrl = [NSURL fileURLWithPath:filePath];
@@ -458,33 +458,13 @@ NSMutableArray* vettedAliases;
                 [attributedString appendAttributedString:attachmentStr];
             } else {
                 if (dict[@"mention"] != [NSNull null] && [dict[@"mention"] length] != 0) {
-                    NSMutableAttributedString *beforeStr = [[NSMutableAttributedString alloc] initWithString: [(NSString *) dict[@"text"] substringWithRange:NSMakeRange(0, [[dict[@"range"] firstObject] integerValue])]];
-                    [beforeStr addAttributes:@{
-                        @"__kIMBaseWritingDirectionAttributeName": @"-1",
-                        @"__kIMMessagePartAttributeName": [NSNumber numberWithInt:index],
-                    } range:NSMakeRange(0, [[beforeStr string] length])];
-                    NSMutableAttributedString *mentionStr = [[NSMutableAttributedString alloc] initWithString: [(NSString *) dict[@"text"] substringWithRange:NSMakeRange([[dict[@"range"] firstObject] integerValue], [[dict[@"range"] lastObject] integerValue])]];
+                    NSMutableAttributedString *mentionStr = [[NSMutableAttributedString alloc] initWithString: dict[@"text"]];
                     [mentionStr addAttributes:@{
                         @"__kIMBaseWritingDirectionAttributeName": @"-1",
                         @"__kIMMentionConfirmedMention": dict[@"mention"],
                         @"__kIMMessagePartAttributeName": [NSNumber numberWithInt:index],
                     } range:NSMakeRange(0, [[mentionStr string] length])];
-                    NSUInteger begin = [[dict[@"range"] firstObject] integerValue] + [[dict[@"range"] lastObject] integerValue];
-                    NSUInteger end = [dict[@"text"] length] - begin;
-                    NSMutableAttributedString *afterStr = [[NSMutableAttributedString alloc] initWithString: [(NSString *) dict[@"text"] substringWithRange:NSMakeRange(begin, end)]];
-                    [afterStr addAttributes:@{
-                        @"__kIMBaseWritingDirectionAttributeName": @"-1",
-                        @"__kIMMessagePartAttributeName": [NSNumber numberWithInt:index],
-                    } range:NSMakeRange(0, [[afterStr string] length])];
-                    if ([[beforeStr string] length] != 0) {
-                        [attributedString appendAttributedString:beforeStr];
-                    }
-                    if ([[mentionStr string] length] != 0) {
-                        [attributedString appendAttributedString:mentionStr];
-                    }
-                    if ([[afterStr string] length] != 0) {
-                        [attributedString appendAttributedString:afterStr];
-                    }
+                    [attributedString appendAttributedString:mentionStr];
                 } else {
                     NSMutableAttributedString *messageStr = [[NSMutableAttributedString alloc] initWithString: dict[@"text"]];
                     [messageStr addAttributes:@{
@@ -494,7 +474,6 @@ NSMutableArray* vettedAliases;
                     [attributedString appendAttributedString:messageStr];
                 }
             }
-            index++;
         }
         [BlueBubblesHelper sendMessage:(data) transfers:[transfers copy] attributedString:attributedString transaction:(transaction)];
     // If the server tells us to get the vetted aliases
