@@ -582,19 +582,22 @@ NSMutableArray* vettedAliases;
         // Use reference to class since it doesn't exist on Big Sur
         Class cls = NSClassFromString(@"IMHandleAvailabilityManager");
         if ([handles firstObject] != nil && cls != nil) {
-            [[cls sharedInstance] _fetchUpdatedStatusForHandle:([handles firstObject]) completion:^() {
-                // delay for 1 second to ensure we have latest status
-                NSTimeInterval delayInSeconds = 1.0;
-                dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-                dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-                    NSInteger *status = [[cls sharedInstance] availabilityForHandle:([handles firstObject])];
-                    DLog("BLUEBUBBLESHELPER: Found status %{public}ld for %{public}@", (long)status, data[@"address"]);
-                    if (transaction != nil) {
-                        BOOL silenced = status == 2;
-                        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"silenced": [NSNumber numberWithBool:silenced]}];
-                    }
-                });
-            }];
+            Selector updatedStatusSelector = NSSelectorFromString("_fetchUpdatedStatusForHandle");
+            if ([cls respondsToSelector:@selector(updatedStatusSelector:)]) {) {
+                [[cls sharedInstance] _fetchUpdatedStatusForHandle:([handles firstObject]) completion:^() {
+                    // delay for 1 second to ensure we have latest status
+                    NSTimeInterval delayInSeconds = 1.0;
+                    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+                    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                        NSInteger *status = [[cls sharedInstance] availabilityForHandle:([handles firstObject])];
+                        DLog("BLUEBUBBLESHELPER: Found status %{public}ld for %{public}@", (long)status, data[@"address"]);
+                        if (transaction != nil) {
+                            BOOL silenced = status == 2;
+                            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"silenced": [NSNumber numberWithBool:silenced]}];
+                        }
+                    });
+                }];
+            }
         }
     } else if ([event isEqualToString:@"notify-anyways"]) {
         IMChat *chat = [BlueBubblesHelper getChat:data[@"chatGuid"] :transaction];
