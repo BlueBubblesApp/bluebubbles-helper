@@ -582,8 +582,7 @@ NSMutableArray* vettedAliases;
         // Use reference to class since it doesn't exist on Big Sur
         Class cls = NSClassFromString(@"IMHandleAvailabilityManager");
         if ([handles firstObject] != nil && cls != nil) {
-            Selector updatedStatusSelector = NSSelectorFromString("_fetchUpdatedStatusForHandle");
-            if ([cls respondsToSelector:@selector(updatedStatusSelector:)]) {) {
+            if ([cls respondsToSelector:NSSelectorFromString(@"_fetchUpdatedStatusForHandle")]) {
                 [[cls sharedInstance] _fetchUpdatedStatusForHandle:([handles firstObject]) completion:^() {
                     // delay for 1 second to ensure we have latest status
                     NSTimeInterval delayInSeconds = 1.0;
@@ -597,6 +596,10 @@ NSMutableArray* vettedAliases;
                         }
                     });
                 }];
+            } else {
+                if (transaction != nil) {
+                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Selector not found!"}];
+                }
             }
         }
     } else if ([event isEqualToString:@"notify-anyways"]) {
