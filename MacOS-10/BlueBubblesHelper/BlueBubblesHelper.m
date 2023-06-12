@@ -34,6 +34,7 @@
 #import "SocialAppsCore/SOAccountRegistrationController.h"
 #import "SocialAppsCore/SOAccountAliasController.h"
 #import "SocialAppsCore/SOAccountAlias.h"
+#import "ZKSwizzle.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -588,10 +589,10 @@ BlueBubblesHelper *plugin;
     IMFileTransfer *newTransfer = [[IMFileTransferCenter sharedInstance] transferForGUID:transferInitGuid];
     // Get location of where attachments should be placed
     NSString *persistentPath;
-    if ([[NSProcessInfo processInfo] operatingSystemVersion].minorVersion == 12) {
-        // Use a different method on macOS Sierra (10.12)
+    if ([[NSProcessInfo processInfo] operatingSystemVersion].minorVersion > 12) {
         persistentPath = [[IMDPersistentAttachmentController sharedInstance] _persistentPathForTransfer:newTransfer filename:filename highQuality:TRUE];
     } else {
+        // Use a different method on macOS Sierra (10.12)
         persistentPath = [[IMDPersistentAttachmentController sharedInstance] _persistentPathForTransfer:newTransfer];
     }
     DLog(@"BLUEBUBBLESHELPER: Requested persistent path: %@", persistentPath);
