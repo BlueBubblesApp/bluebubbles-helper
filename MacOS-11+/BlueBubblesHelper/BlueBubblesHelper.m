@@ -36,6 +36,9 @@
 #import "ETiOSMacBalloonPluginDataSource.h"
 #import "HWiOSMacBalloonDataSource.h"
 #import "IMHandleAvailabilityManager.h"
+#import "IDSIDQueryController.h"
+#import "IDS.h"
+#import "IDSDestination-Additions.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -621,6 +624,32 @@ NSMutableArray* vettedAliases;
                 if (transaction != nil) {
                     [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
                 }
+            }
+        }];
+    // If the server tells us to check iMessage availability
+    } else if ([event isEqualToString:@"check-imessage-availability"] || [event isEqualToString:@"check-facetime-availability"]) {
+        NSString *type = data[@"aliasType"];
+        IDSDestination *dest;
+        NSString* serviceName;
+        
+        if ([event isEqualToString:@"check-imessage-availability"]) {
+            serviceName = IDSServiceNameiMessage;
+        } else {
+            serviceName = IDSServiceNameFaceTime;
+        }
+        
+        if ([type isEqualToString:@"phone"]) {
+            dest = IDSCopyIDForPhoneNumber((__bridge CFStringRef)data[@"address"]);
+        } else {
+            dest = IDSCopyIDForEmailAddress((__bridge CFStringRef)data[@"address"]);
+        }
+        
+        [[IDSIDQueryController sharedInstance] forceRefreshIDStatusForDestinations:(@[dest]) service:(serviceName) listenerID:(@"SOIDSListener-com.apple.imessage-rest") queue:(dispatch_queue_create("HandleIDS", NULL)) completionBlock:^(NSDictionary *response) {
+            NSInteger *status = [response.allValues.firstObject integerValue];
+            BOOL available = status == 1;
+            DLog("BLUEBUBBLESHELPER: Status for %{public}@ is %{public}ld", data[@"address"], (long)available);
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"available": [NSNumber numberWithBool:(available)]}];
             }
         }];
     // If the event is something that hasn't been implemented, we simply ignore it and put this log

@@ -10,6 +10,9 @@
 		93AC09C62565E4150000C60C /* IMCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93AC09C52565E4150000C60C /* IMCore.framework */; };
 		93AC09CC2565E45F0000C60C /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
 		93FD993A2568E7360060D430 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
+		A61DC0282A59FFF300EA75A5 /* IDS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A61DC0272A59FFF200EA75A5 /* IDS.framework */; };
+		A61DC02F2A5A078500EA75A5 /* IDS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A61DC0272A59FFF200EA75A5 /* IDS.framework */; };
+		A61DC0302A5A078500EA75A5 /* IDS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A61DC0272A59FFF200EA75A5 /* IDS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A62991D02972104E00B7E663 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A62991CF2972104E00B7E663 /* AppKit.framework */; };
 		A62991D12972106200B7E663 /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
 		A62991D22972106500B7E663 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
@@ -30,6 +33,20 @@
 		FBCE4ECE201C0F4D002F8A61 /* PrefixHeader.pch in Resources */ = {isa = PBXBuildFile; fileRef = FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		A61DC0312A5A078500EA75A5 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				A61DC0302A5A078500EA75A5 /* IDS.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper DyLib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71554C06257B2E4600296B93 /* IMChatHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMChatHistoryController.h; sourceTree = "<group>"; };
@@ -48,6 +65,12 @@
 		93DFDC5D2568DFD4009551D2 /* IMMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMMessage.h; sourceTree = "<group>"; };
 		93FD99392568E7360060D430 /* NetworkController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkController.m; sourceTree = "<group>"; };
 		93FD993D2568E7500060D430 /* NetworkController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetworkController.h; sourceTree = "<group>"; };
+		A61DC0262A59FF8C00EA75A5 /* IDSIDQueryController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDSIDQueryController.h; sourceTree = "<group>"; };
+		A61DC0272A59FFF200EA75A5 /* IDS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IDS.framework; path = ../../../../../System/Library/PrivateFrameworks/IDS.framework; sourceTree = "<group>"; };
+		A61DC02B2A5A037400EA75A5 /* IDSDestination-Additions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IDSDestination-Additions.h"; sourceTree = "<group>"; };
+		A61DC02C2A5A03C800EA75A5 /* IDS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDS.h; sourceTree = "<group>"; };
+		A61DC02D2A5A045B00EA75A5 /* IDSInternalQueueController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDSInternalQueueController.h; sourceTree = "<group>"; };
+		A61DC02E2A5A049700EA75A5 /* _IDSIDQueryController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _IDSIDQueryController.h; sourceTree = "<group>"; };
 		A62991CB29720FAC00B7E663 /* libBlueBubblesHelper DyLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libBlueBubblesHelper DyLib.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A62991CF2972104E00B7E663 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		A62991D6297210A500B7E663 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -111,6 +134,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A62991DA297210F700B7E663 /* IMDPersistence.framework in Frameworks */,
+				A61DC02F2A5A078500EA75A5 /* IDS.framework in Frameworks */,
 				A62991D9297210EB00B7E663 /* IMSharedUtilities.framework in Frameworks */,
 				A62991D8297210D900B7E663 /* IMCore.framework in Frameworks */,
 				A62991D7297210A500B7E663 /* Foundation.framework in Frameworks */,
@@ -123,6 +147,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */,
+				A61DC0282A59FFF300EA75A5 /* IDS.framework in Frameworks */,
 				93AC09C62565E4150000C60C /* IMCore.framework in Frameworks */,
 				FBCE4EC1201C0F4D002F8A61 /* Foundation.framework in Frameworks */,
 				A68E87E228C3B18900882823 /* IMSharedUtilities.framework in Frameworks */,
@@ -175,6 +200,7 @@
 		FBCE4EBD201C0F4D002F8A61 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A61DC0272A59FFF200EA75A5 /* IDS.framework */,
 				A6490A18298AC986002B0E1D /* SocialAppsCore.framework */,
 				A62991D6297210A500B7E663 /* Foundation.framework */,
 				A62991CF2972104E00B7E663 /* AppKit.framework */,
@@ -271,6 +297,11 @@
 				A68C7FFD29B0344A001002B6 /* ETiOSMacBalloonPluginDataSource.h */,
 				A68C7FFE29B03EC5001002B6 /* HWiOSMacBalloonDataSource.h */,
 				A68C800029B0F19C001002B6 /* IMHandleAvailabilityManager.h */,
+				A61DC0262A59FF8C00EA75A5 /* IDSIDQueryController.h */,
+				A61DC02B2A5A037400EA75A5 /* IDSDestination-Additions.h */,
+				A61DC02C2A5A03C800EA75A5 /* IDS.h */,
+				A61DC02D2A5A045B00EA75A5 /* IDSInternalQueueController.h */,
+				A61DC02E2A5A049700EA75A5 /* _IDSIDQueryController.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";
@@ -299,6 +330,7 @@
 				A62991C929720FAC00B7E663 /* Frameworks */,
 				A6490A0D29846973002B0E1D /* Resources */,
 				A6490A0F29846A3A002B0E1D /* ShellScript */,
+				A61DC0312A5A078500EA75A5 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
