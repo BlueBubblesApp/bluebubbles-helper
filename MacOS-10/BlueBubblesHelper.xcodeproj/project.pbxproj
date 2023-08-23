@@ -8,11 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		2D258662D944A5A4DD8D3C13 /* libPods-BlueBubblesHelper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7145A2D63389BEE3AC08DDD3 /* libPods-BlueBubblesHelper.a */; };
+		7A48E71F098345ADA8C2059A /* libPods-BlueBubblesHelper DyLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 127FB7616167BF78C35BF855 /* libPods-BlueBubblesHelper DyLib.a */; };
 		93AC09C62565E4150000C60C /* IMCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93AC09C52565E4150000C60C /* IMCore.framework */; };
 		93AC09CC2565E45F0000C60C /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
 		93B28EA9257399C00056DAD4 /* ChatDisplayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EA8257399C00056DAD4 /* ChatDisplayController.m */; };
 		93B28EAD25739A430056DAD4 /* SelectorHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EAC25739A430056DAD4 /* SelectorHelper.m */; };
 		93FD993A2568E7360060D430 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
+		A6D825212A36A110006253F5 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6D825202A36A110006253F5 /* AppKit.framework */; };
+		A6D825232A36A11A006253F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6D825222A36A11A006253F5 /* Foundation.framework */; };
+		A6D825242A36A173006253F5 /* IMCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93AC09C52565E4150000C60C /* IMCore.framework */; };
+		A6D825252A36A173006253F5 /* IMCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 93AC09C52565E4150000C60C /* IMCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A6D825272A36A188006253F5 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAE731B7294DCF6C00FA6F15 /* IMDPersistence.framework */; };
+		A6D825282A36A188006253F5 /* IMDPersistence.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EAE731B7294DCF6C00FA6F15 /* IMDPersistence.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A6D825292A36A1EE006253F5 /* SocialAppsCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4401562988780000DEB3BE /* SocialAppsCore.framework */; };
+		A6D8252A2A36A1EE006253F5 /* SocialAppsCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EA4401562988780000DEB3BE /* SocialAppsCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A6D8252D2A36A287006253F5 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
+		A6D8252F2A36A292006253F5 /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
+		A6D825312A36A2A0006253F5 /* ZKSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCE4ECB201C0F4D002F8A61 /* ZKSwizzle.m */; };
 		EA4401542988779B00DEB3BE /* SocialAppsCore in Resources */ = {isa = PBXBuildFile; fileRef = EA4401532988779B00DEB3BE /* SocialAppsCore */; };
 		EA4401572988780000DEB3BE /* SocialAppsCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4401562988780000DEB3BE /* SocialAppsCore.framework */; };
 		EAE731B8294DCF6C00FA6F15 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAE731B7294DCF6C00FA6F15 /* IMDPersistence.framework */; };
@@ -22,7 +34,24 @@
 		FBCE4ECE201C0F4D002F8A61 /* PrefixHeader.pch in Resources */ = {isa = PBXBuildFile; fileRef = FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		A6D825262A36A173006253F5 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				A6D825252A36A173006253F5 /* IMCore.framework in Embed Frameworks */,
+				A6D8252A2A36A1EE006253F5 /* SocialAppsCore.framework in Embed Frameworks */,
+				A6D825282A36A188006253F5 /* IMDPersistence.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		127FB7616167BF78C35BF855 /* libPods-BlueBubblesHelper DyLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper DyLib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		34FA3D7312B0A0F77E4D6E54 /* Pods-BlueBubblesHelper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.debug.xcconfig"; sourceTree = "<group>"; };
 		6955E1273337B34EA5BF653B /* Pods-BlueBubblesHelper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.release.xcconfig"; sourceTree = "<group>"; };
 		7145A2D63389BEE3AC08DDD3 /* libPods-BlueBubblesHelper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -45,9 +74,14 @@
 		93DFDC5D2568DFD4009551D2 /* IMMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMMessage.h; sourceTree = "<group>"; };
 		93FD99392568E7360060D430 /* NetworkController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkController.m; sourceTree = "<group>"; };
 		93FD993D2568E7500060D430 /* NetworkController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetworkController.h; sourceTree = "<group>"; };
+		9D8B8A4340753BAE45518935 /* Pods-BlueBubblesHelper DyLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.release.xcconfig"; sourceTree = "<group>"; };
 		A6CA07A32984995E0030683D /* IMDPersistentAttachmentController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMDPersistentAttachmentController.h; sourceTree = "<group>"; };
+		A6D825152A36A089006253F5 /* libBlueBubblesHelper DyLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libBlueBubblesHelper DyLib.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A6D825202A36A110006253F5 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		A6D825222A36A11A006253F5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A6FBC1E1272074B60078F9C6 /* IMHandleRegistrar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMHandleRegistrar.h; sourceTree = "<group>"; };
 		A6FBC1E3272076730078F9C6 /* IMChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChatItem.h; sourceTree = "<group>"; };
+		E9CE3CC4C09837AA39D25D93 /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.debug.xcconfig"; sourceTree = "<group>"; };
 		EA4401532988779B00DEB3BE /* SocialAppsCore */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SocialAppsCore; sourceTree = "<group>"; };
 		EA4401562988780000DEB3BE /* SocialAppsCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocialAppsCore.framework; path = ../../../../../System/Library/PrivateFrameworks/SocialAppsCore.framework; sourceTree = "<group>"; };
 		EAE731B6294DCA9200FA6F15 /* IMFileTransferCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMFileTransferCenter.h; sourceTree = "<group>"; };
@@ -67,6 +101,19 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		A6D825132A36A089006253F5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A6D825212A36A110006253F5 /* AppKit.framework in Frameworks */,
+				A6D825242A36A173006253F5 /* IMCore.framework in Frameworks */,
+				A6D825292A36A1EE006253F5 /* SocialAppsCore.framework in Frameworks */,
+				A6D825232A36A11A006253F5 /* Foundation.framework in Frameworks */,
+				A6D825272A36A188006253F5 /* IMDPersistence.framework in Frameworks */,
+				7A48E71F098345ADA8C2059A /* libPods-BlueBubblesHelper DyLib.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FBCE4EB8201C0F4D002F8A61 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -88,6 +135,8 @@
 			children = (
 				34FA3D7312B0A0F77E4D6E54 /* Pods-BlueBubblesHelper.debug.xcconfig */,
 				6955E1273337B34EA5BF653B /* Pods-BlueBubblesHelper.release.xcconfig */,
+				E9CE3CC4C09837AA39D25D93 /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */,
+				9D8B8A4340753BAE45518935 /* Pods-BlueBubblesHelper DyLib.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -124,6 +173,7 @@
 			isa = PBXGroup;
 			children = (
 				FBCE4EBB201C0F4D002F8A61 /* BlueBubblesHelper.bundle */,
+				A6D825152A36A089006253F5 /* libBlueBubblesHelper DyLib.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -131,12 +181,15 @@
 		FBCE4EBD201C0F4D002F8A61 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A6D825222A36A11A006253F5 /* Foundation.framework */,
+				A6D825202A36A110006253F5 /* AppKit.framework */,
 				EA4401562988780000DEB3BE /* SocialAppsCore.framework */,
 				EAE731B7294DCF6C00FA6F15 /* IMDPersistence.framework */,
 				93AC09C52565E4150000C60C /* IMCore.framework */,
 				FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */,
 				FBCE4EC0201C0F4D002F8A61 /* Foundation.framework */,
 				7145A2D63389BEE3AC08DDD3 /* libPods-BlueBubblesHelper.a */,
+				127FB7616167BF78C35BF855 /* libPods-BlueBubblesHelper DyLib.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -204,7 +257,36 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		A6D825112A36A089006253F5 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		A6D825142A36A089006253F5 /* BlueBubblesHelper DyLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A6D8251D2A36A08A006253F5 /* Build configuration list for PBXNativeTarget "BlueBubblesHelper DyLib" */;
+			buildPhases = (
+				AB0F3FDC125824C7581F61B0 /* [CP] Check Pods Manifest.lock */,
+				A6D825112A36A089006253F5 /* Headers */,
+				A6D825122A36A089006253F5 /* Sources */,
+				A6D825132A36A089006253F5 /* Frameworks */,
+				A6D825262A36A173006253F5 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "BlueBubblesHelper DyLib";
+			productName = "BlueBubblesHelper DyLib";
+			productReference = A6D825152A36A089006253F5 /* libBlueBubblesHelper DyLib.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 		FBCE4EBA201C0F4D002F8A61 /* BlueBubblesHelper */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FBCE4ED1201C0F4D002F8A61 /* Build configuration list for PBXNativeTarget "BlueBubblesHelper" */;
@@ -233,6 +315,9 @@
 				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = BlueBubbleMessaging;
 				TargetAttributes = {
+					A6D825142A36A089006253F5 = {
+						CreatedOnToolsVersion = 12.0;
+					};
 					FBCE4EBA201C0F4D002F8A61 = {
 						CreatedOnToolsVersion = 9.0.1;
 						ProvisioningStyle = Manual;
@@ -252,6 +337,7 @@
 			projectRoot = "";
 			targets = (
 				FBCE4EBA201C0F4D002F8A61 /* BlueBubblesHelper */,
+				A6D825142A36A089006253F5 /* BlueBubblesHelper DyLib */,
 			);
 		};
 /* End PBXProject section */
@@ -291,6 +377,28 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		AB0F3FDC125824C7581F61B0 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-BlueBubblesHelper DyLib-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		FBCE4EE7201C26B1002F8A61 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -309,6 +417,16 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		A6D825122A36A089006253F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A6D825312A36A2A0006253F5 /* ZKSwizzle.m in Sources */,
+				A6D8252F2A36A292006253F5 /* BlueBubblesHelper.m in Sources */,
+				A6D8252D2A36A287006253F5 /* NetworkController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FBCE4EB7201C0F4D002F8A61 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -324,6 +442,59 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		A6D8251B2A36A08A006253F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E9CE3CC4C09837AA39D25D93 /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = S6D73TBQQU;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
+			};
+			name = Debug;
+		};
+		A6D8251C2A36A08A006253F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9D8B8A4340753BAE45518935 /* Pods-BlueBubblesHelper DyLib.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = S6D73TBQQU;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
+			};
+			name = Release;
+		};
 		FBCE4ECF201C0F4D002F8A61 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -430,7 +601,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 18;
 				DEPLOYMENT_LOCATION = YES;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DSTROOT = /;
@@ -445,7 +616,7 @@
 				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 0.0.14;
+				MARKETING_VERSION = 0.0.16;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -462,7 +633,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 16;
+				CURRENT_PROJECT_VERSION = 18;
 				DEPLOYMENT_LOCATION = YES;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DSTROOT = /;
@@ -477,7 +648,7 @@
 				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 0.0.14;
+				MARKETING_VERSION = 0.0.16;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -488,6 +659,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A6D8251D2A36A08A006253F5 /* Build configuration list for PBXNativeTarget "BlueBubblesHelper DyLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A6D8251B2A36A08A006253F5 /* Debug */,
+				A6D8251C2A36A08A006253F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		FBCE4EB6201C0F4D002F8A61 /* Build configuration list for PBXProject "BlueBubblesHelper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
