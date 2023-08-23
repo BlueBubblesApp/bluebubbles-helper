@@ -394,19 +394,22 @@ NSMutableArray* vettedAliases;
             [controller setPinnedConversationIdentifiers:(finalArr) withUpdateReason:(@"contextMenu")];
         }
     // If the server tells us to create a chat
-    // currently unused method
     } else if ([event isEqualToString:@"create-chat"]) {
-        IMAccountController *sharedAccountController = [IMAccountController sharedInstance];
-        IMAccount *myAccount = [sharedAccountController mostLoggedInAccount];
-
         NSMutableArray<IMHandle*> *handles = [[NSMutableArray alloc] initWithArray:(@[])];
         for (NSString* str in data[@"addresses"]) {
-            NSArray<IMHandle*> *handlesToAdd = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(str)];
-            if (handlesToAdd == nil) {
-                IMHandle *handle = [[IMHandle alloc] initWithAccount:(myAccount) ID:(str) alreadyCanonical:(YES)];
-                handlesToAdd = @[handle];
+            IMHandle *handle;
+            if ([data[@"service"] isEqualToString:@"iMessage"]) {
+                handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(str)];
+            } else {
+                handle = [[[IMAccountController sharedInstance] activeSMSAccount] imHandleWithID:(str)];
+                if (handle == nil) {
+                    handle = [[[IMAccount alloc] initWithService:IMService.smsService] imHandleWithID:(str)];
+                }
             }
-            [handles addObjectsFromArray:(handlesToAdd)];
+            
+            if (handle != nil) {
+                [handles addObject:handle];
+            }
         }
         IMChat *chat;
         if (handles.count > 1) {
@@ -414,15 +417,36 @@ NSMutableArray* vettedAliases;
         } else {
             chat = [[IMChatRegistry sharedInstance] chatForIMHandle:(handles[0])];
         }
-        if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": chat.guid}];
-        }
+        NSMutableDictionary *mutableData = [[NSMutableDictionary alloc] initWithDictionary:data];
+        [mutableData setValue:[chat guid] forKey:@"chatGuid"];
+        [BlueBubblesHelper sendMessage:(mutableData) transfers:nil attributedString:nil transaction:(transaction)];
     // If server tells us to delete a chat
     } else if ([event isEqualToString:@"delete-chat"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
 
         if (chat != nil) {
             [[IMChatRegistry sharedInstance] _chat_remove:(chat)];
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
+        }
+    // If server tells us to delete a message
+    } else if ([event isEqualToString:@"delete-message"]) {
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
+
+        if (chat != nil) {
+            [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
+                IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
+                NSObject *items = messageItem._newChatItems;
+                IMMessagePartChatItem *item;
+                // sometimes items is an array so we need to account for that
+                if ([items isKindOfClass:[NSArray class]]) {
+                    [chat deleteChatItems:(items)];
+                } else {
+                    [chat deleteChatItems:(@[items])];
+                }
+            }];
+            
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
