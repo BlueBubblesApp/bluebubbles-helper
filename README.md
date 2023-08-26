@@ -23,6 +23,10 @@ This is the repo for the bundle containing code to perform various tasks not acc
 - Check user focus status (requires MacOS 12+)
 - Force notify a message (requires MacOS 12+)
 - Retrieve Digital Touch and Handwritten message previews (requires MacOS 11+)
+- Create chats
+- Delete chats
+- Delete messages
+- Check user iMessage and FaceTime status
 
 See [here](https://docs.bluebubbles.app/helper-bundle/imcore-documentation) for more details on how these were implemented.
 

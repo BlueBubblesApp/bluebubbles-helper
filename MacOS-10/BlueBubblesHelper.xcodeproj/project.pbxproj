@@ -14,6 +14,10 @@
 		93B28EA9257399C00056DAD4 /* ChatDisplayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EA8257399C00056DAD4 /* ChatDisplayController.m */; };
 		93B28EAD25739A430056DAD4 /* SelectorHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EAC25739A430056DAD4 /* SelectorHelper.m */; };
 		93FD993A2568E7360060D430 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
+		A63F3AF22A5A22E5002990A8 /* IDS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A63F3AF12A5A22E5002990A8 /* IDS.framework */; };
+		A63F3AF32A5A22E5002990A8 /* IDS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A63F3AF12A5A22E5002990A8 /* IDS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A63F3AF52A5A230B002990A8 /* IDS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A63F3AF12A5A22E5002990A8 /* IDS.framework */; };
+		A63F3AF62A5A230B002990A8 /* IDS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A63F3AF12A5A22E5002990A8 /* IDS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A6D825212A36A110006253F5 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6D825202A36A110006253F5 /* AppKit.framework */; };
 		A6D825232A36A11A006253F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6D825222A36A11A006253F5 /* Foundation.framework */; };
 		A6D825242A36A173006253F5 /* IMCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93AC09C52565E4150000C60C /* IMCore.framework */; };
@@ -35,6 +39,17 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		A63F3AF42A5A22E5002990A8 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				A63F3AF32A5A22E5002990A8 /* IDS.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A6D825262A36A173006253F5 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -42,6 +57,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				A6D825252A36A173006253F5 /* IMCore.framework in Embed Frameworks */,
+				A63F3AF62A5A230B002990A8 /* IDS.framework in Embed Frameworks */,
 				A6D8252A2A36A1EE006253F5 /* SocialAppsCore.framework in Embed Frameworks */,
 				A6D825282A36A188006253F5 /* IMDPersistence.framework in Embed Frameworks */,
 			);
@@ -75,6 +91,12 @@
 		93FD99392568E7360060D430 /* NetworkController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkController.m; sourceTree = "<group>"; };
 		93FD993D2568E7500060D430 /* NetworkController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetworkController.h; sourceTree = "<group>"; };
 		9D8B8A4340753BAE45518935 /* Pods-BlueBubblesHelper DyLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.release.xcconfig"; sourceTree = "<group>"; };
+		A63F3AF12A5A22E5002990A8 /* IDS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IDS.framework; path = ../../../../../System/Library/PrivateFrameworks/IDS.framework; sourceTree = "<group>"; };
+		A63F3AF72A5A235C002990A8 /* IDSIDQueryController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDSIDQueryController.h; sourceTree = "<group>"; };
+		A63F3AF82A5A2387002990A8 /* IDSDestination-Additions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IDSDestination-Additions.h"; sourceTree = "<group>"; };
+		A63F3AF92A5A239E002990A8 /* IDS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDS.h; sourceTree = "<group>"; };
+		A63F3AFA2A5A23C7002990A8 /* IDSInternalQueueController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDSInternalQueueController.h; sourceTree = "<group>"; };
+		A63F3AFB2A5A23E7002990A8 /* _IDSIDQueryController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _IDSIDQueryController.h; sourceTree = "<group>"; };
 		A6CA07A32984995E0030683D /* IMDPersistentAttachmentController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMDPersistentAttachmentController.h; sourceTree = "<group>"; };
 		A6D825152A36A089006253F5 /* libBlueBubblesHelper DyLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libBlueBubblesHelper DyLib.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6D825202A36A110006253F5 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -109,6 +131,7 @@
 				A6D825242A36A173006253F5 /* IMCore.framework in Frameworks */,
 				A6D825292A36A1EE006253F5 /* SocialAppsCore.framework in Frameworks */,
 				A6D825232A36A11A006253F5 /* Foundation.framework in Frameworks */,
+				A63F3AF52A5A230B002990A8 /* IDS.framework in Frameworks */,
 				A6D825272A36A188006253F5 /* IMDPersistence.framework in Frameworks */,
 				7A48E71F098345ADA8C2059A /* libPods-BlueBubblesHelper DyLib.a in Frameworks */,
 			);
@@ -122,6 +145,7 @@
 				FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */,
 				93AC09C62565E4150000C60C /* IMCore.framework in Frameworks */,
 				EAE731B8294DCF6C00FA6F15 /* IMDPersistence.framework in Frameworks */,
+				A63F3AF22A5A22E5002990A8 /* IDS.framework in Frameworks */,
 				FBCE4EC1201C0F4D002F8A61 /* Foundation.framework in Frameworks */,
 				2D258662D944A5A4DD8D3C13 /* libPods-BlueBubblesHelper.a in Frameworks */,
 			);
@@ -181,6 +205,7 @@
 		FBCE4EBD201C0F4D002F8A61 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A63F3AF12A5A22E5002990A8 /* IDS.framework */,
 				A6D825222A36A11A006253F5 /* Foundation.framework */,
 				A6D825202A36A110006253F5 /* AppKit.framework */,
 				EA4401562988780000DEB3BE /* SocialAppsCore.framework */,
@@ -251,6 +276,11 @@
 				A6FBC1E1272074B60078F9C6 /* IMHandleRegistrar.h */,
 				A6FBC1E3272076730078F9C6 /* IMChatItem.h */,
 				A6CA07A32984995E0030683D /* IMDPersistentAttachmentController.h */,
+				A63F3AF72A5A235C002990A8 /* IDSIDQueryController.h */,
+				A63F3AF82A5A2387002990A8 /* IDSDestination-Additions.h */,
+				A63F3AF92A5A239E002990A8 /* IDS.h */,
+				A63F3AFA2A5A23C7002990A8 /* IDSInternalQueueController.h */,
+				A63F3AFB2A5A23E7002990A8 /* _IDSIDQueryController.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";
@@ -296,6 +326,7 @@
 				FBCE4EB8201C0F4D002F8A61 /* Frameworks */,
 				FBCE4EB9201C0F4D002F8A61 /* Resources */,
 				FBCE4EE7201C26B1002F8A61 /* Run Script */,
+				A63F3AF42A5A22E5002990A8 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -451,14 +482,17 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = lib;
 				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MARKETING_VERSION = 0.0.17;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -478,13 +512,16 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = lib;
 				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MARKETING_VERSION = 0.0.17;
 				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -601,7 +638,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEPLOYMENT_LOCATION = YES;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DSTROOT = /;
@@ -616,7 +653,7 @@
 				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 0.0.16;
+				MARKETING_VERSION = 0.0.17;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -633,7 +670,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEPLOYMENT_LOCATION = YES;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DSTROOT = /;
@@ -648,7 +685,7 @@
 				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 0.0.16;
+				MARKETING_VERSION = 0.0.17;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

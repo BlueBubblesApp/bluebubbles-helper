@@ -35,6 +35,9 @@
 #import "SocialAppsCore/SOAccountAliasController.h"
 #import "SocialAppsCore/SOAccountAlias.h"
 #import "ZKSwizzle.h"
+#import "IDSIDQueryController.h"
+#import "IDS.h"
+#import "IDSDestination-Additions.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -343,33 +346,57 @@ BlueBubblesHelper *plugin;
     // If the server tells us to create a chat
     // currently unused method
     } else if ([event isEqualToString:@"create-chat"]) {
-        IMAccountController *sharedAccountController = [IMAccountController sharedInstance];
-        IMAccount *myAccount = [sharedAccountController mostLoggedInAccount];
-
         NSMutableArray<IMHandle*> *handles = [[NSMutableArray alloc] initWithArray:(@[])];
-        for (NSString* str in data[@"addresses"]) {
-            NSArray<IMHandle*> *handlesToAdd = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(str)];
-            if (handlesToAdd == nil) {
-                IMHandle *handle = [[IMHandle alloc] initWithAccount:(myAccount) ID:(str) alreadyCanonical:(YES)];
-                handlesToAdd = @[handle];
-            }
-            [handles addObjectsFromArray:(handlesToAdd)];
-        }
+       for (NSString* str in data[@"addresses"]) {
+           IMHandle *handle;
+           if ([data[@"service"] isEqualToString:@"iMessage"]) {
+               handle = [[[IMAccountController sharedInstance] bestAccountForService:(IMService.iMessageService)] imHandleWithID:(str)];
+           } else {
+               handle = [[[IMAccountController sharedInstance] bestAccountForService:(IMService.smsService)] imHandleWithID:(str)];
+               if (handle == nil) {
+                   handle = [[[IMAccount alloc] initWithService:IMService.smsService] imHandleWithID:(str)];
+               }
+           }
+           
+           if (handle != nil) {
+               [handles addObject:handle];
+           }
+       }
         IMChat *chat;
         if (handles.count > 1) {
             chat = [[IMChatRegistry sharedInstance] chatForIMHandles:(handles)];
         } else {
             chat = [[IMChatRegistry sharedInstance] chatForIMHandle:(handles[0])];
         }
-        if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": chat.guid}];
-        }
+        NSMutableDictionary *mutableData = [[NSMutableDictionary alloc] initWithDictionary:data];
+        [mutableData setValue:[chat guid] forKey:@"chatGuid"];
+        [BlueBubblesHelper sendMessage:(mutableData) transfers:nil attributedString:nil transaction:(transaction)];
     // If server tells us to delete a chat
     } else if ([event isEqualToString:@"delete-chat"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
 
         if (chat != nil) {
             [[IMChatRegistry sharedInstance] _chat_remove:(chat)];
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
+        }
+        // If server tells us to delete a message
+    } else if ([event isEqualToString:@"delete-message"]) {
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
+
+        if (chat != nil) {
+            [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
+                IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
+                NSObject *items = messageItem._newChatItems;
+                // sometimes items is an array so we need to account for that
+                if ([items isKindOfClass:[NSArray class]]) {
+                    [chat deleteChatItems:(items)];
+                } else {
+                    [chat deleteChatItems:(@[items])];
+                }
+            }];
+            
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
@@ -503,6 +530,32 @@ BlueBubblesHelper *plugin;
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
         }
+    // If the server tells us to check iMessage availability
+    } else if ([event isEqualToString:@"check-imessage-availability"] || [event isEqualToString:@"check-facetime-availability"]) {
+        NSString *type = data[@"aliasType"];
+        IDSDestination *dest;
+        NSString* serviceName;
+        
+        if ([event isEqualToString:@"check-imessage-availability"]) {
+            serviceName = IDSServiceNameiMessage;
+        } else {
+            serviceName = IDSServiceNameFaceTime;
+        }
+        
+        if ([type isEqualToString:@"phone"]) {
+            dest = IDSCopyIDForPhoneNumber((__bridge CFStringRef)data[@"address"]);
+        } else {
+            dest = IDSCopyIDForEmailAddress((__bridge CFStringRef)data[@"address"]);
+        }
+        
+        [[IDSIDQueryController sharedInstance] refreshIDStatusForDestinations:(@[dest]) service:(serviceName) listenerID:(@"SOIDSListener-com.apple.imessage-rest") queue:(dispatch_queue_create("HandleIDS", NULL)) completionBlock:^(NSDictionary *response) {
+            NSInteger *status = [response.allValues.firstObject integerValue];
+            BOOL available = status == 1;
+            DLog(@"BLUEBUBBLESHELPER: Status for %@ is %ld", data[@"address"], (long)available);
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"available": [NSNumber numberWithBool:(available)]}];
+            }
+        }];
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
