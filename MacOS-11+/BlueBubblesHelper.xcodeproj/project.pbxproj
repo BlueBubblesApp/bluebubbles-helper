@@ -12,7 +12,6 @@
 		93FD993A2568E7360060D430 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
 		A61DC0282A59FFF300EA75A5 /* IDS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A61DC0272A59FFF200EA75A5 /* IDS.framework */; };
 		A61DC02F2A5A078500EA75A5 /* IDS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A61DC0272A59FFF200EA75A5 /* IDS.framework */; };
-		A61DC0302A5A078500EA75A5 /* IDS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A61DC0272A59FFF200EA75A5 /* IDS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A62991D02972104E00B7E663 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A62991CF2972104E00B7E663 /* AppKit.framework */; };
 		A62991D12972106200B7E663 /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
 		A62991D22972106500B7E663 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
@@ -25,6 +24,7 @@
 		A6490A1C298DC81C002B0E1D /* VettedAliasDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = A6490A1B298DC81C002B0E1D /* VettedAliasDictionary.m */; };
 		A6490A1D298DC81C002B0E1D /* VettedAliasDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = A6490A1B298DC81C002B0E1D /* VettedAliasDictionary.m */; };
 		A6490A1F298DCC35002B0E1D /* VettedAliasDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = A6490A1E298DCC35002B0E1D /* VettedAliasDictionary.h */; };
+		A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = A62991CB29720FAC00B7E663 /* BlueBubblesHelper.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A68E87E228C3B18900882823 /* IMSharedUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A68E87E128C3B18900882823 /* IMSharedUtilities.framework */; };
 		A69A83E027D18385007BB936 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69A83DF27D18385007BB936 /* IMDPersistence.framework */; };
 		FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */; };
@@ -34,15 +34,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		A61DC0312A5A078500EA75A5 /* Embed Frameworks */ = {
+		A65C21A62A9AAAE600D6FB7F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
+			buildActionMask = 12;
+			dstPath = "/Applications/BlueBubbles.app/Contents/Resources/appResources/private-api/macos11";
+			dstSubfolderSpec = 0;
 			files = (
-				A61DC0302A5A078500EA75A5 /* IDS.framework in Embed Frameworks */,
+				A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in CopyFiles */,
 			);
-			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -71,7 +70,7 @@
 		A61DC02C2A5A03C800EA75A5 /* IDS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDS.h; sourceTree = "<group>"; };
 		A61DC02D2A5A045B00EA75A5 /* IDSInternalQueueController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDSInternalQueueController.h; sourceTree = "<group>"; };
 		A61DC02E2A5A049700EA75A5 /* _IDSIDQueryController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _IDSIDQueryController.h; sourceTree = "<group>"; };
-		A62991CB29720FAC00B7E663 /* libBlueBubblesHelper DyLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libBlueBubblesHelper DyLib.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A62991CB29720FAC00B7E663 /* BlueBubblesHelper.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BlueBubblesHelper.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		A62991CF2972104E00B7E663 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		A62991D6297210A500B7E663 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A6490A18298AC986002B0E1D /* SocialAppsCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocialAppsCore.framework; path = ../../../../../System/Library/PrivateFrameworks/SocialAppsCore.framework; sourceTree = "<group>"; };
@@ -192,7 +191,7 @@
 			isa = PBXGroup;
 			children = (
 				FBCE4EBB201C0F4D002F8A61 /* BlueBubblesHelper.bundle */,
-				A62991CB29720FAC00B7E663 /* libBlueBubblesHelper DyLib.dylib */,
+				A62991CB29720FAC00B7E663 /* BlueBubblesHelper.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -329,8 +328,8 @@
 				A62991C829720FAC00B7E663 /* Sources */,
 				A62991C929720FAC00B7E663 /* Frameworks */,
 				A6490A0D29846973002B0E1D /* Resources */,
+				A65C21A62A9AAAE600D6FB7F /* CopyFiles */,
 				A6490A0F29846A3A002B0E1D /* ShellScript */,
-				A61DC0312A5A078500EA75A5 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -338,7 +337,7 @@
 			);
 			name = "BlueBubblesHelper DyLib";
 			productName = "BlueBubblesHelper DyLib";
-			productReference = A62991CB29720FAC00B7E663 /* libBlueBubblesHelper DyLib.dylib */;
+			productReference = A62991CB29720FAC00B7E663 /* BlueBubblesHelper.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 		FBCE4EBA201C0F4D002F8A61 /* BlueBubblesHelper */ = {
@@ -476,7 +475,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
+			shellScript = "killall Messages\n";
 		};
 		A64B88AC2712494A00BAD446 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -538,7 +537,7 @@
 				DSTROOT = /;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
 				INSTALL_PATH = /Users/tanay/Desktop/test;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
@@ -546,7 +545,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = BlueBubblesHelper;
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited) $(SYSTEM_LIBRARY_DIR)/PrivateFrameworks";
@@ -567,13 +566,13 @@
 				DSTROOT = /;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
 				INSTALL_PATH = /Users/tanay/Desktop/test;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 0.0.17;
 				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = BlueBubblesHelper;
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited) $(SYSTEM_LIBRARY_DIR)/PrivateFrameworks";
