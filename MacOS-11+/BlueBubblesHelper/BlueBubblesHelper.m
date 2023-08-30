@@ -263,22 +263,10 @@ NSMutableArray* vettedAliases;
             }
             return;
         }
-        NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
+        IMHandle *handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(data[@"address"])];
 
-        if (handles != nil) {
-            IMAccountController *sharedAccountController = [IMAccountController sharedInstance];
-            IMAccount *myAccount = [sharedAccountController mostLoggedInAccount];
-            IMHandle *handle = [[IMHandle alloc] initWithAccount:(myAccount) ID:(data[@"address"]) alreadyCanonical:(YES)];
-            handles = @[handle];
-        } else {
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to load handles for provided address!"}];
-            }
-            return;
-        }
-
-        if(chat != nil && [chat canAddParticipants:(handles)]) {
-            [chat inviteParticipantsToiMessageChat:(handles) reason:(0)];
+        if (handle != nil && chat != nil && [chat canAddParticipant:(handle)]) {
+            [chat inviteParticipantsToiMessageChat:(@[handle]) reason:(0)];
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
@@ -299,17 +287,11 @@ NSMutableArray* vettedAliases;
             }
             return;
         }
-        NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
+        
+        IMHandle *handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(data[@"address"])];
 
-        if (handles == nil) {
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to load handles for provided address!"}];
-            }
-            return;
-        }
-
-        if(chat != nil && [chat canAddParticipants:(handles)]) {
-            [chat removeParticipantsFromiMessageChat:(handles) reason:(0)];
+        if (handle != nil && chat != nil && [chat canAddParticipant:(handle)]) {
+            [chat removeParticipantsFromiMessageChat:(@[handle]) reason:(0)];
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
@@ -605,17 +587,17 @@ NSMutableArray* vettedAliases;
         }
     // If the server asks us to check the focus status of a user
     } else if ([event isEqualToString:@"check-focus-status"]) {
-        NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
+        IMHandle *handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(data[@"address"])];
         // Use reference to class since it doesn't exist on Big Sur
         Class cls = NSClassFromString(@"IMHandleAvailabilityManager");
-        if ([handles firstObject] != nil && cls != nil) {
+        if (handle != nil && cls != nil) {
             if ([cls instancesRespondToSelector:NSSelectorFromString(@"_fetchUpdatedStatusForHandle:completion:")]) {
-                [[cls sharedInstance] _fetchUpdatedStatusForHandle:([handles firstObject]) completion:^() {
+                [[cls sharedInstance] _fetchUpdatedStatusForHandle:(handle) completion:^() {
                     // delay for 1 second to ensure we have latest status
                     NSTimeInterval delayInSeconds = 1.0;
                     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
                     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-                        NSInteger *status = [[cls sharedInstance] availabilityForHandle:([handles firstObject])];
+                        NSInteger *status = [[cls sharedInstance] availabilityForHandle:(handle)];
                         DLog("BLUEBUBBLESHELPER: Found status %{public}ld for %{public}@", (long)status, data[@"address"]);
                         if (transaction != nil) {
                             BOOL silenced = status == 2;
