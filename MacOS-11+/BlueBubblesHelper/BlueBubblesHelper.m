@@ -658,6 +658,18 @@ NSMutableArray* vettedAliases;
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"available": [NSNumber numberWithBool:(available)]}];
             }
         }];
+    // If the server tells us to download a purged attachment
+    } else if ([event isEqualToString:@"download-purged-attachment"]) {
+        IMFileTransfer* transfer = [[IMFileTransferCenter sharedInstance] transferForGUID:(data[@"attachmentGuid"])];
+        if ([transfer transferState] != 0 || ![transfer isIncoming]) {
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"No need to unpurge!"}];
+            }
+        }
+        
+        [[IMFileTransferCenter sharedInstance] registerTransferWithDaemon:([transfer guid])];
+        [[IMFileTransferCenter sharedInstance] acceptTransfer:([transfer guid])];
+        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog("BLUEBUBBLESHELPER: Not implemented %{public}@", event);
