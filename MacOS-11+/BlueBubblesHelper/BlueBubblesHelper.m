@@ -15,7 +15,7 @@
 #import "IMPerson.h"
 #import "IMAccount.h"
 #import "IMAccountController.h"
-#import "IMService-IMService_GetService.h"
+#import "IMService.h"
 #import "IMChat.h"
 #import "IMMessage.h"
 #import "IMMessageItem.h"
@@ -378,21 +378,28 @@ NSMutableArray* vettedAliases;
     // If the server tells us to create a chat
     } else if ([event isEqualToString:@"create-chat"]) {
         NSMutableArray<IMHandle*> *handles = [[NSMutableArray alloc] initWithArray:(@[])];
+        BOOL failed = false;
         for (NSString* str in data[@"addresses"]) {
             IMHandle *handle;
             if ([data[@"service"] isEqualToString:@"iMessage"]) {
                 handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(str)];
             } else {
                 handle = [[[IMAccountController sharedInstance] activeSMSAccount] imHandleWithID:(str)];
-                if (handle == nil) {
-                    handle = [[[IMAccount alloc] initWithService:IMService.smsService] imHandleWithID:(str)];
-                }
             }
             
             if (handle != nil) {
                 [handles addObject:handle];
+            } else {
+                failed = true;
+                break;
             }
         }
+        
+        if (failed) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to find all handles for specified service!"}];
+            return;
+        }
+        
         IMChat *chat;
         if (handles.count > 1) {
             chat = [[IMChatRegistry sharedInstance] chatForIMHandles:(handles)];

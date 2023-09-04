@@ -120,7 +120,7 @@
 		FBCE4ECA201C0F4D002F8A61 /* ZKSwizzle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ZKSwizzle.h; path = ZKSwizzle/ZKSwizzle.h; sourceTree = "<group>"; };
 		FBCE4ECB201C0F4D002F8A61 /* ZKSwizzle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ZKSwizzle.m; path = ZKSwizzle/ZKSwizzle.m; sourceTree = "<group>"; };
 		FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
-		FBCE4ED6201C0FDE002F8A61 /* IMService-IMService_GetService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IMService-IMService_GetService.h"; sourceTree = "<group>"; };
+		FBCE4ED6201C0FDE002F8A61 /* IMService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMService.h; sourceTree = "<group>"; };
 		FBCE4ED7201C0FDE002F8A61 /* IMAccountController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMAccountController.h; sourceTree = "<group>"; };
 		FBCE4ED8201C0FDE002F8A61 /* IMPerson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMPerson.h; sourceTree = "<group>"; };
 		FBCE4ED9201C0FDE002F8A61 /* IMHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMHandle.h; sourceTree = "<group>"; };
@@ -274,7 +274,7 @@
 				71554C19257B616400296B93 /* IMMessagePartChatItem.h */,
 				FBCE4ED8201C0FDE002F8A61 /* IMPerson.h */,
 				A64B888F2712320500BAD446 /* IMRemoteObjectCoding.h */,
-				FBCE4ED6201C0FDE002F8A61 /* IMService-IMService_GetService.h */,
+				FBCE4ED6201C0FDE002F8A61 /* IMService.h */,
 				A64B88A12712347700BAD446 /* IMSystemMonitorListener-Protocol.h */,
 				71554C17257B609B00296B93 /* IMTextMessagePartChatItem.h */,
 				71554C0F257B58F100296B93 /* IMTranscriptChatItem.h */,
