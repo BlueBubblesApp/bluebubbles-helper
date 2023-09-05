@@ -122,11 +122,6 @@ NSMutableArray* vettedAliases;
     };
     NSDictionary *message = @{@"event": @"ping", @"message": @"Helper Connected!"};
     [controller sendMessage:message];
-    
-    // initialize vetted alias cache and start alias listener
-//    vettedAliases = [BlueBubblesHelper getVettedAliases];
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_aliasesChanged:) name:@"IMAccountAliasesChangedNotification" object:nil];
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_aliasesChanged:) name:@"SOAccountAliasesChangedNotification_Private" object:nil];
 
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
 //    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC));
@@ -1041,6 +1036,22 @@ ZKSwizzleInterface(BBH_IMChat, IMChat, NSObject)
         }
     }
     return hasBeenHandled;
+}
+
+@end
+
+ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
+@implementation BBH_IMAccount
+
+- (void)_registrationStatusChanged:(id)arg1 {
+    NSNotification *notif = arg1;
+    IMAccount* acct = [notif object];
+    NSDictionary *info = [notif userInfo];
+    if ([[acct serviceName] isEqualToString:@"iMessage"] && [info objectForKey:@"__kIMAccountAliasesRemovedKey"]) {
+        DLog("BLUEBUBBLESHELPER: alias updated %{public}@", notif);
+        [[NetworkController sharedInstance] sendMessage: @{@"event": @"aliases-removed", @"data": info}];
+    }
+    return ZKOrig(void, arg1);
 }
 
 @end
