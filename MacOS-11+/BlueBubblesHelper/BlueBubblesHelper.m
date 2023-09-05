@@ -41,6 +41,8 @@
 #import "IDSDestination-Additions.h"
 #import "IMDDController.h"
 #import "IMNicknameController.h"
+#import "IMNickname.h"
+#import "IMNicknameAvatarImage.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -170,7 +172,7 @@ NSMutableArray* vettedAliases;
     }
 
     DLog("BLUEBUBBLESHELPER: Message received: %{public}@, %{public}@", event, data);
-    
+
     // If the server tells us to start typing
      if([event isEqualToString: @"start-typing"]) {
         // Get the IMChat instance for the guid specified in eventData
@@ -284,7 +286,7 @@ NSMutableArray* vettedAliases;
             }
             return;
         }
-        
+
         IMHandle *handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(data[@"address"])];
 
         if (handle != nil && chat != nil && [chat canAddParticipant:(handle)]) {
@@ -305,20 +307,20 @@ NSMutableArray* vettedAliases;
     // If the server tells us to edit a message
     } else if ([event isEqualToString:@"edit-message"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
-        
+
         [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
             NSMutableAttributedString *editedString = [[NSMutableAttributedString alloc] initWithString: data[@"editedMessage"]];
             NSMutableAttributedString *bcString = [[NSMutableAttributedString alloc] initWithString: data[@"backwardsCompatibilityMessage"]];
             [chat editMessage:(message) atPartIndex:([data[@"partIndex"] integerValue]) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
         }];
-        
+
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
         }
     // If the server tells us to unsend a message
     } else if ([event isEqualToString:@"unsend-message"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
-        
+
         [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
             IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
             NSObject *items = messageItem._newChatItems;
@@ -347,10 +349,10 @@ NSMutableArray* vettedAliases;
             } else {
                 item = (IMMessagePartChatItem *)items;
             }
-            
+
             [chat retractMessagePart:(item)];
         }];
-        
+
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
         }
@@ -383,7 +385,7 @@ NSMutableArray* vettedAliases;
             } else {
                 handle = [[[IMAccountController sharedInstance] activeSMSAccount] imHandleWithID:(str)];
             }
-            
+
             if (handle != nil) {
                 [handles addObject:handle];
             } else {
@@ -391,12 +393,12 @@ NSMutableArray* vettedAliases;
                 break;
             }
         }
-        
+
         if (failed) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to find all handles for specified service!"}];
             return;
         }
-        
+
         IMChat *chat;
         if (handles.count > 1) {
             chat = [[IMChatRegistry sharedInstance] chatForIMHandles:(handles)];
@@ -432,7 +434,7 @@ NSMutableArray* vettedAliases;
                     [chat deleteChatItems:(@[items])];
                 }
             }];
-            
+
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
@@ -492,7 +494,7 @@ NSMutableArray* vettedAliases;
     // If the server wants to get media for a balloon bundle item
     } else if ([event isEqualToString:@"balloon-bundle-media-path"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
-        
+
         [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
             IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
             NSObject *items = messageItem._newChatItems;
@@ -577,7 +579,7 @@ NSMutableArray* vettedAliases;
         }
     } else if ([event isEqualToString:@"notify-anyways"]) {
         IMChat *chat = [BlueBubblesHelper getChat:data[@"chatGuid"] :transaction];
-        
+
         [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
             IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
             NSObject *items = messageItem._newChatItems;
@@ -588,7 +590,7 @@ NSMutableArray* vettedAliases;
             } else {
                 item = (IMMessagePartChatItem *)items;
             }
-            
+
             if (item != nil) {
                 [chat markChatItemAsNotifyRecipient:item];
                 if (transaction != nil) {
@@ -601,19 +603,19 @@ NSMutableArray* vettedAliases;
         NSString *type = data[@"aliasType"];
         IDSDestination *dest;
         NSString* serviceName;
-        
+
         if ([event isEqualToString:@"check-imessage-availability"]) {
             serviceName = IDSServiceNameiMessage;
         } else {
             serviceName = IDSServiceNameFaceTime;
         }
-        
+
         if ([type isEqualToString:@"phone"]) {
             dest = IDSCopyIDForPhoneNumber((__bridge CFStringRef)data[@"address"]);
         } else {
             dest = IDSCopyIDForEmailAddress((__bridge CFStringRef)data[@"address"]);
         }
-        
+
         [[IDSIDQueryController sharedInstance] forceRefreshIDStatusForDestinations:(@[dest]) service:(serviceName) listenerID:(@"SOIDSListener-com.apple.imessage-rest") queue:(dispatch_queue_create("HandleIDS", NULL)) completionBlock:^(NSDictionary *response) {
             NSInteger *status = [response.allValues.firstObject integerValue];
             BOOL available = status == 1;
@@ -630,25 +632,38 @@ NSMutableArray* vettedAliases;
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"No need to unpurge!"}];
             }
         }
-        
+
         [[IMFileTransferCenter sharedInstance] registerTransferWithDaemon:([transfer guid])];
         [[IMFileTransferCenter sharedInstance] acceptTransfer:([transfer guid])];
         [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
     // If the server asks us if the chat can have a nickname shared
     } else if ([event isEqualToString:@"should-offer-nickname-sharing"]) {
         IMChat *chat = [BlueBubblesHelper getChat:data[@"chatGuid"] :transaction];
-        
+
         BOOL offer = [[IMNicknameController sharedInstance] shouldOfferNicknameSharingForChat:chat];
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"share": [NSNumber numberWithBool:offer]}];
         }
-    // If the server tells us to download a purged attachment
+    // If the server tells us to share a nickname
     } else if ([event isEqualToString:@"share-nickname"]) {
         IMChat *chat = [BlueBubblesHelper getChat:data[@"chatGuid"] :transaction];
-        
+
         [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] forChat:chat];
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        }
+    // If the server tells us to get nickname info
+    } else if ([event isEqualToString:@"get-nickname-info"]) {
+
+        NSString *name = [[[IMNicknameController sharedInstance] personalNickname] displayName];
+        NSString *avatarPath = [[[[IMNicknameController sharedInstance] personalNickname] avatar] imageFilePath];
+        if (transaction != nil) {
+            NSDictionary *data = @{
+                @"transactionId": transaction,
+                @"name": name ?: [NSNull null],
+                @"avatar_path": avatarPath ?: [NSNull null],
+            };
+            [[NetworkController sharedInstance] sendMessage:data];
         }
     // If the server tells us to get the current account info
     } else if ([event isEqualToString:@"get-account-info"]) {

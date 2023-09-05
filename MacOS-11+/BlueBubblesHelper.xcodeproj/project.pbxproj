@@ -97,6 +97,8 @@
 		A64B88B82715011200BAD446 /* IMCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMCore.h; sourceTree = "<group>"; };
 		A65C21AD2AA67C9500D6FB7F /* IMDDController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMDDController.h; sourceTree = "<group>"; };
 		A65C21AE2AA6800500D6FB7F /* IMNicknameController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMNicknameController.h; sourceTree = "<group>"; };
+		A65C21B12AA6CB7400D6FB7F /* IMNicknameAvatarImage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMNicknameAvatarImage.h; sourceTree = "<group>"; };
+		A65C21B22AA6CB7400D6FB7F /* IMNickname.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMNickname.h; sourceTree = "<group>"; };
 		A68C7FF729B025C7001002B6 /* IMTranscriptPluginChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMTranscriptPluginChatItem.h; sourceTree = "<group>"; };
 		A68C7FFD29B0344A001002B6 /* ETiOSMacBalloonPluginDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ETiOSMacBalloonPluginDataSource.h; sourceTree = "<group>"; };
 		A68C7FFE29B03EC5001002B6 /* HWiOSMacBalloonDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HWiOSMacBalloonDataSource.h; sourceTree = "<group>"; };
@@ -252,6 +254,8 @@
 		FBCE4EDB201C264F002F8A61 /* IMCore */ = {
 			isa = PBXGroup;
 			children = (
+				A65C21B22AA6CB7400D6FB7F /* IMNickname.h */,
+				A65C21B12AA6CB7400D6FB7F /* IMNicknameAvatarImage.h */,
 				A6DAE8E729CCD09F00C23C79 /* SKStatusSubscriptionServiceDelegate-Protocol.h */,
 				A64B8891271232E200BAD446 /* IMChatItem.h */,
 				A64B8893271232E300BAD446 /* IMInlineReplyController.h */,
