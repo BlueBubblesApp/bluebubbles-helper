@@ -71,7 +71,7 @@ static id sharedInstance = nil;
     // add a newline to the message so back-to-back messages are split and sent correctly
     NSString *jsonMessage = [NSString stringWithFormat:(@"%@\r\n"), message];
     NSData* finalData = [jsonMessage dataUsingEncoding:NSUTF8StringEncoding];
-    DLog("BLUEBUBBLESHELPER: data: %{public}@", data[@"event"]);
+    DLog("BLUEBUBBLESHELPER: Sending data: %{public}@", data);
     [asyncSocket writeData:(finalData) withTimeout:(-1) tag:(1)];
 }
 

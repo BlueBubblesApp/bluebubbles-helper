@@ -99,6 +99,12 @@
 		A65C21AE2AA6800500D6FB7F /* IMNicknameController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMNicknameController.h; sourceTree = "<group>"; };
 		A65C21B12AA6CB7400D6FB7F /* IMNicknameAvatarImage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMNicknameAvatarImage.h; sourceTree = "<group>"; };
 		A65C21B22AA6CB7400D6FB7F /* IMNickname.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMNickname.h; sourceTree = "<group>"; };
+		A65C21B32AA96B0300D6FB7F /* IMFMFSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFMFSession.h; sourceTree = "<group>"; };
+		A65C21B42AA96B3C00D6FB7F /* FMFSessionDelegate-Protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FMFSessionDelegate-Protocol.h"; sourceTree = "<group>"; };
+		A65C21B52AA96B7A00D6FB7F /* FMFSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FMFSession.h; sourceTree = "<group>"; };
+		A65C21B62AA96BAF00D6FB7F /* FMFXPCInternalClientProtocol-Protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FMFXPCInternalClientProtocol-Protocol.h"; sourceTree = "<group>"; };
+		A65C21B72AAA7F5500D6FB7F /* FMFLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FMFLocation.h; sourceTree = "<group>"; };
+		A65C21B82AAA7FCF00D6FB7F /* FMFHandle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FMFHandle.h; sourceTree = "<group>"; };
 		A68C7FF729B025C7001002B6 /* IMTranscriptPluginChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMTranscriptPluginChatItem.h; sourceTree = "<group>"; };
 		A68C7FFD29B0344A001002B6 /* ETiOSMacBalloonPluginDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ETiOSMacBalloonPluginDataSource.h; sourceTree = "<group>"; };
 		A68C7FFE29B03EC5001002B6 /* HWiOSMacBalloonDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HWiOSMacBalloonDataSource.h; sourceTree = "<group>"; };
@@ -309,6 +315,12 @@
 				A61DC02E2A5A049700EA75A5 /* _IDSIDQueryController.h */,
 				A65C21AD2AA67C9500D6FB7F /* IMDDController.h */,
 				A65C21AE2AA6800500D6FB7F /* IMNicknameController.h */,
+				A65C21B32AA96B0300D6FB7F /* IMFMFSession.h */,
+				A65C21B42AA96B3C00D6FB7F /* FMFSessionDelegate-Protocol.h */,
+				A65C21B52AA96B7A00D6FB7F /* FMFSession.h */,
+				A65C21B62AA96BAF00D6FB7F /* FMFXPCInternalClientProtocol-Protocol.h */,
+				A65C21B72AAA7F5500D6FB7F /* FMFLocation.h */,
+				A65C21B82AAA7FCF00D6FB7F /* FMFHandle.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";

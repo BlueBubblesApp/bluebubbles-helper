@@ -43,6 +43,9 @@
 #import "IMNicknameController.h"
 #import "IMNickname.h"
 #import "IMNicknameAvatarImage.h"
+#import "IMFMFSession.h"
+#import "FMFSession.h"
+#import "FMFLocation.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -717,6 +720,32 @@ NSMutableArray* vettedAliases;
 //                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to modify alias"}];
 //            }
 //        }
+    // If the server tells us to get findmy friends locations
+    } else if ([event isEqualToString:@"findmy-friends"]) {
+        FMFSession *session = [[IMFMFSession sharedInstance] session];
+        NSArray* handles = [session getHandlesSharingLocationsWithMe];
+        NSMutableArray* locations = [[NSMutableArray alloc] initWithArray:@[]];
+        
+        for (NSObject* handle in handles) {
+            FMFLocation* location = [[IMFMFSession sharedInstance] locationForFMFHandle:handle];
+            NSDictionary* locDetails = @{
+                @"handle": [[location handle] identifier] ?: [NSNull null],
+                @"coordinates": @[@([location coordinate].latitude), @([location coordinate].longitude)],
+                @"long_address": [location longAddress] ?: [NSNull null],
+                @"short_address": [location shortAddress] ?: [NSNull null],
+                @"subtitle": [location subtitle] ?: [NSNull null],
+                @"title": [location title] ?: [NSNull null],
+            };
+            [locations addObject:locDetails];
+        }
+        
+        if (transaction != nil) {
+            NSDictionary *data = @{
+                @"transactionId": transaction,
+                @"locations": locations,
+            };
+            [[NetworkController sharedInstance] sendMessage: data];
+        }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog("BLUEBUBBLESHELPER: Not implemented %{public}@", event);
