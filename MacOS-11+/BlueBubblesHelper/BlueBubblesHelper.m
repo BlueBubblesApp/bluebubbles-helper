@@ -638,7 +638,9 @@ NSMutableArray* vettedAliases;
 
         [[IMFileTransferCenter sharedInstance] registerTransferWithDaemon:([transfer guid])];
         [[IMFileTransferCenter sharedInstance] acceptTransfer:([transfer guid])];
-        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        }
     // If the server asks us if the chat can have a nickname shared
     } else if ([event isEqualToString:@"should-offer-nickname-sharing"]) {
         IMChat *chat = [BlueBubblesHelper getChat:data[@"chatGuid"] :transaction];
@@ -907,7 +909,7 @@ NSMutableArray* vettedAliases;
     
     BOOL ddScan = false;
     if (data[@"ddScan"] != [NSNull null]) {
-        isAudioMessage = [data[@"ddScan"] integerValue] == 1;
+        ddScan = [data[@"ddScan"] integerValue] == 1;
     }
 
     void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSString*, long long*, NSRange, NSDictionary*, NSArray*, BOOL, BOOL) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSString *associatedMessageGuid, long long *reaction, NSRange range, NSDictionary *summaryInfo, NSArray *transferGUIDs, BOOL isAudioMessage, BOOL ddScan) {
