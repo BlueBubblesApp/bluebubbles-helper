@@ -651,7 +651,11 @@ NSMutableArray* vettedAliases;
     } else if ([event isEqualToString:@"share-nickname"]) {
         IMChat *chat = [BlueBubblesHelper getChat:data[@"chatGuid"] :transaction];
 
-        [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] forChat:chat];
+        if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion == 11) {
+            [[IMNicknameController sharedInstance] whitelistHandesForNicknameSharing:[chat participants] forChat:chat];
+        } else {
+            [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] forChat:chat];
+        }
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
         }
