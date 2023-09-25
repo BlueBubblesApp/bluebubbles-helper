@@ -51,7 +51,7 @@
 -(void)_updateLocalNicknameStore;
 -(void)_updatePersonalNicknameWithMeCardIfNecessary;
 -(void)allowHandlesForNicknameSharing:(id)arg0 forChat:(id)arg1 ;
--(void)whitelistHandesForNicknameSharing:(id)arg1 forChat:(id)arg2;
+-(void)whitelistHandlesForNicknameSharing:(id)arg1 forChat:(id)arg2;
 -(void)clearHandleFromScrutiny:(id)arg0 ;
 -(void)clearPendingNicknameUpdatesForHandle:(id)arg0 ;
 -(void)denyHandlesForNicknameSharing:(id)arg0 ;

@@ -654,7 +654,7 @@ NSMutableArray* vettedAliases;
         IMChat *chat = [BlueBubblesHelper getChat:data[@"chatGuid"] :transaction];
 
         if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion == 11) {
-            [[IMNicknameController sharedInstance] whitelistHandesForNicknameSharing:[chat participants] forChat:chat];
+            [[IMNicknameController sharedInstance] whitelistHandlesForNicknameSharing:[chat participants] forChat:chat];
         } else {
             [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] forChat:chat];
         }
@@ -663,9 +663,20 @@ NSMutableArray* vettedAliases;
         }
     // If the server tells us to get nickname info
     } else if ([event isEqualToString:@"get-nickname-info"]) {
-
-        NSString *name = [[[IMNicknameController sharedInstance] personalNickname] displayName];
-        NSString *avatarPath = [[[[IMNicknameController sharedInstance] personalNickname] avatar] imageFilePath];
+        NSString *address = data[@"address"];
+        NSString *name;
+        NSString *avatarPath;
+        
+        if (address == [NSNull null]) {
+            name = [[[IMNicknameController sharedInstance] personalNickname] displayName];
+            avatarPath = [[[[IMNicknameController sharedInstance] personalNickname] avatar] imageFilePath];
+        } else {
+            IMHandle *handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(data[@"address"])];
+            IMNickname *nickname = [[IMNicknameController sharedInstance] nicknameForHandle:(handle)];
+            name = [nickname displayName];
+            avatarPath = [[nickname avatar] imageFilePath];
+        }
+        
         if (transaction != nil) {
             NSDictionary *data = @{
                 @"transactionId": transaction,
@@ -1089,6 +1100,21 @@ ZKSwizzleInterface(BBH_IMChat, IMChat, NSObject)
 }
 
 @end
+
+//ZKSwizzleInterface(BBH_NSNotificationCenter, NSNotificationCenter, NSObject)
+//@implementation BBH_NSNotificationCenter
+//
+//- (void)addObserver:(id)observer selector:(SEL)aSelector name:(nullable NSNotificationName)aName object:(nullable id)anObject {
+//    if ([aName localizedCaseInsensitiveContainsString:@"facetime"]) {
+//        DLog("BLUEBUBBLESHELPER: observer %{public}@", observer);
+//        DLog("BLUEBUBBLESHELPER: sel %{public}@", NSStringFromSelector(aSelector));
+//        DLog("BLUEBUBBLESHELPER: name %{public}@", aName);
+//        DLog("BLUEBUBBLESHELPER: object %{public}@", anObject);
+//    }
+//    return ZKOrig(void, observer, aSelector, aName, anObject);
+//}
+//
+//@end
 
 ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
 @implementation BBH_IMAccount
