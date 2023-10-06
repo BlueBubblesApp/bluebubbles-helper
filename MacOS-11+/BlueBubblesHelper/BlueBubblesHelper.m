@@ -311,10 +311,15 @@ NSMutableArray* vettedAliases;
     } else if ([event isEqualToString:@"edit-message"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
 
-        [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
+        [BlueBubblesHelper getMessageItemSonoma:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessageItem *message) {
             NSMutableAttributedString *editedString = [[NSMutableAttributedString alloc] initWithString: data[@"editedMessage"]];
             NSMutableAttributedString *bcString = [[NSMutableAttributedString alloc] initWithString: data[@"backwardsCompatibilityMessage"]];
-            [chat editMessage:(message) atPartIndex:([data[@"partIndex"] integerValue]) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
+
+            if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion >= 14) {
+                [chat editMessageItem:(message) atPartIndex:([data[@"partIndex"] longValue]) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
+            } else {
+                [chat editMessage:(message) atPartIndex:([data[@"partIndex"] integerValue]) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
+            }
         }];
 
         if (transaction != nil) {
@@ -830,6 +835,13 @@ NSMutableArray* vettedAliases;
 +(void) getMessageItem:(IMChat *)chat :(NSString *)actionMessageGuid completionBlock:(void (^)(IMMessage *message))block {
     [[IMChatHistoryController sharedInstance] loadMessageWithGUID:(actionMessageGuid) completionBlock:^(IMMessage *message) {
         DLog("BLUEBUBBLESHELPER: Got message for guid %{public}@", actionMessageGuid);
+        block(message);
+    }];
+}
+
++(void) getMessageItemSonoma:(IMChat *)chat :(NSString *)actionMessageGuid completionBlock:(void (^)(IMMessageItem *message))block {
+    [[IMChatHistoryController sharedInstance] loadMessageItemWithGUID:(actionMessageGuid) completionBlock:^(IMMessageItem *message) {
+        DLog("BLUEBUBBLESHELPER: Got message item for guid %{public}@", actionMessageGuid);
         block(message);
     }];
 }
