@@ -1,0 +1,14 @@
+# Uncomment the next line to define a global platform for your project
+platform :macos, '11.0'
+
+target 'BlueBubblesFaceTimeHelper' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  # use_frameworks!
+
+  # Pods for BlueBubblesHelper
+
+   pod 'CocoaAsyncSocket'
+
+end
+
+workspace 'BlueBubblesFaceTimeHelper'
