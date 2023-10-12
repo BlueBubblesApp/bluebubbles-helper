@@ -120,7 +120,8 @@
 @property(retain, nonatomic) NSString *lastAddressedHandleID; // @synthesize lastAddressedHandleID=_lastAddressedHandleID;
 @property(retain, nonatomic) NSArray *frequentReplies; // @synthesize frequentReplies=_frequentReplies;
 - (void)downloadPurgedAttachments;
--(void)editMessage:(id)arg0 atPartIndex:(NSInteger)arg1 withNewPartText:(id)arg2 backwardCompatabilityText:(id)arg3 API_AVAILABLE(macos(13), ios(16.0), watchos(9.0));
+- (void)editMessage:(id)arg0 atPartIndex:(NSInteger)arg1 withNewPartText:(id)arg2 backwardCompatabilityText:(id)arg3 API_AVAILABLE(macos(13), ios(16.0), watchos(9.0));
+- (void)editMessageItem:(id)arg1 atPartIndex:(long)arg2 withNewPartText:(id)arg3 backwardCompatabilityText:(id)arg4 API_AVAILABLE(macos(14), ios(17.0), watchos(10.0));
 - (void)sendProgress:(id)arg1 progressDidChange:(float)arg2 sendingMessages:(id)arg3 sendCount:(unsigned long long)arg4 totalCount:(unsigned long long)arg5 finished:(BOOL)arg6;
 - (id)sendProgressDelegate;
 - (void)setSendProgressDelegate:(id)arg1;

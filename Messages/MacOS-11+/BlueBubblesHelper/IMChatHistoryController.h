@@ -18,6 +18,7 @@
 @property(retain) NSMutableDictionary *_runningQueries; // @synthesize _runningQueries;
 - (void)messageQuery:(id)arg1 finishedWithResult:(id)arg2 chatGUIDs:(id)arg3;
 - (void)loadMessageWithGUID:(NSString*)arg1 completionBlock:(void (^)(IMMessage *message))arg2;
+- (void)loadMessageItemWithGUID:(NSString*)arg1 completionBlock:(void (^)(IMMessageItem *message))arg2;
 - (void)dealloc;
 - (id)init;
 
