@@ -178,6 +178,7 @@ typedef NS_ENUM(NSInteger, IMAccountRegistrationFailureReason) {
 - (void)setDictionaryData:(id)arg1 forPreferenceKey:(id)arg2;
 - (void)removeObjectForPreferenceKey:(id)arg1;
 - (void)setObject:(id)arg1 forPreferenceKey:(id)arg2;
+- (void) setDisplayName:(id)arg1;
 - (id)objectForPreferenceKey:(id)arg1;
 @property(readonly, nonatomic) NSDictionary *accountPreferences;
 - (void)_removePersistentPropertyForKey:(id)arg1;
