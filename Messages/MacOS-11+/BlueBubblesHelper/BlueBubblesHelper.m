@@ -136,21 +136,6 @@ NSMutableArray* vettedAliases;
 //    });
 }
 
-/**
- Internal reaction to notifications about aliases
- @param notification the object inside of the notification will always be a SOAccountAliasController
- */
-+(void) _aliasesChanged: (NSNotification*) notification {
-    NSArray* newAliases = [BlueBubblesHelper getAliases:true];
-    NSSet *setCurrent = [NSSet setWithArray:vettedAliases];
-    NSSet *setUpdated = [NSSet setWithArray:newAliases];
-    NSMutableSet *difference = [setUpdated mutableCopy];
-    [difference minusSet:setCurrent];
-    NSArray *finalAliases = [difference valueForKey:@"dictionary"];
-    DLog("BLUEBUBBLESHELPER: Aliases Changed %{public}@", finalAliases);
-    [[NetworkController sharedInstance] sendMessage: @{@"event": @"aliases-updated", @"aliases": finalAliases}];
-}
-
 // Run when receiving a new message from the tcp socket
 -(void) handleMessage: (NetworkController*)controller  message:(NSString *)message {
     // The data is in the form of a json string, so we need to convert it to a NSDictionary
@@ -709,39 +694,24 @@ NSMutableArray* vettedAliases;
             };
             [[NetworkController sharedInstance] sendMessage: data];
         }
-    } else if ([event isEqualToString:@"deactivate-alias"] || [event isEqualToString:@"activate-alias"]) {
-//        BOOL activate = [event isEqualToString:@"activate-alias"];
-//        NSString* alias = data[@"alias"];
-//
-//        BOOL result = false;
-//        if ([BlueBubblesHelper isAccountEnabled]) {
-//            SOAccountAliasController* aliasController = [[SOAccountRegistrationController registrationController] aliasController];
-//
-//            @try {
-//                SOAccountAlias* accountAlias = [aliasController aliasForName:alias];
-//
-//                DLog("BLUEBUBBLESHELPER: Modifying alias state: %{public}@", accountAlias);
-//                if (activate) {
-//                    [accountAlias activate];
-//                } else {
-//                    [aliasController deactivateAliases:@[accountAlias]];
-//                }
-//
-//                result = true;
-//            } @catch (NSException *exception) {
-//                DLog("BLUEBUBBLESHELPER: No alias found with name %{public}@", alias);
-//            }
-//        } else {
-//            DLog("BLUEBUBBLESHELPER: Can't modify aliases, account not enabled");
-//        }
-//
-//        if (transaction != nil) {
-//            if (result) {
-//                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
-//            } else {
-//                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to modify alias"}];
-//            }
-//        }
+    // If the server tells us to modify the active alias used to start chats
+    } else if ([event isEqualToString:@"modify-active-alias"]) {
+        NSString* alias = data[@"alias"];
+
+        if ([BlueBubblesHelper isAccountEnabled]) {
+            MAccountController *controller = [IMAccountController sharedInstance];
+            IMAccount *account = [controller activeIMessageAccount];
+            [account setDisplayName:alias];
+            
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
+        } else {
+            DLog("BLUEBUBBLESHELPER: Can't modify aliases, account not enabled");
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to modify alias"}];
+            }
+        }
     // If the server tells us to get findmy friends locations
     } else if ([event isEqualToString:@"findmy-friends"]) {
         FMFSession *session = [[IMFMFSession sharedInstance] session];

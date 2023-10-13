@@ -35,7 +35,7 @@
 
 /* Begin PBXFileReference section */
 		0E34963F28F675CD369195619FFCED35 /* CocoaAsyncSocket-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CocoaAsyncSocket-prefix.pch"; sourceTree = "<group>"; };
-		33B6DB1F6D86539E8B6FA1534E65C726 /* Pods-BlueBubblesHelper DyLib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "Pods-BlueBubblesHelper DyLib"; path = "libPods-BlueBubblesHelper DyLib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		33B6DB1F6D86539E8B6FA1534E65C726 /* libPods-BlueBubblesHelper DyLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper DyLib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		380121A647CD6830DD4437223DC7E010 /* Pods-BlueBubblesHelper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-BlueBubblesHelper.debug.xcconfig"; sourceTree = "<group>"; };
 		38C630D0A8DC54C2B1A7BBE7E2CD889F /* Pods-BlueBubblesHelper DyLib-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-BlueBubblesHelper DyLib-acknowledgements.markdown"; sourceTree = "<group>"; };
 		44E7B908CDB3BF0D17BD48C0C19651F5 /* Pods-BlueBubblesHelper DyLib-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-BlueBubblesHelper DyLib-acknowledgements.plist"; sourceTree = "<group>"; };
@@ -49,7 +49,7 @@
 		8107E0304B553EAA2D2EAFF466DA7FF9 /* CocoaAsyncSocket.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CocoaAsyncSocket.release.xcconfig; sourceTree = "<group>"; };
 		86AD2C54CD8661FCCC5D404CE6F55564 /* CocoaAsyncSocket.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CocoaAsyncSocket.debug.xcconfig; sourceTree = "<group>"; };
 		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		A0F76041041492977D2608618C2DD383 /* Pods-BlueBubblesHelper */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "Pods-BlueBubblesHelper"; path = "libPods-BlueBubblesHelper.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0F76041041492977D2608618C2DD383 /* libPods-BlueBubblesHelper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B658275E5FC3C66A7802C570535B242C /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDAsyncUdpSocket.h; path = Source/GCD/GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
 		C439B42C78960D0CD0C68788B8DC1C6B /* GCDAsyncSocket.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GCDAsyncSocket.h; path = Source/GCD/GCDAsyncSocket.h; sourceTree = "<group>"; };
 		D1FB09445011C186C32EA6A325D2B4F5 /* Pods-BlueBubblesHelper-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-BlueBubblesHelper-acknowledgements.plist"; sourceTree = "<group>"; };
@@ -99,8 +99,8 @@
 			isa = PBXGroup;
 			children = (
 				6CBEFE4F9E22AFDC6347A739BB35FF8C /* libCocoaAsyncSocket.a */,
-				A0F76041041492977D2608618C2DD383 /* Pods-BlueBubblesHelper */,
-				33B6DB1F6D86539E8B6FA1534E65C726 /* Pods-BlueBubblesHelper DyLib */,
+				A0F76041041492977D2608618C2DD383 /* libPods-BlueBubblesHelper.a */,
+				33B6DB1F6D86539E8B6FA1534E65C726 /* libPods-BlueBubblesHelper DyLib.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -222,7 +222,7 @@
 			);
 			name = "Pods-BlueBubblesHelper DyLib";
 			productName = "Pods-BlueBubblesHelper DyLib";
-			productReference = 33B6DB1F6D86539E8B6FA1534E65C726 /* Pods-BlueBubblesHelper DyLib */;
+			productReference = 33B6DB1F6D86539E8B6FA1534E65C726 /* libPods-BlueBubblesHelper DyLib.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		6083682834ABE0AE7BD1CBF06CADD036 /* CocoaAsyncSocket */ = {
@@ -257,7 +257,7 @@
 			);
 			name = "Pods-BlueBubblesHelper";
 			productName = "Pods-BlueBubblesHelper";
-			productReference = A0F76041041492977D2608618C2DD383 /* Pods-BlueBubblesHelper */;
+			productReference = A0F76041041492977D2608618C2DD383 /* libPods-BlueBubblesHelper.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -339,7 +339,10 @@
 			baseConfigurationReference = 6B8803A1293D40983B2E9B42B5F15283 /* Pods-BlueBubblesHelper.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = (
+					"$(ARCHS_STANDARD_64_BIT)",
+					arm64e,
+				);
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -360,7 +363,10 @@
 			baseConfigurationReference = 576869F8EF88005B2378A7DF2537347B /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = (
+					"$(ARCHS_STANDARD_64_BIT)",
+					arm64e,
+				);
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -376,7 +382,7 @@
 			};
 			name = Debug;
 		};
-		56C209FE6D6F53B49264D955004C195E /* Release */ = {
+		3CD442B4EEBA085C40C74BF3774A5FEE /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8107E0304B553EAA2D2EAFF466DA7FF9 /* CocoaAsyncSocket.release.xcconfig */;
 			buildSettings = {
@@ -389,7 +395,7 @@
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				EXECUTABLE_PREFIX = lib;
 				GCC_PREFIX_HEADER = "Target Support Files/CocoaAsyncSocket/CocoaAsyncSocket-prefix.pch";
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
@@ -399,6 +405,7 @@
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -406,6 +413,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					"$(ARCHS_STANDARD)",
+					arm64e,
+				);
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -468,7 +479,10 @@
 			baseConfigurationReference = 380121A647CD6830DD4437223DC7E010 /* Pods-BlueBubblesHelper.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = (
+					"$(ARCHS_STANDARD_64_BIT)",
+					arm64e,
+				);
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -489,7 +503,10 @@
 			baseConfigurationReference = E6D0AAFBC376F55CDEFB089CEBD80929 /* Pods-BlueBubblesHelper DyLib.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = (
+					"$(ARCHS_STANDARD_64_BIT)",
+					arm64e,
+				);
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -509,6 +526,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					"$(ARCHS_STANDARD)",
+					arm64e,
+				);
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -571,7 +592,7 @@
 			};
 			name = Debug;
 		};
-		ECA1F75A4BDF3219875E2E973D663195 /* Debug */ = {
+		FC168BE39B1C1DB9250684C75AE2F4D4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 86AD2C54CD8661FCCC5D404CE6F55564 /* CocoaAsyncSocket.debug.xcconfig */;
 			buildSettings = {
@@ -584,7 +605,7 @@
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				EXECUTABLE_PREFIX = lib;
 				GCC_PREFIX_HEADER = "Target Support Files/CocoaAsyncSocket/CocoaAsyncSocket-prefix.pch";
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOLFLAGS = "";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
@@ -594,6 +615,7 @@
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -603,8 +625,8 @@
 		0F2BAEF2E3ADDA5146DDCC8F2393B86F /* Build configuration list for PBXNativeTarget "CocoaAsyncSocket" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				ECA1F75A4BDF3219875E2E973D663195 /* Debug */,
-				56C209FE6D6F53B49264D955004C195E /* Release */,
+				FC168BE39B1C1DB9250684C75AE2F4D4 /* Debug */,
+				3CD442B4EEBA085C40C74BF3774A5FEE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
