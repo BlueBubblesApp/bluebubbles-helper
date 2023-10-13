@@ -80,7 +80,7 @@
 		9316AE962576029C002AE8EE /* IMChatRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChatRegistry.h; sourceTree = "<group>"; };
 		9316AE98257606EC002AE8EE /* IMChat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChat.h; sourceTree = "<group>"; };
 		9316AE9A257614E2002AE8EE /* IMTypingChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMTypingChatItem.h; sourceTree = "<group>"; };
-		93AC09C52565E4150000C60C /* IMCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMCore.framework; path = ../../../../../System/Library/PrivateFrameworks/IMCore.framework; sourceTree = "<group>"; };
+		93AC09C52565E4150000C60C /* IMCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMCore.framework; path = /System/Library/PrivateFrameworks/IMCore.framework; sourceTree = "<group>"; };
 		93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlueBubblesHelper.m; sourceTree = "<group>"; };
 		93B28EA5257399450056DAD4 /* Logging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
 		93B28EA7257399A70056DAD4 /* ChatDisplayController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChatDisplayController.h; sourceTree = "<group>"; };
@@ -91,7 +91,7 @@
 		93FD99392568E7360060D430 /* NetworkController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkController.m; sourceTree = "<group>"; };
 		93FD993D2568E7500060D430 /* NetworkController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetworkController.h; sourceTree = "<group>"; };
 		9D8B8A4340753BAE45518935 /* Pods-BlueBubblesHelper DyLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.release.xcconfig"; sourceTree = "<group>"; };
-		A63F3AF12A5A22E5002990A8 /* IDS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IDS.framework; path = ../../../../../System/Library/PrivateFrameworks/IDS.framework; sourceTree = "<group>"; };
+		A63F3AF12A5A22E5002990A8 /* IDS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IDS.framework; path = /System/Library/PrivateFrameworks/IDS.framework; sourceTree = "<group>"; };
 		A63F3AF72A5A235C002990A8 /* IDSIDQueryController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDSIDQueryController.h; sourceTree = "<group>"; };
 		A63F3AF82A5A2387002990A8 /* IDSDestination-Additions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IDSDestination-Additions.h"; sourceTree = "<group>"; };
 		A63F3AF92A5A239E002990A8 /* IDS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDS.h; sourceTree = "<group>"; };
@@ -105,9 +105,9 @@
 		A6FBC1E3272076730078F9C6 /* IMChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChatItem.h; sourceTree = "<group>"; };
 		E9CE3CC4C09837AA39D25D93 /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.debug.xcconfig"; sourceTree = "<group>"; };
 		EA4401532988779B00DEB3BE /* SocialAppsCore */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SocialAppsCore; sourceTree = "<group>"; };
-		EA4401562988780000DEB3BE /* SocialAppsCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocialAppsCore.framework; path = ../../../../../System/Library/PrivateFrameworks/SocialAppsCore.framework; sourceTree = "<group>"; };
+		EA4401562988780000DEB3BE /* SocialAppsCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocialAppsCore.framework; path = /System/Library/PrivateFrameworks/SocialAppsCore.framework; sourceTree = "<group>"; };
 		EAE731B6294DCA9200FA6F15 /* IMFileTransferCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMFileTransferCenter.h; sourceTree = "<group>"; };
-		EAE731B7294DCF6C00FA6F15 /* IMDPersistence.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMDPersistence.framework; path = ../../../../../System/Library/PrivateFrameworks/IMDPersistence.framework; sourceTree = "<group>"; };
+		EAE731B7294DCF6C00FA6F15 /* IMDPersistence.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMDPersistence.framework; path = /System/Library/PrivateFrameworks/IMDPersistence.framework; sourceTree = "<group>"; };
 		FBCE4EBB201C0F4D002F8A61 /* BlueBubblesHelper.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BlueBubblesHelper.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		FBCE4EC0201C0F4D002F8A61 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };

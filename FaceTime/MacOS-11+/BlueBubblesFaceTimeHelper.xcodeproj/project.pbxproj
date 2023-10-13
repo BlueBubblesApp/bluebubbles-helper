@@ -32,7 +32,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		93AC09C52565E4150000C60C /* IMCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMCore.framework; path = ../../../../../System/Library/PrivateFrameworks/IMCore.framework; sourceTree = "<group>"; };
+		93AC09C52565E4150000C60C /* IMCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMCore.framework; path = /System/Library/PrivateFrameworks/IMCore.framework; sourceTree = "<group>"; };
 		93AC09CB2565E45F0000C60C /* BlueBubblesFaceTimeHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlueBubblesFaceTimeHelper.m; sourceTree = "<group>"; };
 		93B28EA5257399450056DAD4 /* Logging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
 		93FD99392568E7360060D430 /* NetworkController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkController.m; sourceTree = "<group>"; };
@@ -49,9 +49,9 @@
 		A649F26B2AB93EA700D2F1F0 /* TUConversationMember.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TUConversationMember.h; sourceTree = "<group>"; };
 		A649F26C2AB9427200D2F1F0 /* TUConversationMemberAssociation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TUConversationMemberAssociation.h; sourceTree = "<group>"; };
 		A649F26D2AB9593100D2F1F0 /* CSDConversation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CSDConversation.h; sourceTree = "<group>"; };
-		A649F26E2ABA002A00D2F1F0 /* callservicesd */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = callservicesd; path = ../../../../../System/Library/PrivateFrameworks/TelephonyUtilities.framework/callservicesd; sourceTree = "<group>"; };
+		A649F26E2ABA002A00D2F1F0 /* callservicesd */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = callservicesd; path = /System/Library/PrivateFrameworks/TelephonyUtilities.framework/callservicesd; sourceTree = "<group>"; };
 		A65C21BA2AAD5E3400D6FB7F /* TUConversationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TUConversationManager.h; sourceTree = "<group>"; };
-		A65C21BB2AAD602500D6FB7F /* TelephonyUtilities.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TelephonyUtilities.framework; path = ../../../../../System/Library/PrivateFrameworks/TelephonyUtilities.framework; sourceTree = "<group>"; };
+		A65C21BB2AAD602500D6FB7F /* TelephonyUtilities.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TelephonyUtilities.framework; path = /System/Library/PrivateFrameworks/TelephonyUtilities.framework; sourceTree = "<group>"; };
 		A65C21BF2AAD6D0900D6FB7F /* CaptainHook.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CaptainHook.h; sourceTree = "<group>"; };
 		A65C21C02AAD722500D6FB7F /* CTBlockDescription.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CTBlockDescription.h; sourceTree = "<group>"; };
 		A65C21C12AAD725300D6FB7F /* CTBlockDescription.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CTBlockDescription.m; sourceTree = "<group>"; };
