@@ -699,7 +699,7 @@ NSMutableArray* vettedAliases;
         NSString* alias = data[@"alias"];
 
         if ([BlueBubblesHelper isAccountEnabled]) {
-            MAccountController *controller = [IMAccountController sharedInstance];
+            IMAccountController *controller = [IMAccountController sharedInstance];
             IMAccount *account = [controller activeIMessageAccount];
             [account setDisplayName:alias];
             
