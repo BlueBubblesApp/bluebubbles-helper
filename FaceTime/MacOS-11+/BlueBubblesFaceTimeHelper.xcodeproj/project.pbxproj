@@ -55,7 +55,7 @@
 		A65C21BF2AAD6D0900D6FB7F /* CaptainHook.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CaptainHook.h; sourceTree = "<group>"; };
 		A65C21C02AAD722500D6FB7F /* CTBlockDescription.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CTBlockDescription.h; sourceTree = "<group>"; };
 		A65C21C12AAD725300D6FB7F /* CTBlockDescription.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CTBlockDescription.m; sourceTree = "<group>"; };
-		A6CA47952AC0B23C004E21C8 /* avconferenced */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = avconferenced; path = ../../../../../usr/libexec/avconferenced; sourceTree = "<group>"; };
+		A6CA47952AC0B23C004E21C8 /* avconferenced */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = avconferenced; path = /usr/libexec/avconferenced; sourceTree = "<group>"; };
 		A6CA47962AC121B6004E21C8 /* CSDConversationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CSDConversationManager.h; sourceTree = "<group>"; };
 		A6CA47972AC1E8BE004E21C8 /* TUCall.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TUCall.h; sourceTree = "<group>"; };
 		D78D31A6C775FF68E11D8083 /* libPods-BlueBubblesFaceTimeHelper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesFaceTimeHelper.a"; sourceTree = BUILT_PRODUCTS_DIR; };
