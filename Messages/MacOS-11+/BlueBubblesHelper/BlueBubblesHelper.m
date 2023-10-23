@@ -296,12 +296,40 @@ NSMutableArray* vettedAliases;
     } else if ([event isEqualToString:@"edit-message"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
 
-        [BlueBubblesHelper getMessageItemSonoma:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessageItem *message) {
+        [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
             NSMutableAttributedString *editedString = [[NSMutableAttributedString alloc] initWithString: data[@"editedMessage"]];
             NSMutableAttributedString *bcString = [[NSMutableAttributedString alloc] initWithString: data[@"backwardsCompatibilityMessage"]];
 
             if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion >= 14) {
-                [chat editMessageItem:(message) atPartIndex:([data[@"partIndex"] longValue]) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
+                IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
+                NSObject *items = messageItem._newChatItems;
+                IMMessagePartChatItem *item;
+                // sometimes items is an array so we need to account for that
+                if ([items isKindOfClass:[NSArray class]]) {
+                    for (IMMessagePartChatItem *i in (NSArray *) items) {
+                        // IMAggregateAttachmentMessagePartChatItem is a photo gallery and has subparts
+                        // Only available Monterey+, use reference to class loaded at runtime to avoid crashes on Big Sur
+                        Class cls = NSClassFromString(@"IMAggregateAttachmentMessagePartChatItem");
+                        if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && [i isKindOfClass:cls]) {
+                            IMAggregateAttachmentMessagePartChatItem *aggregate = i;
+                            for (IMMessagePartChatItem *i2 in [aggregate aggregateAttachmentParts]) {
+                                if ([i2 index] == [data[@"partIndex"] integerValue]) {
+                                    item = i2;
+                                    break;
+                                }
+                            }
+                        } else {
+                            if ([i index] == [data[@"partIndex"] integerValue]) {
+                                item = i;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    item = (IMMessagePartChatItem *)items;
+                }
+
+                [chat editMessageItem:(item) atPartIndex:([data[@"partIndex"] longValue]) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
             } else {
                 [chat editMessage:(message) atPartIndex:([data[@"partIndex"] integerValue]) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
             }
@@ -805,13 +833,6 @@ NSMutableArray* vettedAliases;
 +(void) getMessageItem:(IMChat *)chat :(NSString *)actionMessageGuid completionBlock:(void (^)(IMMessage *message))block {
     [[IMChatHistoryController sharedInstance] loadMessageWithGUID:(actionMessageGuid) completionBlock:^(IMMessage *message) {
         DLog("BLUEBUBBLESHELPER: Got message for guid %{public}@", actionMessageGuid);
-        block(message);
-    }];
-}
-
-+(void) getMessageItemSonoma:(IMChat *)chat :(NSString *)actionMessageGuid completionBlock:(void (^)(IMMessageItem *message))block {
-    [[IMChatHistoryController sharedInstance] loadMessageItemWithGUID:(actionMessageGuid) completionBlock:^(IMMessageItem *message) {
-        DLog("BLUEBUBBLESHELPER: Got message item for guid %{public}@", actionMessageGuid);
         block(message);
     }];
 }
