@@ -38,6 +38,7 @@
 #import "IDSIDQueryController.h"
 #import "IDS.h"
 #import "IDSDestination-Additions.h"
+#import "IMDDController.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -119,9 +120,6 @@ BlueBubblesHelper *plugin;
     };
     NSDictionary *message = @{@"event": @"ping", @"message": @"Helper Connected!"};
     [controller sendMessage:message];
-
-    // Register Alias Changed Listener
-    [BlueBubblesHelper registerListenerForActiveAliasChanged];
 
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
     // Quickly test a message event
@@ -283,22 +281,10 @@ BlueBubblesHelper *plugin;
             }
             return;
         }
-        NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
+        IMHandle *handle = [[[IMAccountController sharedInstance] bestAccountForService:(IMService.iMessageService)] imHandleWithID:(data[@"address"])];
 
-        if (handles != nil) {
-            IMAccountController *sharedAccountController = [IMAccountController sharedInstance];
-            IMAccount *myAccount = [sharedAccountController mostLoggedInAccount];
-            IMHandle *handle = [[IMHandle alloc] initWithAccount:(myAccount) ID:(data[@"address"]) alreadyCanonical:(YES)];
-            handles = @[handle];
-        } else {
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to load handles for provided address!"}];
-            }
-            return;
-        }
-
-        if(chat != nil && [chat canAddParticipants:(handles)]) {
-            [chat inviteParticipantsToiMessageChat:(handles) reason:(0)];
+        if (handle != nil && chat != nil && [chat canAddParticipant:(handle)]) {
+            [chat inviteParticipantsToiMessageChat:(@[handle]) reason:(0)];
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
@@ -319,17 +305,10 @@ BlueBubblesHelper *plugin;
             }
             return;
         }
-        NSArray<IMHandle*> *handles = [[IMHandleRegistrar sharedInstance] getIMHandlesForID:(data[@"address"])];
+        IMHandle *handle = [[[IMAccountController sharedInstance] bestAccountForService:(IMService.iMessageService)] imHandleWithID:(data[@"address"])];
 
-        if (handles == nil) {
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to load handles for provided address!"}];
-            }
-            return;
-        }
-
-        if(chat != nil && [chat canAddParticipants:(handles)]) {
-            [chat removeParticipantsFromiMessageChat:(handles) reason:(0)];
+        if (handle != nil && chat != nil && [chat canAddParticipant:(handle)]) {
+            [chat removeParticipantsFromiMessageChat:(@[handle]) reason:(0)];
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
@@ -347,21 +326,28 @@ BlueBubblesHelper *plugin;
     // currently unused method
     } else if ([event isEqualToString:@"create-chat"]) {
         NSMutableArray<IMHandle*> *handles = [[NSMutableArray alloc] initWithArray:(@[])];
-       for (NSString* str in data[@"addresses"]) {
-           IMHandle *handle;
-           if ([data[@"service"] isEqualToString:@"iMessage"]) {
-               handle = [[[IMAccountController sharedInstance] bestAccountForService:(IMService.iMessageService)] imHandleWithID:(str)];
-           } else {
-               handle = [[[IMAccountController sharedInstance] bestAccountForService:(IMService.smsService)] imHandleWithID:(str)];
-               if (handle == nil) {
-                   handle = [[[IMAccount alloc] initWithService:IMService.smsService] imHandleWithID:(str)];
-               }
-           }
-           
-           if (handle != nil) {
-               [handles addObject:handle];
-           }
-       }
+        BOOL failed = false;
+        for (NSString* str in data[@"addresses"]) {
+            IMHandle *handle;
+            if ([data[@"service"] isEqualToString:@"iMessage"]) {
+                handle = [[[IMAccountController sharedInstance] bestAccountForService:(IMService.iMessageService)] imHandleWithID:(str)];
+            } else {
+                handle = [[[IMAccountController sharedInstance] bestAccountForService:(IMService.smsService)] imHandleWithID:(str)];
+            }
+
+            if (handle != nil) {
+                [handles addObject:handle];
+            } else {
+                failed = true;
+                break;
+            }
+        }
+
+        if (failed) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to find all handles for specified service!"}];
+            return;
+        }
+        
         IMChat *chat;
         if (handles.count > 1) {
             chat = [[IMChatRegistry sharedInstance] chatForIMHandles:(handles)];
@@ -474,52 +460,6 @@ BlueBubblesHelper *plugin;
             index++;
         }
         [BlueBubblesHelper sendMessage:(data) transfers:[transfers copy] attributedString:attributedString transaction:(transaction)];
-    } else if ([event isEqualToString:@"vetted-aliases"]) {
-
-        NSArray* aliasNames = [BlueBubblesHelper getVettedAliases];
-
-        if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": aliasNames}];
-        }
-
-    } else if ([event isEqualToString:@"deactivate-alias"]) {
-
-        NSString * alias = data[@"alias"];
-
-        BOOL successfulDeactivation = [BlueBubblesHelper deactivateAliasForName:alias];
-
-        if (successfulDeactivation){
-
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
-            }
-
-        } else {
-
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to deactivate alias"}];
-            }
-
-        }
-    } else if ([event isEqualToString:@"activate-alias"]) {
-
-        NSString * alias = data[@"alias"];
-
-        BOOL successfulActivation = [BlueBubblesHelper activateAliasForName:alias];
-
-        if (successfulActivation){
-
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
-            }
-
-        } else {
-
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to activate alias"}];
-            }
-
-        }
     // If server tells us to leave a chat
     } else if ([event isEqualToString:@"leave-chat"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
@@ -556,6 +496,41 @@ BlueBubblesHelper *plugin;
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"available": [NSNumber numberWithBool:(available)]}];
             }
         }];
+    // If the server tells us to get the current account info
+    } else if ([event isEqualToString:@"get-account-info"]) {
+        IMAccount *account = [[IMAccountController sharedInstance] bestAccountForService:(IMService.iMessageService)];
+        IMAccount *smsAccount = [[IMAccountController sharedInstance] bestAccountForService:(IMService.smsService)];
+
+        if (transaction != nil) {
+            NSDictionary *data = @{
+                @"transactionId": transaction,
+                @"apple_id": [account strippedLogin] ?: [NSNull null],
+                @"account_name": [[account loginIMHandle] fullName] ?: [NSNull null],
+                @"sms_forwarding_enabled": [NSNumber numberWithBool:[smsAccount allowsSMSRelay] ?: FALSE],
+                @"sms_forwarding_capable": [NSNumber numberWithBool:[smsAccount isSMSRelayCapable] ?: FALSE],
+                @"vetted_aliases": [BlueBubblesHelper getAliases:true],
+                @"aliases": [BlueBubblesHelper getAliases:false],
+                @"login_status_message": [account loginStatusMessage] ?: [NSNull null],
+            };
+            [[NetworkController sharedInstance] sendMessage: data];
+        }
+    // If the server tells us to modify the active alias used to start chats
+    } else if ([event isEqualToString:@"modify-active-alias"]) {
+        NSString* alias = data[@"alias"];
+
+        if ([BlueBubblesHelper isAccountEnabled]) {
+            IMAccount *account = [[IMAccountController sharedInstance] bestAccountForService:(IMService.iMessageService)];
+            [account setDisplayName:alias];
+
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            }
+        } else {
+            DLog(@"BLUEBUBBLESHELPER: Can't modify aliases, account not enabled");
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Unable to modify alias"}];
+            }
+        }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog(@"BLUEBUBBLESHELPER: Not implemented %@", event);
@@ -685,126 +660,45 @@ BlueBubblesHelper *plugin;
 }
 
 /**
- Starts the listener for alias status changes
- */
-+(void) registerListenerForActiveAliasChanged {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_aliasesChanged:) name:@"IMAccountAliasesChangedNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_aliasesChanged:) name:@"SOAccountAliasesChangedNotification_Private" object:nil];
-}
-/**
- Internal reaction to notifications about aliases
- @param notification the object inside of the notification will always be a SOAccountAliasController
- */
-+(void)_aliasesChanged:  (NSNotification *)notification{
-    SOAccountAliasController * account = notification.object;
-
-    NSArray* currentAliases = [BlueBubblesHelper getVettedAliases];
-    DLog(@"BLUEBUBBLESHELPERF: Aliases Changed %@", currentAliases);
-    [[NetworkController sharedInstance] sendMessage: @{@"event": @"aliases-updated", @"aliases": currentAliases}];
-
-
-}
-
-/**
  Get the account enabled state
  @return True if the account enabled state is 4 or false if else or not signed in
  */
 +(BOOL) isAccountEnabled {
-    SOAccountRegistrationController* registrationController = [SOAccountRegistrationController registrationController];
-
-    if (registrationController!=NULL && [registrationController isSignedIn]){
-
-        long long enabledState = [registrationController enabledState];
-        NSLog(@"BLUEBUBBLESHELPER: Account Enabled State %lld", enabledState);
-        return enabledState == 4;
-
-    } else {
-        return FALSE;
-    }
-
-    return [registrationController isSignedIn];
+    IMAccount *account = [[IMAccountController sharedInstance] bestAccountForService:(IMService.iMessageService)];
+    return [account isActive] && [account isRegistered] && [account isOperational] && [account isConnected];
 }
 
 /**
   Gets the active alias associated with the signed account
   @return The active alias's names if not logged in returns a empty list
   */
-+(NSArray *) getVettedAliases {
-
++(NSMutableArray *) getAliases:(BOOL)vetted {
     if ([self isAccountEnabled]) {
-        SOAccountRegistrationController* registrationController = [SOAccountRegistrationController registrationController];
-        SOAccountAliasController * aliasController = [registrationController aliasController];
+        IMAccount *account = [[IMAccountController sharedInstance] bestAccountForService:(IMService.iMessageService)];
+        NSArray* aliases = @[];
+        if (vetted) {
+            aliases = [account vettedAliases];
+        } else {
+            aliases = [account aliases];
+        }
+        DLog(@"BLUEBUBBLESHELPER: Vetted Aliases %@", aliases);
 
-        NSArray* activeAliases = [aliasController vettedAliases];
-        NSLog(@"BLUEBUBBLESHELPER: Vetted Aliases %@", activeAliases);
-
-
-        NSMutableArray *returnedAliases = [[NSMutableArray  alloc] init];
-
-        for (SOAccountAlias* alias in activeAliases) {
-
-            [returnedAliases addObject:@{@"name":[alias name],@"active":[NSNumber numberWithBool:[alias active]]}];
+        NSMutableArray* returnedAliases = [[NSMutableArray alloc] init];
+        for (NSObject* alias in aliases) {
+            NSDictionary* info = [account _aliasInfoForAlias:(alias)];
+            if (info == nil) {
+                [returnedAliases addObject: @{@"Alias": alias}];
+            } else {
+                [returnedAliases addObject: info];
+            }
         }
 
         return returnedAliases;
-
     } else {
-
-        DLog(@"BLUEBUBBLESHELPER: Can't get aliases account not enabled");
-        return @[];
-
+        DLog(@"BLUEBUBBLESHELPER: Can't get aliases - account not enabled");
+        return [[NSMutableArray alloc] initWithArray:@[]];
     }
-
-}
-
-/**
- Deactivates Alias
- */
-+(BOOL) deactivateAliasForName:(NSString * ) aliasName {
-
-    if ([self isAccountEnabled]) {
-
-    SOAccountRegistrationController* registrationController = [SOAccountRegistrationController registrationController];
-    SOAccountAliasController * aliasController = [registrationController aliasController];
-        @try {
-            SOAccountAlias * aliasToDisable = [aliasController aliasForName:aliasName];
-            DLog(@"BLUEBUBBLESHELPER: Deactivating Alias %@", aliasToDisable);
-            [aliasController deactivateAliases:@[aliasToDisable]];
-            return true;
-        } @catch (NSException *exception) {
-            DLog(@"BLUEBUBBLESHELPER: No alias found with name %@", aliasName);
-            return false;
-        }
-    } else {
-
-        DLog(@"BLUEBUBBLESHELPER: Can't disable alias, account not enabled");
-        return false;
-    }
-}
-
-/**
- Activate Alias
- */
-+(BOOL) activateAliasForName:(NSString * ) aliasName {
-
-    if ([self isAccountEnabled]) {
-
-    SOAccountRegistrationController* registrationController = [SOAccountRegistrationController registrationController];
-    SOAccountAliasController * aliasController = [registrationController aliasController];
-        @try {
-            SOAccountAlias * aliasToActivate = [aliasController aliasForName:aliasName];
-            DLog(@"BLUEBUBBLESHELPER: Activating Alias %@", aliasToActivate);
-            [aliasToActivate activate];
-            return true;
-        } @catch (NSException *exception) {
-            DLog(@"BLUEBUBBLESHELPER: No alias found with name %@", aliasName);
-            return false;
-        }
-    } else {
-
-        DLog(@"BLUEBUBBLESHELPER: Can't activate alias, account not enabled");
-        return false;
-    }
+    return [[NSMutableArray alloc] initWithArray:@[]];
 }
 
 +(void) sendMessage: (NSDictionary *) data transfers: (NSArray *) transfers attributedString:(NSMutableAttributedString *) attributedString transaction:(NSString *) transaction {
@@ -837,21 +731,53 @@ BlueBubblesHelper *plugin;
     if (data[@"isAudioMessage"] != [NSNull null]) {
         isAudioMessage = [data[@"isAudioMessage"] integerValue] == 1;
     }
+    
+    BOOL ddScan = false;
+    if (data[@"ddScan"] != [NSNull null]) {
+        ddScan = [data[@"ddScan"] integerValue] == 1;
+    }
 
-    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSArray*, BOOL) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSArray *transferGUIDs, BOOL isAudioMessage) {
+    void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSArray*, BOOL, BOOL) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSArray *transferGUIDs, BOOL isAudioMessage, BOOL ddScan) {
         IMMessage *messageToSend = [[IMMessage alloc] init];
         messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(transferGUIDs) flags:(isAudioMessage ? 0x300005 : (subject ? 0x10000d : 0x100005)) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
-        [chat sendMessage:(messageToSend)];
+        if (ddScan) {
+            [[IMDDController sharedInstance] scanMessage:messageToSend waitUntilDone:TRUE completionBlock:^(NSObject* temp, NSObject* ddMessageToSend) {
+                [chat sendMessage:(ddMessageToSend)];
+                if (transaction != nil) {
+                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
+                }
+            }];
+        } else {
+            [chat sendMessage:(messageToSend)];
+            if (transaction != nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
+            }
+        }
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastFinishedMessage] guid]}];
         }
     };
 
-    createMessage(attributedString, subjectAttributedString, effectId, nil, transfers, isAudioMessage);
+    createMessage(attributedString, subjectAttributedString, effectId, nil, transfers, isAudioMessage, ddScan);
 }
 
 @end
 
+ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
+@implementation BBH_IMAccount
+
+- (void)_registrationStatusChanged:(id)arg1 {
+    NSNotification *notif = arg1;
+    IMAccount* acct = [notif object];
+    NSDictionary *info = [notif userInfo];
+    if ([[acct serviceName] isEqualToString:@"iMessage"] && [info objectForKey:@"__kIMAccountAliasesRemovedKey"]) {
+        DLog(@"BLUEBUBBLESHELPER: alias updated %@", notif);
+        [[NetworkController sharedInstance] sendMessage: @{@"event": @"aliases-removed", @"data": info}];
+    }
+    return ZKOrig(void, arg1);
+}
+
+@end
 
 // Credit to w0lf
 // Handles all of the incoming typing events

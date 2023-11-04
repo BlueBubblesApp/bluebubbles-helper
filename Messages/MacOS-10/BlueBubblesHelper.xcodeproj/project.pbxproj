@@ -97,6 +97,7 @@
 		A63F3AF92A5A239E002990A8 /* IDS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDS.h; sourceTree = "<group>"; };
 		A63F3AFA2A5A23C7002990A8 /* IDSInternalQueueController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDSInternalQueueController.h; sourceTree = "<group>"; };
 		A63F3AFB2A5A23E7002990A8 /* _IDSIDQueryController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _IDSIDQueryController.h; sourceTree = "<group>"; };
+		A69FC1B32AE73F95007E9D24 /* IMDDController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMDDController.h; sourceTree = "<group>"; };
 		A6CA07A32984995E0030683D /* IMDPersistentAttachmentController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMDPersistentAttachmentController.h; sourceTree = "<group>"; };
 		A6D825152A36A089006253F5 /* libBlueBubblesHelper DyLib.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libBlueBubblesHelper DyLib.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6D825202A36A110006253F5 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -281,6 +282,7 @@
 				A63F3AF92A5A239E002990A8 /* IDS.h */,
 				A63F3AFA2A5A23C7002990A8 /* IDSInternalQueueController.h */,
 				A63F3AFB2A5A23E7002990A8 /* _IDSIDQueryController.h */,
+				A69FC1B32AE73F95007E9D24 /* IMDDController.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";
