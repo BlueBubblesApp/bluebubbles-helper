@@ -302,34 +302,7 @@ NSMutableArray* vettedAliases;
 
             if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion >= 14) {
                 IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
-                NSObject *items = messageItem._newChatItems;
-                IMMessagePartChatItem *item;
-                // sometimes items is an array so we need to account for that
-                if ([items isKindOfClass:[NSArray class]]) {
-                    for (IMMessagePartChatItem *i in (NSArray *) items) {
-                        // IMAggregateAttachmentMessagePartChatItem is a photo gallery and has subparts
-                        // Only available Monterey+, use reference to class loaded at runtime to avoid crashes on Big Sur
-                        Class cls = NSClassFromString(@"IMAggregateAttachmentMessagePartChatItem");
-                        if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && [i isKindOfClass:cls]) {
-                            IMAggregateAttachmentMessagePartChatItem *aggregate = i;
-                            for (IMMessagePartChatItem *i2 in [aggregate aggregateAttachmentParts]) {
-                                if ([i2 index] == [data[@"partIndex"] integerValue]) {
-                                    item = i2;
-                                    break;
-                                }
-                            }
-                        } else {
-                            if ([i index] == [data[@"partIndex"] integerValue]) {
-                                item = i;
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    item = (IMMessagePartChatItem *)items;
-                }
-
-                [chat editMessageItem:(item) atPartIndex:([data[@"partIndex"] longValue]) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
+                [chat editMessageItem:(messageItem) atPartIndex:([data[@"partIndex"] longValue]) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
             } else {
                 [chat editMessage:(message) atPartIndex:([data[@"partIndex"] integerValue]) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
             }
