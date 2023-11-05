@@ -17,15 +17,11 @@
 		A63F3AF22A5A22E5002990A8 /* IDS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A63F3AF12A5A22E5002990A8 /* IDS.framework */; };
 		A63F3AF32A5A22E5002990A8 /* IDS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A63F3AF12A5A22E5002990A8 /* IDS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A63F3AF52A5A230B002990A8 /* IDS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A63F3AF12A5A22E5002990A8 /* IDS.framework */; };
-		A63F3AF62A5A230B002990A8 /* IDS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A63F3AF12A5A22E5002990A8 /* IDS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A6D825212A36A110006253F5 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6D825202A36A110006253F5 /* AppKit.framework */; };
 		A6D825232A36A11A006253F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6D825222A36A11A006253F5 /* Foundation.framework */; };
 		A6D825242A36A173006253F5 /* IMCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93AC09C52565E4150000C60C /* IMCore.framework */; };
-		A6D825252A36A173006253F5 /* IMCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 93AC09C52565E4150000C60C /* IMCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A6D825272A36A188006253F5 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAE731B7294DCF6C00FA6F15 /* IMDPersistence.framework */; };
-		A6D825282A36A188006253F5 /* IMDPersistence.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EAE731B7294DCF6C00FA6F15 /* IMDPersistence.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A6D825292A36A1EE006253F5 /* SocialAppsCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4401562988780000DEB3BE /* SocialAppsCore.framework */; };
-		A6D8252A2A36A1EE006253F5 /* SocialAppsCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EA4401562988780000DEB3BE /* SocialAppsCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A6D8252D2A36A287006253F5 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
 		A6D8252F2A36A292006253F5 /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
 		A6D825312A36A2A0006253F5 /* ZKSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCE4ECB201C0F4D002F8A61 /* ZKSwizzle.m */; };
@@ -46,20 +42,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				A63F3AF32A5A22E5002990A8 /* IDS.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		A6D825262A36A173006253F5 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				A6D825252A36A173006253F5 /* IMCore.framework in Embed Frameworks */,
-				A63F3AF62A5A230B002990A8 /* IDS.framework in Embed Frameworks */,
-				A6D8252A2A36A1EE006253F5 /* SocialAppsCore.framework in Embed Frameworks */,
-				A6D825282A36A188006253F5 /* IMDPersistence.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -308,7 +290,6 @@
 				A6D825112A36A089006253F5 /* Headers */,
 				A6D825122A36A089006253F5 /* Sources */,
 				A6D825132A36A089006253F5 /* Frameworks */,
-				A6D825262A36A173006253F5 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -484,14 +465,14 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = lib;
 				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 0.0.17;
+				MARKETING_VERSION = 0.0.18;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
@@ -514,14 +495,14 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = lib;
 				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 0.0.17;
+				MARKETING_VERSION = 0.0.18;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -640,7 +621,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEPLOYMENT_LOCATION = YES;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DSTROOT = /;
@@ -655,7 +636,7 @@
 				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 0.0.17;
+				MARKETING_VERSION = 0.0.18;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -672,7 +653,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 20;
 				DEPLOYMENT_LOCATION = YES;
 				DEVELOPMENT_TEAM = S6D73TBQQU;
 				DSTROOT = /;
@@ -687,7 +668,7 @@
 				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 0.0.17;
+				MARKETING_VERSION = 0.0.18;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

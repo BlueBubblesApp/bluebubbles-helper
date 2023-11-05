@@ -123,7 +123,7 @@ BlueBubblesHelper *plugin;
 
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
     // Quickly test a message event
-    //     [self handleMessage:controller message:@"{\"action\":\"send-message\",\"data\":{\"chatGuid\":\"iMessage;-;elliotnash@gmail.com\",\"subject\":\"\",\"message\":\"Elliot\",\"attributedBody\":{\"runs\":[{\"attributes\":{\"__kIMMessagePartAttributeName\":0,\"__kIMMentionConfirmedMention\":\"elliotnash@gmail.com\"},\"range\":[0,6]}],\"string\":\"Elliot\"},\"effectsId\":\"com.apple.MobileSMS.expressivesend.impact\",\"selectedMessageGuid\":null}}"];
+    // [self handleMessage:controller message:@"{\"action\":\"send-message\",\"transactionId\":\"bruh\",\"data\":{\"chatGuid\":\"iMessage;+;chat748046387255158516\",\"ddScan\":0,\"message\":\"https://google.com\"}}"];
 }
 
 // Run when receiving a new message from the tcp socket
@@ -740,19 +740,7 @@ BlueBubblesHelper *plugin;
     void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSArray*, BOOL, BOOL) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSArray *transferGUIDs, BOOL isAudioMessage, BOOL ddScan) {
         IMMessage *messageToSend = [[IMMessage alloc] init];
         messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(transferGUIDs) flags:(isAudioMessage ? 0x300005 : (subject ? 0x10000d : 0x100005)) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
-        if (ddScan) {
-            [[IMDDController sharedInstance] scanMessage:messageToSend waitUntilDone:TRUE completionBlock:^(NSObject* temp, NSObject* ddMessageToSend) {
-                [chat sendMessage:(ddMessageToSend)];
-                if (transaction != nil) {
-                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
-                }
-            }];
-        } else {
-            [chat sendMessage:(messageToSend)];
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
-            }
-        }
+        [chat sendMessage:(messageToSend)];
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastFinishedMessage] guid]}];
         }
