@@ -908,7 +908,7 @@ NSMutableArray* vettedAliases;
             messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(0x5) error:(nil) guid:(nil) subject:(nil) associatedMessageGUID:(associatedMessageGuid) associatedMessageType:*(reaction) associatedMessageRange:(range) messageSummaryInfo:(summaryInfo)];
         }
         if (ddScan) {
-            [[IMDDController sharedInstance] scanMessage:messageToSend completionBlock:^(NSObject* temp, NSObject* ddMessageToSend) {
+            [[IMDDController sharedInstance] scanMessage:messageToSend outgoing:TRUE waitUntilDone:TRUE completionBlock:^(NSObject* temp, NSObject* ddMessageToSend) {
                 [chat sendMessage:(ddMessageToSend)];
                 if (transaction != nil) {
                     [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
