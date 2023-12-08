@@ -27,6 +27,8 @@
 		A6490A1F298DCC35002B0E1D /* VettedAliasDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = A6490A1E298DCC35002B0E1D /* VettedAliasDictionary.h */; };
 		A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = A62991CB29720FAC00B7E663 /* BlueBubblesHelper.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A68E87E228C3B18900882823 /* IMSharedUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A68E87E128C3B18900882823 /* IMSharedUtilities.framework */; };
+		A69960EA2B1F9A700081FB69 /* FMF.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69960E92B1F9A6F0081FB69 /* FMF.framework */; };
+		A69960F52B20D89C0081FB69 /* CTBlockDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = A69960F42B20D8860081FB69 /* CTBlockDescription.m */; };
 		A69A83E027D18385007BB936 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69A83DF27D18385007BB936 /* IMDPersistence.framework */; };
 		F8EA7496D989633D9E36BF1B /* libPods-BlueBubblesHelper DyLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */; };
 		FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */; };
@@ -115,6 +117,13 @@
 		A68E87DF28C3B01F00882823 /* IMFileTransfer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransfer.h; sourceTree = "<group>"; };
 		A68E87E028C3B04500882823 /* IMFileTransferCenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMFileTransferCenter.h; sourceTree = "<group>"; };
 		A68E87E128C3B18900882823 /* IMSharedUtilities.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMSharedUtilities.framework; path = /System/Library/PrivateFrameworks/IMSharedUtilities.framework; sourceTree = "<group>"; };
+		A69960E92B1F9A6F0081FB69 /* FMF.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FMF.framework; path = ../../../../../../System/Library/PrivateFrameworks/FMF.framework; sourceTree = "<group>"; };
+		A69960ED2B2004540081FB69 /* FindMyLocateObjCWrapper.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FindMyLocateObjCWrapper.framework; path = ../../../../Downloads/FindMyLocateObjCWrapper.framework; sourceTree = "<group>"; };
+		A69960F12B2005100081FB69 /* FMLSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FMLSession.h; sourceTree = "<group>"; };
+		A69960F22B20D7B40081FB69 /* CTBlockDescription.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CTBlockDescription.h; sourceTree = "<group>"; };
+		A69960F42B20D8860081FB69 /* CTBlockDescription.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CTBlockDescription.m; sourceTree = "<group>"; };
+		A69960F62B20E46B0081FB69 /* FMLLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FMLLocation.h; sourceTree = "<group>"; };
+		A69960F72B20E4AD0081FB69 /* FMLHandle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FMLHandle.h; sourceTree = "<group>"; };
 		A69A83DE27D18092007BB936 /* IMDPersistentAttachmentController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMDPersistentAttachmentController.h; sourceTree = "<group>"; };
 		A69A83DF27D18385007BB936 /* IMDPersistence.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMDPersistence.framework; path = /System/Library/PrivateFrameworks/IMDPersistence.framework; sourceTree = "<group>"; };
 		A6DAE8E729CCD09F00C23C79 /* SKStatusSubscriptionServiceDelegate-Protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SKStatusSubscriptionServiceDelegate-Protocol.h"; sourceTree = "<group>"; };
@@ -146,6 +155,7 @@
 			files = (
 				A62991DA297210F700B7E663 /* IMDPersistence.framework in Frameworks */,
 				A61DC02F2A5A078500EA75A5 /* IDS.framework in Frameworks */,
+				A69960EA2B1F9A700081FB69 /* FMF.framework in Frameworks */,
 				A62991D9297210EB00B7E663 /* IMSharedUtilities.framework in Frameworks */,
 				A62991D8297210D900B7E663 /* IMCore.framework in Frameworks */,
 				A62991D7297210A500B7E663 /* Foundation.framework in Frameworks */,
@@ -213,6 +223,8 @@
 		FBCE4EBD201C0F4D002F8A61 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A69960ED2B2004540081FB69 /* FindMyLocateObjCWrapper.framework */,
+				A69960E92B1F9A6F0081FB69 /* FMF.framework */,
 				A61DC0272A59FFF200EA75A5 /* IDS.framework */,
 				A6490A18298AC986002B0E1D /* SocialAppsCore.framework */,
 				A62991D6297210A500B7E663 /* Foundation.framework */,
@@ -257,6 +269,8 @@
 			children = (
 				FBCE4ECA201C0F4D002F8A61 /* ZKSwizzle.h */,
 				FBCE4ECB201C0F4D002F8A61 /* ZKSwizzle.m */,
+				A69960F22B20D7B40081FB69 /* CTBlockDescription.h */,
+				A69960F42B20D8860081FB69 /* CTBlockDescription.m */,
 			);
 			name = ZKSwizzle;
 			sourceTree = "<group>";
@@ -325,6 +339,9 @@
 				A65C21B62AA96BAF00D6FB7F /* FMFXPCInternalClientProtocol-Protocol.h */,
 				A65C21B72AAA7F5500D6FB7F /* FMFLocation.h */,
 				A65C21B82AAA7FCF00D6FB7F /* FMFHandle.h */,
+				A69960F12B2005100081FB69 /* FMLSession.h */,
+				A69960F62B20E46B0081FB69 /* FMLLocation.h */,
+				A69960F72B20E4AD0081FB69 /* FMLHandle.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";
@@ -353,7 +370,7 @@
 				A62991C929720FAC00B7E663 /* Frameworks */,
 				A6490A0D29846973002B0E1D /* Resources */,
 				A65C21A62A9AAAE600D6FB7F /* CopyFiles */,
-				A6490A0F29846A3A002B0E1D /* ShellScript */,
+				A6490A0F29846A3A002B0E1D /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -486,7 +503,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A6490A0F29846A3A002B0E1D /* ShellScript */ = {
+		A6490A0F29846A3A002B0E1D /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -495,6 +512,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -528,6 +546,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A69960F52B20D89C0081FB69 /* CTBlockDescription.m in Sources */,
 				A62991D52972107400B7E663 /* ZKSwizzle.m in Sources */,
 				A62991D22972106500B7E663 /* NetworkController.m in Sources */,
 				A6490A1D298DC81C002B0E1D /* VettedAliasDictionary.m in Sources */,
