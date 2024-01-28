@@ -1161,7 +1161,7 @@ ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
     NSNotification *notif = arg1;
     IMAccount* acct = [notif object];
     NSDictionary *info = [notif userInfo];
-    if ([[acct serviceName] isEqualToString:@"iMessage"] && [info objectForKey:@"__kIMAccountAliasesRemovedKey"]) {
+    if ([info objectForKey:@"__kIMAccountAliasesRemovedKey"] != nil && [[acct serviceName] isEqualToString:@"iMessage"]) {
         DLog("BLUEBUBBLESHELPER: alias updated %{public}@", notif);
         [[NetworkController sharedInstance] sendMessage: @{@"event": @"aliases-removed", @"data": info}];
     }
