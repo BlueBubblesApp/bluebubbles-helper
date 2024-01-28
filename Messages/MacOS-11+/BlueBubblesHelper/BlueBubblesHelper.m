@@ -715,6 +715,7 @@ NSMutableArray* vettedAliases;
                 @"vetted_aliases": [BlueBubblesHelper getAliases:true],
                 @"aliases": [BlueBubblesHelper getAliases:false],
                 @"login_status_message": [account loginStatusMessage] ?: [NSNull null],
+                @"active_alias": [account displayName] ?: [NSNull null]
             };
             [[NetworkController sharedInstance] sendMessage: data];
         }
