@@ -1170,11 +1170,20 @@ ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
 
 @end
 
-//ZKSwizzleInterface(WBWT_IMChat, IMChat, NSObject)
-//@implementation WBWT_IMChat
-//-(void)_setDisplayName:(id)arg1 {
-//    DLog("BLUEBUBBLESHELPER: %{public}@", [arg1 className]);
+//ZKSwizzleInterface(BBH_NSNotificationCenter, NSNotificationCenter, NSObject)
+//@implementation BBH_NSNotificationCenter
+//
+//- (void)addObserver:(id)observer selector:(SEL)aSelector name:(nullable NSNotificationName)aName object:(nullable id)anObject {
+//    if ([aName isEqualToString:@"CNContactStoreDidChangeNotification"]) {
+//        return ZKOrig(void, observer, aSelector, aName, anObject);
+//    }
+//    DLog("BLUEBUBBLESFACETIMEHELPER: >>>>>>>>>>>>> name %{public}@", aName);
+//    DLog("BLUEBUBBLESFACETIMEHELPER: observer %{public}@", observer);
+//    DLog("BLUEBUBBLESFACETIMEHELPER: sel %{public}@", NSStringFromSelector(aSelector));
+//    DLog("BLUEBUBBLESFACETIMEHELPER: object %{public}@", anObject);
+//    return ZKOrig(void, observer, aSelector, aName, anObject);
 //}
+//
 //@end
 //
 //-(void)sendMessageAcknowledgment:(long long)arg1 forChatItem:(id)arg2 withAssociatedMessageInfo:(id)arg3 withGuid:(id)arg4 {
