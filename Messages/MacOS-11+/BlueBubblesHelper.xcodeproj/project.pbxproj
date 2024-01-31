@@ -127,6 +127,7 @@
 		A69A83DE27D18092007BB936 /* IMDPersistentAttachmentController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMDPersistentAttachmentController.h; sourceTree = "<group>"; };
 		A69A83DF27D18385007BB936 /* IMDPersistence.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMDPersistence.framework; path = /System/Library/PrivateFrameworks/IMDPersistence.framework; sourceTree = "<group>"; };
 		A6DAE8E729CCD09F00C23C79 /* SKStatusSubscriptionServiceDelegate-Protocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SKStatusSubscriptionServiceDelegate-Protocol.h"; sourceTree = "<group>"; };
+		A6E13E352B65C8F9002983AD /* FMFSessionDataManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FMFSessionDataManager.h; sourceTree = "<group>"; };
 		A6E1F4CF27166012000A0EF6 /* IMPinnedConversationsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMPinnedConversationsController.h; sourceTree = "<group>"; };
 		A6E7318229A3D37000AAED78 /* IMAggregateAttachmentMessagePartChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMAggregateAttachmentMessagePartChatItem.h; sourceTree = "<group>"; };
 		A6E7318329A3D49600AAED78 /* IMAttachmentMessagePartChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMAttachmentMessagePartChatItem.h; sourceTree = "<group>"; };
@@ -342,6 +343,7 @@
 				A69960F12B2005100081FB69 /* FMLSession.h */,
 				A69960F62B20E46B0081FB69 /* FMLLocation.h */,
 				A69960F72B20E4AD0081FB69 /* FMLHandle.h */,
+				A6E13E352B65C8F9002983AD /* FMFSessionDataManager.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";
@@ -579,7 +581,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEFINES_MODULE = YES;
 				DSTROOT = /;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -589,7 +591,7 @@
 				INSTALL_PATH = /Users/tanay/Desktop/test;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.0.18;
+				MARKETING_VERSION = 0.0.19;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -614,7 +616,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEFINES_MODULE = YES;
 				DSTROOT = /;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -624,7 +626,7 @@
 				INSTALL_PATH = /Users/tanay/Desktop/test;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.0.18;
+				MARKETING_VERSION = 0.0.19;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = BlueBubblesHelper;
 				SDKROOT = macosx;

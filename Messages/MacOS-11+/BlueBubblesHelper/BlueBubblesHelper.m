@@ -50,6 +50,7 @@
 #import "CTBlockDescription.h"
 #import "FMLHandle.h"
 #import "FMLLocation.h"
+#import "FMFSessionDataManager.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -740,7 +741,7 @@ NSMutableArray* vettedAliases;
             }
         }
     // If the server tells us to get findmy friends locations
-    } else if ([event isEqualToString:@"findmy-friends"]) {
+    } else if ([event isEqualToString:@"refresh-findmy-friends"]) {
         if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 13) {
             FindMyLocateSession *session = [[IMFMFSession sharedInstance] fmlSession];
             DLog("BLUEBUBBLESHELPER: block 1: %@", [session locationUpdateCallback]);
@@ -776,19 +777,13 @@ NSMutableArray* vettedAliases;
         } else {
             FMFSession *session = [[IMFMFSession sharedInstance] session];
             NSArray* handles = [session getHandlesSharingLocationsWithMe];
-            DLog("BLUEBUBBLESHELPER: handles test: %@", handles);
+            DLog("BLUEBUBBLESHELPER: Found FMF Handles: %{public}@", handles);
+            
+            // Send the current cached locations to the server just in case
             NSMutableArray* locations = [[NSMutableArray alloc] initWithArray:@[]];
-            [self DumpObjcMethods:[FMFSession class]];
-            
-            IMAccountController *controller = [IMAccountController sharedInstance];
-            IMAccount *account = [controller activeIMessageAccount];
-            [session refreshLocationForHandles:(handles) callerId:([FMFHandle handleWithId:[account strippedLogin]]) priority:(1000) completion:^(NSObject *test2, NSObject *test) {
-                DLog("BLUEBUBBLESHELPER: %@", test);
-                DLog("BLUEBUBBLESHELPER: %@", [test className]);
-            }];
-            
             for (NSObject* handle in handles) {
                 FMFLocation* location = [[IMFMFSession sharedInstance] locationForFMFHandle:handle];
+                NSInteger* type = ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) ? 0 : [location locationType];
                 NSDictionary* locDetails = @{
                     @"handle": [[location handle] identifier] ?: [NSNull null],
                     @"coordinates": @[@([location coordinate].latitude), @([location coordinate].longitude)],
@@ -796,6 +791,9 @@ NSMutableArray* vettedAliases;
                     @"short_address": [location shortAddress] ?: [NSNull null],
                     @"subtitle": [location subtitle] ?: [NSNull null],
                     @"title": [location title] ?: [NSNull null],
+                    @"last_updated": [NSNumber numberWithDouble:round([[location timestamp] timeIntervalSince1970])*1000],
+                    @"is_locating_in_progress": [NSNumber numberWithBool:[location isLocatingInProgress]] ?: [NSNull null],
+                    @"status": (type == 0) ? @"legacy" : (type == 2) ? @"live" : @"shallow"
                 };
                 [locations addObject:locDetails];
             }
@@ -807,6 +805,10 @@ NSMutableArray* vettedAliases;
                 };
                 [[NetworkController sharedInstance] sendMessage: data];
             }
+            
+            [session removeHandles:[session handles]];
+            [session addHandles:handles];
+            [session forceRefresh];
         }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
@@ -1152,6 +1154,56 @@ ZKSwizzleInterface(BBH_FindMyLocateSession, FindMyLocateSession, NSObject)
 - (id /* block */)locationUpdateCallback {
     DLog("BLUEBUBBLESHELPER: fired");
     return ZKOrig(id);
+}
+
+@end
+
+// Handle FindMy data changes
+ZKSwizzleInterface(BBH_FMFSessionDataManager, FMFSessionDataManager , NSObject)
+@implementation BBH_FMFSessionDataManager
+
+- (void)setLocations:(id)arg1 {
+    Class class = NSClassFromString(@"FMFSessionDataManager");
+    NSSet* locations = [[class sharedInstance] locations];
+    DLog("BLUEBUBBLESHELPER: Got new locations: %{public}@", locations);
+    
+    for (FMFLocation* location in locations) {
+        NSInteger* type = ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) ? 0 : [location locationType];
+        NSMutableDictionary* locDetails = [[NSMutableDictionary alloc] initWithDictionary: @{
+            @"handle": [[location handle] identifier] ?: [NSNull null],
+            @"coordinates": @[@([location coordinate].latitude), @([location coordinate].longitude)],
+            @"long_address": [location longAddress] ?: [NSNull null],
+            @"short_address": [location shortAddress] ?: [NSNull null],
+            @"subtitle": [location subtitle] ?: [NSNull null],
+            @"title": [location title] ?: [NSNull null],
+            @"last_updated": [NSNumber numberWithDouble:round([[location timestamp] timeIntervalSince1970])*1000],
+            @"is_locating_in_progress": [NSNumber numberWithBool:[location isLocatingInProgress]] ?: [NSNull null],
+            @"status": (type == 0) ? @"legacy" : (type == 2) ? @"live" : @"shallow"
+        }];
+        
+        if ([location coordinate].latitude == 0 && [location coordinate].longitude == 0 && [location longAddress] != nil) {
+            DLog("BLUEBUBBLESHELPER: Geocoding location for %{public}@", [[location handle] identifier]);
+            [[[CLGeocoder alloc] init] geocodeAddressString:[location longAddress] completionHandler:^(NSArray<CLPlacemark*>* placemarks, NSError* error) {
+                if (placemarks.count > 0) {
+                    CLLocation* coords = [[placemarks firstObject] location];
+                    [locDetails setValue:@[@([coords coordinate].latitude), @([coords coordinate].longitude)] forKey:@"coordinates"];
+                }
+
+                NSDictionary *data = @{
+                    @"event": @"new-findmy-location",
+                    @"data": @[locDetails],
+                };
+                [[NetworkController sharedInstance] sendMessage: data];
+            }];
+        } else {
+            NSDictionary *data = @{
+                @"event": @"new-findmy-location",
+                @"data": @[locDetails],
+            };
+            [[NetworkController sharedInstance] sendMessage: data];
+        }
+    }
+    return ZKOrig(void, arg1);
 }
 
 @end
