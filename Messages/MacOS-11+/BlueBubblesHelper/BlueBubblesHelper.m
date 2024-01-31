@@ -46,6 +46,11 @@
 #import "IMFMFSession.h"
 #import "FMFSession.h"
 #import "FMFLocation.h"
+#import "FMLSession.h"
+#import "CTBlockDescription.h"
+#import "FMLHandle.h"
+#import "FMLLocation.h"
+#import "FMFSessionDataManager.h"
 
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
@@ -106,8 +111,12 @@ NSMutableArray* vettedAliases;
     DLog("BLUEBUBBLESHELPER: %{public}@ loaded into %{public}@ on macOS %ld.%ld", [self className], [[NSBundle mainBundle] bundleIdentifier], (long)major, (long)minor);
 
     if ([[[NSBundle mainBundle] bundleIdentifier] isEqualToString:@"com.apple.MobileSMS"]) {
-        DLog("BLUEBUBBLESHELPER: Initializing Connection...");
-        [plugin initializeNetworkController];
+        // Delay by 5 seconds so the server has a chance to initialize all the socket services
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            DLog("BLUEBUBBLESHELPER: Initializing Connection...");
+            [plugin initializeNetworkController];
+        });
     } else {
         DLog("BLUEBUBBLESHELPER: Injected into non-iMessage process %@, aborting.", [[NSBundle mainBundle] bundleIdentifier]);
         return;
@@ -125,8 +134,6 @@ NSMutableArray* vettedAliases;
     controller.messageReceivedBlock =  ^(NetworkController *controller, NSString *data) {
         [self handleMessage:controller message: data];
     };
-    NSDictionary *message = @{@"event": @"ping", @"message": @"Helper Connected!"};
-    [controller sendMessage:message];
 
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
 //    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC));
@@ -134,6 +141,25 @@ NSMutableArray* vettedAliases;
 //         [self handleMessage:controller message:@"{\"action\":\"send-multipart\",\"data\":{\"chatGuid\":\"iMessage;-;tanay@neotia.in\",\"subject\":\"SUBJECT\",\"parts\":[{\"text\":\"PART 1\",\"mention\":\"tanay@neotia.in\",\"range\":[0,4]},{\"text\":\"PART 3\"}],\"effectId\":\"com.apple.MobileSMS.expressivesend.impact\",\"selectedMessageGuid\":null}}"];
 //         [self handleMessage:controller message:@"{\"action\":\"send-attachment\",\"data\":{\"filePath\":\"/Users/tanay/Library/Messages/Attachments/BlueBubbles/1668779053637.jpg\",\"chatGuid\":\"iMessage;-;zshames2@icloud.com\",\"isAudioMessage\":0}}"];
 //    });
+}
+
+-(void) DumpObjcMethods:(Class) clz {
+
+    unsigned int methodCount = 0;
+    Method *methods = class_copyMethodList(clz, &methodCount);
+
+    DLog("BLUEBUBBLESHELPER: Found %d methods on '%s'\n", methodCount, class_getName(clz));
+
+    for (unsigned int i = 0; i < methodCount; i++) {
+        Method method = methods[i];
+
+        DLog("\tBLUEBUBBLESHELPER: '%s' has method named '%s' of encoding '%s'\n",
+               class_getName(clz),
+               sel_getName(method_getName(method)),
+               method_getTypeEncoding(method));
+    }
+
+    free(methods);
 }
 
 // Run when receiving a new message from the tcp socket
@@ -692,6 +718,7 @@ NSMutableArray* vettedAliases;
                 @"vetted_aliases": [BlueBubblesHelper getAliases:true],
                 @"aliases": [BlueBubblesHelper getAliases:false],
                 @"login_status_message": [account loginStatusMessage] ?: [NSNull null],
+                @"active_alias": [account displayName] ?: [NSNull null]
             };
             [[NetworkController sharedInstance] sendMessage: data];
         }
@@ -714,30 +741,74 @@ NSMutableArray* vettedAliases;
             }
         }
     // If the server tells us to get findmy friends locations
-    } else if ([event isEqualToString:@"findmy-friends"]) {
-        FMFSession *session = [[IMFMFSession sharedInstance] session];
-        NSArray* handles = [session getHandlesSharingLocationsWithMe];
-        NSMutableArray* locations = [[NSMutableArray alloc] initWithArray:@[]];
-        
-        for (NSObject* handle in handles) {
-            FMFLocation* location = [[IMFMFSession sharedInstance] locationForFMFHandle:handle];
-            NSDictionary* locDetails = @{
-                @"handle": [[location handle] identifier] ?: [NSNull null],
-                @"coordinates": @[@([location coordinate].latitude), @([location coordinate].longitude)],
-                @"long_address": [location longAddress] ?: [NSNull null],
-                @"short_address": [location shortAddress] ?: [NSNull null],
-                @"subtitle": [location subtitle] ?: [NSNull null],
-                @"title": [location title] ?: [NSNull null],
-            };
-            [locations addObject:locDetails];
-        }
-        
-        if (transaction != nil) {
-            NSDictionary *data = @{
-                @"transactionId": transaction,
-                @"locations": locations,
-            };
-            [[NetworkController sharedInstance] sendMessage: data];
+    } else if ([event isEqualToString:@"refresh-findmy-friends"]) {
+        if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 13) {
+            FindMyLocateSession *session = [[IMFMFSession sharedInstance] fmlSession];
+            DLog("BLUEBUBBLESHELPER: block 1: %@", [session locationUpdateCallback]);
+//            [self logString:[[[[CTBlockDescription alloc] initWithBlock:[session locationUpdateCallback]] blockSignature] debugDescription]];
+//            NSObject *block = ^(FMLLocation *test, FMLHandle *test2) {
+//                DLog("BLUEBUBBLESHELPER: test2: %@", test);
+//                DLog("BLUEBUBBLESHELPER: test2: %@", [test className]);
+//            };
+//            DLog("BLUEBUBBLESHELPER: setting block: %@", block);
+//            DLog("BLUEBUBBLESHELPER: setting block: %@", [[[[CTBlockDescription alloc] initWithBlock:block] blockSignature] debugDescription]);
+//            [session setLocationUpdateCallback:block];
+//            DLog("BLUEBUBBLESHELPER: block 2: %@", [session locationUpdateCallback]);
+//            DLog("BLUEBUBBLESHELPER: block 2: %@", [[[[CTBlockDescription alloc] initWithBlock:[session locationUpdateCallback]] blockSignature] debugDescription]);
+            [session getFriendsSharingLocationsWithMeWithCompletion:^(NSArray *friends) {
+                for (NSObject* friend in friends) {
+                    NSObject* handle = [friend performSelector:(NSSelectorFromString(@"handle"))];
+                    DLog("BLUEBUBBLESHELPER: test: %@", handle);
+                    [session startRefreshingLocationForHandles:@[handle] priority:(1000) isFromGroup:FALSE reverseGeocode:TRUE completion:^() {
+                        NSObject *test = [session cachedLocationForHandle:handle includeAddress:TRUE];
+                        DLog("BLUEBUBBLESHELPER: test: %@", test);
+                        DLog("BLUEBUBBLESHELPER: test: %@", [test className]);
+                    }];
+                }
+            }];
+            
+            if (transaction != nil) {
+                NSDictionary *data = @{
+                    @"transactionId": transaction,
+                    @"locations": @[],
+                };
+                [[NetworkController sharedInstance] sendMessage: data];
+            }
+        } else {
+            FMFSession *session = [[IMFMFSession sharedInstance] session];
+            NSArray* handles = [session getHandlesSharingLocationsWithMe];
+            DLog("BLUEBUBBLESHELPER: Found FMF Handles: %{public}@", handles);
+            
+            // Send the current cached locations to the server just in case
+            NSMutableArray* locations = [[NSMutableArray alloc] initWithArray:@[]];
+            for (NSObject* handle in handles) {
+                FMFLocation* location = [[IMFMFSession sharedInstance] locationForFMFHandle:handle];
+                NSInteger* type = ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) ? 0 : [location locationType];
+                NSDictionary* locDetails = @{
+                    @"handle": [[location handle] identifier] ?: [NSNull null],
+                    @"coordinates": @[@([location coordinate].latitude), @([location coordinate].longitude)],
+                    @"long_address": [location longAddress] ?: [NSNull null],
+                    @"short_address": [location shortAddress] ?: [NSNull null],
+                    @"subtitle": [location subtitle] ?: [NSNull null],
+                    @"title": [location title] ?: [NSNull null],
+                    @"last_updated": [NSNumber numberWithDouble:round([[location timestamp] timeIntervalSince1970])*1000],
+                    @"is_locating_in_progress": [NSNumber numberWithBool:[location isLocatingInProgress]] ?: [NSNull null],
+                    @"status": (type == 0) ? @"legacy" : (type == 2) ? @"live" : @"shallow"
+                };
+                [locations addObject:locDetails];
+            }
+            
+            if (transaction != nil) {
+                NSDictionary *data = @{
+                    @"transactionId": transaction,
+                    @"locations": locations,
+                };
+                [[NetworkController sharedInstance] sendMessage: data];
+            }
+            
+            [session removeHandles:[session handles]];
+            [session addHandles:handles];
+            [session forceRefresh];
         }
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
@@ -1077,20 +1148,65 @@ ZKSwizzleInterface(BBH_IMChat, IMChat, NSObject)
 
 @end
 
-//ZKSwizzleInterface(BBH_NSNotificationCenter, NSNotificationCenter, NSObject)
-//@implementation BBH_NSNotificationCenter
-//
-//- (void)addObserver:(id)observer selector:(SEL)aSelector name:(nullable NSNotificationName)aName object:(nullable id)anObject {
-//    if ([aName localizedCaseInsensitiveContainsString:@"facetime"]) {
-//        DLog("BLUEBUBBLESHELPER: observer %{public}@", observer);
-//        DLog("BLUEBUBBLESHELPER: sel %{public}@", NSStringFromSelector(aSelector));
-//        DLog("BLUEBUBBLESHELPER: name %{public}@", aName);
-//        DLog("BLUEBUBBLESHELPER: object %{public}@", anObject);
-//    }
-//    return ZKOrig(void, observer, aSelector, aName, anObject);
-//}
-//
-//@end
+ZKSwizzleInterface(BBH_FindMyLocateSession, FindMyLocateSession, NSObject)
+@implementation BBH_FindMyLocateSession
+
+- (id /* block */)locationUpdateCallback {
+    DLog("BLUEBUBBLESHELPER: fired");
+    return ZKOrig(id);
+}
+
+@end
+
+// Handle FindMy data changes
+ZKSwizzleInterface(BBH_FMFSessionDataManager, FMFSessionDataManager , NSObject)
+@implementation BBH_FMFSessionDataManager
+
+- (void)setLocations:(id)arg1 {
+    Class class = NSClassFromString(@"FMFSessionDataManager");
+    NSSet* locations = [[class sharedInstance] locations];
+    DLog("BLUEBUBBLESHELPER: Got new locations: %{public}@", locations);
+    
+    for (FMFLocation* location in locations) {
+        NSInteger* type = ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) ? 0 : [location locationType];
+        NSMutableDictionary* locDetails = [[NSMutableDictionary alloc] initWithDictionary: @{
+            @"handle": [[location handle] identifier] ?: [NSNull null],
+            @"coordinates": @[@([location coordinate].latitude), @([location coordinate].longitude)],
+            @"long_address": [location longAddress] ?: [NSNull null],
+            @"short_address": [location shortAddress] ?: [NSNull null],
+            @"subtitle": [location subtitle] ?: [NSNull null],
+            @"title": [location title] ?: [NSNull null],
+            @"last_updated": [NSNumber numberWithDouble:round([[location timestamp] timeIntervalSince1970])*1000],
+            @"is_locating_in_progress": [NSNumber numberWithBool:[location isLocatingInProgress]] ?: [NSNull null],
+            @"status": (type == 0) ? @"legacy" : (type == 2) ? @"live" : @"shallow"
+        }];
+        
+        if ([location coordinate].latitude == 0 && [location coordinate].longitude == 0 && [location longAddress] != nil) {
+            DLog("BLUEBUBBLESHELPER: Geocoding location for %{public}@", [[location handle] identifier]);
+            [[[CLGeocoder alloc] init] geocodeAddressString:[location longAddress] completionHandler:^(NSArray<CLPlacemark*>* placemarks, NSError* error) {
+                if (placemarks.count > 0) {
+                    CLLocation* coords = [[placemarks firstObject] location];
+                    [locDetails setValue:@[@([coords coordinate].latitude), @([coords coordinate].longitude)] forKey:@"coordinates"];
+                }
+
+                NSDictionary *data = @{
+                    @"event": @"new-findmy-location",
+                    @"data": @[locDetails],
+                };
+                [[NetworkController sharedInstance] sendMessage: data];
+            }];
+        } else {
+            NSDictionary *data = @{
+                @"event": @"new-findmy-location",
+                @"data": @[locDetails],
+            };
+            [[NetworkController sharedInstance] sendMessage: data];
+        }
+    }
+    return ZKOrig(void, arg1);
+}
+
+@end
 
 ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
 @implementation BBH_IMAccount
@@ -1099,7 +1215,7 @@ ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
     NSNotification *notif = arg1;
     IMAccount* acct = [notif object];
     NSDictionary *info = [notif userInfo];
-    if ([[acct serviceName] isEqualToString:@"iMessage"] && [info objectForKey:@"__kIMAccountAliasesRemovedKey"]) {
+    if ([info objectForKey:@"__kIMAccountAliasesRemovedKey"] != nil && [[acct serviceName] isEqualToString:@"iMessage"]) {
         DLog("BLUEBUBBLESHELPER: alias updated %{public}@", notif);
         [[NetworkController sharedInstance] sendMessage: @{@"event": @"aliases-removed", @"data": info}];
     }
@@ -1108,11 +1224,20 @@ ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
 
 @end
 
-//ZKSwizzleInterface(WBWT_IMChat, IMChat, NSObject)
-//@implementation WBWT_IMChat
-//-(void)_setDisplayName:(id)arg1 {
-//    DLog("BLUEBUBBLESHELPER: %{public}@", [arg1 className]);
+//ZKSwizzleInterface(BBH_NSNotificationCenter, NSNotificationCenter, NSObject)
+//@implementation BBH_NSNotificationCenter
+//
+//- (void)addObserver:(id)observer selector:(SEL)aSelector name:(nullable NSNotificationName)aName object:(nullable id)anObject {
+//    if ([aName isEqualToString:@"CNContactStoreDidChangeNotification"]) {
+//        return ZKOrig(void, observer, aSelector, aName, anObject);
+//    }
+//    DLog("BLUEBUBBLESFACETIMEHELPER: >>>>>>>>>>>>> name %{public}@", aName);
+//    DLog("BLUEBUBBLESFACETIMEHELPER: observer %{public}@", observer);
+//    DLog("BLUEBUBBLESFACETIMEHELPER: sel %{public}@", NSStringFromSelector(aSelector));
+//    DLog("BLUEBUBBLESFACETIMEHELPER: object %{public}@", anObject);
+//    return ZKOrig(void, observer, aSelector, aName, anObject);
 //}
+//
 //@end
 //
 //-(void)sendMessageAcknowledgment:(long long)arg1 forChatItem:(id)arg2 withAssociatedMessageInfo:(id)arg3 withGuid:(id)arg4 {
