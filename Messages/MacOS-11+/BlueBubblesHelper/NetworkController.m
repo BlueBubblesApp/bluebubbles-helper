@@ -77,7 +77,11 @@ static id sharedInstance = nil;
 
 - (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port {
     DLog("BLUEBUBBLESHELPER: socket:%{public}p didConnectToHost:%{public}@ port:%{public}hu", sock, host, port);
-    NSDictionary *message = @{@"event": @"ping", @"message": @"Helper Connected!"};
+    NSDictionary *message = @{
+        @"event": @"ping",
+        @"message": @"Helper Connected!",
+        @"process": [[NSBundle mainBundle] bundleIdentifier],
+    };
     [self sendMessage:message];
 }
 
@@ -100,7 +104,7 @@ static id sharedInstance = nil;
 }
 
 - (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err {
-    DLog("BLUEBUBBLESHELPER: Disconnected from server, attempting to reconnect in 5 seconds...");
+    DLog("BLUEBUBBLESHELPER: Disconnected from server, attempting to reconnect in 5 seconds... (%{public}@)", err);
     double delayInSeconds = 5.0;
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){

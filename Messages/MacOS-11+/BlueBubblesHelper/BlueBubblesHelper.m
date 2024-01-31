@@ -110,8 +110,12 @@ NSMutableArray* vettedAliases;
     DLog("BLUEBUBBLESHELPER: %{public}@ loaded into %{public}@ on macOS %ld.%ld", [self className], [[NSBundle mainBundle] bundleIdentifier], (long)major, (long)minor);
 
     if ([[[NSBundle mainBundle] bundleIdentifier] isEqualToString:@"com.apple.MobileSMS"]) {
-        DLog("BLUEBUBBLESHELPER: Initializing Connection...");
-        [plugin initializeNetworkController];
+        // Delay by 5 seconds so the server has a chance to initialize all the socket services
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            DLog("BLUEBUBBLESHELPER: Initializing Connection...");
+            [plugin initializeNetworkController];
+        });
     } else {
         DLog("BLUEBUBBLESHELPER: Injected into non-iMessage process %@, aborting.", [[NSBundle mainBundle] bundleIdentifier]);
         return;
@@ -129,8 +133,6 @@ NSMutableArray* vettedAliases;
     controller.messageReceivedBlock =  ^(NetworkController *controller, NSString *data) {
         [self handleMessage:controller message: data];
     };
-    NSDictionary *message = @{@"event": @"ping", @"message": @"Helper Connected!"};
-    [controller sendMessage:message];
 
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
 //    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC));
