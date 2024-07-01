@@ -813,7 +813,8 @@ NSMutableArray* vettedAliases;
         }
     } else if ([event isEqualToString:@"search-messages"]) {
         NSString* query = data[@"query"];
-        [self searchMessages:query completionBlock:^(NSArray<NSString *> *results) {
+        NSString* matchType = data[@"matchType"];
+        [self searchMessages:query matchType:matchType completionBlock:^(NSArray<NSString *> *results) {
             if (results) {
                 if (transaction != nil) {
                     NSDictionary *data = @{
@@ -1100,9 +1101,21 @@ NSMutableArray* vettedAliases;
     }
 }
 
-- (void)searchMessages:(NSString *)searchQuery completionBlock:(void (^)(NSMutableArray<NSString *> *results))onComplete {
-    NSString *queryString = [NSString stringWithFormat:@"kMDItemTextContent=\"%@*\"cwdt", searchQuery];
-
+- (void)searchMessages:(NSString *)searchQuery matchType:(NSString *)matchType completionBlock:(void (^)(NSMutableArray<NSString *> *results))onComplete {
+    NSString *queryString = [NSString stringWithFormat:@"kMDItemTextContent=\"%@\"cwdt", searchQuery];
+    
+    // c -> Performs a case-insensitive search.
+    // d -> Performs a search that ignores diacritical marks.
+    // w -> Matches on word boundaries. This modifier treats transitions from lowercase to uppercase as word boundaries.
+    // t -> Performs a search on a tokenized value. For example, a search field can contain tokenized values.
+    
+    // When "t" is used, the tokens do not need to match the order provided.
+    // That's why when the matchType is exact, we exclude it.
+    // I'm not sure how to do a true exact match query.
+    if ([matchType isEqualToString:@"exact"]) {
+        queryString = [NSString stringWithFormat:@"kMDItemTextContent=\"%@\"cwd", searchQuery];
+    }
+    
     // Create a query context if needed, otherwise pass nil
     CSSearchQueryContext *queryContext = [[CSSearchQueryContext alloc] init];
     
