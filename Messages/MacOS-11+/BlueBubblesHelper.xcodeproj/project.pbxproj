@@ -521,7 +521,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "killall Messages\n";
+			shellScript = "killall -q Messages; exit 0;\n";
 		};
 		A64B88AC2712494A00BAD446 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;

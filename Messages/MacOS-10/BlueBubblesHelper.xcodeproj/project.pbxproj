@@ -426,7 +426,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "codesign --deep -s \"-\" /Library/Application\\ Support/MacEnhance/Plugins/BlueBubblesHelper.bundle\nkillall Messages\nsleep 1\nopen -b com.apple.ichat\n";
+			shellScript = "codesign --deep -s \"-\" /Library/Application\\ Support/MacEnhance/Plugins/BlueBubblesHelper.bundle\nkillall -q Messages\nsleep 1\nopen -b com.apple.ichat\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
