@@ -9,6 +9,7 @@
 @import AppKit;
 
 #import <Foundation/Foundation.h>
+#import <CoreSpotlight/CoreSpotlight.h>
 
 #import "IMTextMessagePartChatItem.h"
 #import "IMHandle.h"
@@ -745,16 +746,16 @@ NSMutableArray* vettedAliases;
         if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 13) {
             FindMyLocateSession *session = [[IMFMFSession sharedInstance] fmlSession];
             DLog("BLUEBUBBLESHELPER: block 1: %@", [session locationUpdateCallback]);
-//            [self logString:[[[[CTBlockDescription alloc] initWithBlock:[session locationUpdateCallback]] blockSignature] debugDescription]];
-//            NSObject *block = ^(FMLLocation *test, FMLHandle *test2) {
-//                DLog("BLUEBUBBLESHELPER: test2: %@", test);
-//                DLog("BLUEBUBBLESHELPER: test2: %@", [test className]);
-//            };
-//            DLog("BLUEBUBBLESHELPER: setting block: %@", block);
-//            DLog("BLUEBUBBLESHELPER: setting block: %@", [[[[CTBlockDescription alloc] initWithBlock:block] blockSignature] debugDescription]);
-//            [session setLocationUpdateCallback:block];
-//            DLog("BLUEBUBBLESHELPER: block 2: %@", [session locationUpdateCallback]);
-//            DLog("BLUEBUBBLESHELPER: block 2: %@", [[[[CTBlockDescription alloc] initWithBlock:[session locationUpdateCallback]] blockSignature] debugDescription]);
+            //            [self logString:[[[[CTBlockDescription alloc] initWithBlock:[session locationUpdateCallback]] blockSignature] debugDescription]];
+            //            NSObject *block = ^(FMLLocation *test, FMLHandle *test2) {
+            //                DLog("BLUEBUBBLESHELPER: test2: %@", test);
+            //                DLog("BLUEBUBBLESHELPER: test2: %@", [test className]);
+            //            };
+            //            DLog("BLUEBUBBLESHELPER: setting block: %@", block);
+            //            DLog("BLUEBUBBLESHELPER: setting block: %@", [[[[CTBlockDescription alloc] initWithBlock:block] blockSignature] debugDescription]);
+            //            [session setLocationUpdateCallback:block];
+            //            DLog("BLUEBUBBLESHELPER: block 2: %@", [session locationUpdateCallback]);
+            //            DLog("BLUEBUBBLESHELPER: block 2: %@", [[[[CTBlockDescription alloc] initWithBlock:[session locationUpdateCallback]] blockSignature] debugDescription]);
             [session getFriendsSharingLocationsWithMeWithCompletion:^(NSArray *friends) {
                 for (NSObject* friend in friends) {
                     NSObject* handle = [friend performSelector:(NSSelectorFromString(@"handle"))];
@@ -810,6 +811,27 @@ NSMutableArray* vettedAliases;
             [session addHandles:handles];
             [session forceRefresh];
         }
+    } else if ([event isEqualToString:@"search-messages"]) {
+        NSString* query = data[@"query"];
+        [self searchMessages:query completionBlock:^(NSArray<NSString *> *results) {
+            if (results) {
+                if (transaction != nil) {
+                    NSDictionary *data = @{
+                        @"transactionId": transaction,
+                        @"results": results,
+                    };
+                    [[NetworkController sharedInstance] sendMessage: data];
+                }
+            } else {
+                if (transaction != nil) {
+                    NSDictionary *data = @{
+                        @"transactionId": transaction,
+                        @"error": @"Failed to execute search! Please refer to Console logs.",
+                    };
+                    [[NetworkController sharedInstance] sendMessage: data];
+                }
+            }
+        }];
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
     } else {
         DLog("BLUEBUBBLESHELPER: Not implemented %{public}@", event);
@@ -1076,6 +1098,43 @@ NSMutableArray* vettedAliases;
     } else {
         createMessage(attributedString, subjectAttributedString, effectId, nil, nil, nil, NSMakeRange(0, 0), nil, transfers, isAudioMessage, ddScan);
     }
+}
+
+- (void)searchMessages:(NSString *)searchQuery completionBlock:(void (^)(NSMutableArray<NSString *> *results))onComplete {
+    NSString *queryString = [NSString stringWithFormat:@"kMDItemTextContent=\"%@*\"cwdt", searchQuery];
+
+    // Create a query context if needed, otherwise pass nil
+    CSSearchQueryContext *queryContext = [[CSSearchQueryContext alloc] init];
+    
+    // uniqueIdentifier -> Message GUID
+    // attributes.domainIdentifier -> Chat GUID
+    // attributes.displayName -> Group Chat Name (null if none)
+    // Leaving empty unless we want something specific...
+    queryContext.fetchAttributes = @[];
+    CSSearchQuery *query = [[CSSearchQuery alloc] initWithQueryString:queryString queryContext:queryContext];
+
+    NSMutableArray<NSString *> *results = [NSMutableArray array];
+    query.foundItemsHandler = ^(NSArray<CSSearchableItem *> * _Nonnull items) {
+        for (CSSearchableItem *item in items) {
+            // Add the unique identifier to the results array
+            [results addObject:item.uniqueIdentifier];
+        }
+    };
+    
+    query.completionHandler = ^(NSError * _Nullable error) {
+        if (error) {
+            DLog("BLUEBUBBLESHELPER: Message search error: %@", error.localizedDescription);
+            if (onComplete) {
+                onComplete(nil);
+            }
+        } else {
+            if (onComplete) {
+                onComplete([results copy]);
+            }
+        }
+    };
+    
+    [query start];
 }
 
 /**
