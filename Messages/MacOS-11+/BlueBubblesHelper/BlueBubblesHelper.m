@@ -827,10 +827,18 @@ NSMutableArray* vettedAliases;
                 if (transaction != nil) {
                     NSDictionary *data = @{
                         @"transactionId": transaction,
-                        @"error": @"Failed to execute search! Please refer to Console logs.",
+                        @"error": @"Failed to execute search! Search returned null.",
                     };
                     [[NetworkController sharedInstance] sendMessage: data];
                 }
+            }
+        } errorBlock:^(NSString *err) {
+            if (transaction != nil) {
+                NSDictionary *data = @{
+                    @"transactionId": transaction,
+                    @"error": err,
+                };
+                [[NetworkController sharedInstance] sendMessage: data];
             }
         }];
     // If the event is something that hasn't been implemented, we simply ignore it and put this log
@@ -1101,7 +1109,7 @@ NSMutableArray* vettedAliases;
     }
 }
 
-- (void)searchMessages:(NSString *)searchQuery matchType:(NSString *)matchType completionBlock:(void (^)(NSMutableArray<NSString *> *results))onComplete {
+- (void)searchMessages:(NSString *)searchQuery matchType:(NSString *)matchType completionBlock:(void (^)(NSMutableArray<NSString *> *results))onComplete errorBlock:(void (^)(NSString *err))onError {
     NSString *queryString = [NSString stringWithFormat:@"kMDItemTextContent=\"%@\"cwdt", searchQuery];
     
     // c -> Performs a case-insensitive search.
@@ -1114,6 +1122,15 @@ NSMutableArray* vettedAliases;
     // I'm not sure how to do a true exact match query.
     if ([matchType isEqualToString:@"exact"]) {
         queryString = [NSString stringWithFormat:@"kMDItemTextContent=\"%@\"cwd", searchQuery];
+    }
+    
+    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) {
+        DLog("BLUEBUBBLESHELPER: Message searching is not supported before macOS 13.0");
+        if (onError) {
+            onError(@"Message searching is not supported before macOS 13.0");
+        }
+        
+        return;
     }
     
     // Create a query context if needed, otherwise pass nil
@@ -1137,8 +1154,8 @@ NSMutableArray* vettedAliases;
     query.completionHandler = ^(NSError * _Nullable error) {
         if (error) {
             DLog("BLUEBUBBLESHELPER: Message search error: %@", error.localizedDescription);
-            if (onComplete) {
-                onComplete(nil);
+            if (onError) {
+                onError(error.localizedDescription);
             }
         } else {
             if (onComplete) {
