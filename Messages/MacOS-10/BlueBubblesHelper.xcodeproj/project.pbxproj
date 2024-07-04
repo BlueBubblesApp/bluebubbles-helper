@@ -3,19 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 48;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2D258662D944A5A4DD8D3C13 /* libPods-BlueBubblesHelper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7145A2D63389BEE3AC08DDD3 /* libPods-BlueBubblesHelper.a */; };
 		7A48E71F098345ADA8C2059A /* libPods-BlueBubblesHelper DyLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 127FB7616167BF78C35BF855 /* libPods-BlueBubblesHelper DyLib.a */; };
-		93AC09C62565E4150000C60C /* IMCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93AC09C52565E4150000C60C /* IMCore.framework */; };
-		93AC09CC2565E45F0000C60C /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
-		93B28EA9257399C00056DAD4 /* ChatDisplayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EA8257399C00056DAD4 /* ChatDisplayController.m */; };
-		93B28EAD25739A430056DAD4 /* SelectorHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B28EAC25739A430056DAD4 /* SelectorHelper.m */; };
-		93FD993A2568E7360060D430 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
-		A63F3AF22A5A22E5002990A8 /* IDS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A63F3AF12A5A22E5002990A8 /* IDS.framework */; };
-		A63F3AF32A5A22E5002990A8 /* IDS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A63F3AF12A5A22E5002990A8 /* IDS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A63F3AF52A5A230B002990A8 /* IDS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A63F3AF12A5A22E5002990A8 /* IDS.framework */; };
 		A6D825212A36A110006253F5 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6D825202A36A110006253F5 /* AppKit.framework */; };
 		A6D825232A36A11A006253F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6D825222A36A11A006253F5 /* Foundation.framework */; };
@@ -25,28 +17,7 @@
 		A6D8252D2A36A287006253F5 /* NetworkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* NetworkController.m */; };
 		A6D8252F2A36A292006253F5 /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
 		A6D825312A36A2A0006253F5 /* ZKSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCE4ECB201C0F4D002F8A61 /* ZKSwizzle.m */; };
-		EA4401542988779B00DEB3BE /* SocialAppsCore in Resources */ = {isa = PBXBuildFile; fileRef = EA4401532988779B00DEB3BE /* SocialAppsCore */; };
-		EA4401572988780000DEB3BE /* SocialAppsCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4401562988780000DEB3BE /* SocialAppsCore.framework */; };
-		EAE731B8294DCF6C00FA6F15 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAE731B7294DCF6C00FA6F15 /* IMDPersistence.framework */; };
-		FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */; };
-		FBCE4EC1201C0F4D002F8A61 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCE4EC0201C0F4D002F8A61 /* Foundation.framework */; };
-		FBCE4ECC201C0F4D002F8A61 /* ZKSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCE4ECB201C0F4D002F8A61 /* ZKSwizzle.m */; };
-		FBCE4ECE201C0F4D002F8A61 /* PrefixHeader.pch in Resources */ = {isa = PBXBuildFile; fileRef = FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		A63F3AF42A5A22E5002990A8 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				A63F3AF32A5A22E5002990A8 /* IDS.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		127FB7616167BF78C35BF855 /* libPods-BlueBubblesHelper DyLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper DyLib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -91,7 +62,6 @@
 		EA4401562988780000DEB3BE /* SocialAppsCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocialAppsCore.framework; path = /System/Library/PrivateFrameworks/SocialAppsCore.framework; sourceTree = "<group>"; };
 		EAE731B6294DCA9200FA6F15 /* IMFileTransferCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMFileTransferCenter.h; sourceTree = "<group>"; };
 		EAE731B7294DCF6C00FA6F15 /* IMDPersistence.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IMDPersistence.framework; path = /System/Library/PrivateFrameworks/IMDPersistence.framework; sourceTree = "<group>"; };
-		FBCE4EBB201C0F4D002F8A61 /* BlueBubblesHelper.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BlueBubblesHelper.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		FBCE4EC0201C0F4D002F8A61 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		FBCE4EC4201C0F4D002F8A61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -117,20 +87,6 @@
 				A63F3AF52A5A230B002990A8 /* IDS.framework in Frameworks */,
 				A6D825272A36A188006253F5 /* IMDPersistence.framework in Frameworks */,
 				7A48E71F098345ADA8C2059A /* libPods-BlueBubblesHelper DyLib.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FBCE4EB8201C0F4D002F8A61 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EA4401572988780000DEB3BE /* SocialAppsCore.framework in Frameworks */,
-				FBCE4EBF201C0F4D002F8A61 /* AppKit.framework in Frameworks */,
-				93AC09C62565E4150000C60C /* IMCore.framework in Frameworks */,
-				EAE731B8294DCF6C00FA6F15 /* IMDPersistence.framework in Frameworks */,
-				A63F3AF22A5A22E5002990A8 /* IDS.framework in Frameworks */,
-				FBCE4EC1201C0F4D002F8A61 /* Foundation.framework in Frameworks */,
-				2D258662D944A5A4DD8D3C13 /* libPods-BlueBubblesHelper.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -179,7 +135,6 @@
 		FBCE4EBC201C0F4D002F8A61 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FBCE4EBB201C0F4D002F8A61 /* BlueBubblesHelper.bundle */,
 				A6D825152A36A089006253F5 /* libBlueBubblesHelper DyLib.dylib */,
 			);
 			name = Products;
@@ -300,26 +255,6 @@
 			productReference = A6D825152A36A089006253F5 /* libBlueBubblesHelper DyLib.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
-		FBCE4EBA201C0F4D002F8A61 /* BlueBubblesHelper */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = FBCE4ED1201C0F4D002F8A61 /* Build configuration list for PBXNativeTarget "BlueBubblesHelper" */;
-			buildPhases = (
-				47366F660A8FC9CF6CF8AC69 /* [CP] Check Pods Manifest.lock */,
-				FBCE4EB7201C0F4D002F8A61 /* Sources */,
-				FBCE4EB8201C0F4D002F8A61 /* Frameworks */,
-				FBCE4EB9201C0F4D002F8A61 /* Resources */,
-				FBCE4EE7201C26B1002F8A61 /* Run Script */,
-				A63F3AF42A5A22E5002990A8 /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = BlueBubblesHelper;
-			productName = typeStatus13;
-			productReference = FBCE4EBB201C0F4D002F8A61 /* BlueBubblesHelper.bundle */;
-			productType = "com.apple.product-type.bundle";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -331,9 +266,7 @@
 				TargetAttributes = {
 					A6D825142A36A089006253F5 = {
 						CreatedOnToolsVersion = 12.0;
-					};
-					FBCE4EBA201C0F4D002F8A61 = {
-						CreatedOnToolsVersion = 9.0.1;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -349,47 +282,12 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				FBCE4EBA201C0F4D002F8A61 /* BlueBubblesHelper */,
 				A6D825142A36A089006253F5 /* BlueBubblesHelper DyLib */,
 			);
 		};
 /* End PBXProject section */
 
-/* Begin PBXResourcesBuildPhase section */
-		FBCE4EB9201C0F4D002F8A61 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EA4401542988779B00DEB3BE /* SocialAppsCore in Resources */,
-				FBCE4ECE201C0F4D002F8A61 /* PrefixHeader.pch in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
 /* Begin PBXShellScriptBuildPhase section */
-		47366F660A8FC9CF6CF8AC69 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-BlueBubblesHelper-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 		AB0F3FDC125824C7581F61B0 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -412,21 +310,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		FBCE4EE7201C26B1002F8A61 /* Run Script */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Run Script";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "codesign --deep -s \"-\" /Library/Application\\ Support/MacEnhance/Plugins/BlueBubblesHelper.bundle\nkillall -q Messages\nsleep 1\nopen -b com.apple.ichat\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -437,18 +320,6 @@
 				A6D825312A36A2A0006253F5 /* ZKSwizzle.m in Sources */,
 				A6D8252F2A36A292006253F5 /* BlueBubblesHelper.m in Sources */,
 				A6D8252D2A36A287006253F5 /* NetworkController.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FBCE4EB7201C0F4D002F8A61 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				93B28EAD25739A430056DAD4 /* SelectorHelper.m in Sources */,
-				93FD993A2568E7360060D430 /* NetworkController.m in Sources */,
-				FBCE4ECC201C0F4D002F8A61 /* ZKSwizzle.m in Sources */,
-				93B28EA9257399C00056DAD4 /* ChatDisplayController.m in Sources */,
-				93AC09CC2565E45F0000C60C /* BlueBubblesHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -478,10 +349,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-				);
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited) $(SYSTEM_LIBRARY_DIR)/PrivateFrameworks";
 			};
 			name = Debug;
 		};
@@ -507,10 +375,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
-				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-				);
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited) $(SYSTEM_LIBRARY_DIR)/PrivateFrameworks";
 			};
 			name = Release;
 		};
@@ -611,72 +476,6 @@
 			};
 			name = Release;
 		};
-		FBCE4ED2201C0F4D002F8A61 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 34FA3D7312B0A0F77E4D6E54 /* Pods-BlueBubblesHelper.debug.xcconfig */;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 20;
-				DEPLOYMENT_LOCATION = YES;
-				DEVELOPMENT_TEAM = WPV275H8W7;
-				DSTROOT = /;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-				);
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/PrefixHeader.pch";
-				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
-				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
-				MACH_O_TYPE = mh_dylib;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 0.0.18;
-				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Debug;
-		};
-		FBCE4ED3201C0F4D002F8A61 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6955E1273337B34EA5BF653B /* Pods-BlueBubblesHelper.release.xcconfig */;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 20;
-				DEPLOYMENT_LOCATION = YES;
-				DEVELOPMENT_TEAM = WPV275H8W7;
-				DSTROOT = /;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
-				);
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/PrefixHeader.pch";
-				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
-				INSTALL_PATH = "/Library/Application Support/MacEnhance/Plugins";
-				MACH_O_TYPE = mh_dylib;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				MARKETING_VERSION = 0.0.18;
-				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -694,15 +493,6 @@
 			buildConfigurations = (
 				FBCE4ECF201C0F4D002F8A61 /* Debug */,
 				FBCE4ED0201C0F4D002F8A61 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		FBCE4ED1201C0F4D002F8A61 /* Build configuration list for PBXNativeTarget "BlueBubblesHelper" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				FBCE4ED2201C0F4D002F8A61 /* Debug */,
-				FBCE4ED3201C0F4D002F8A61 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
