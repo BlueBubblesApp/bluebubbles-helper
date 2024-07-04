@@ -463,6 +463,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = AE20B1F38F795C02536396EA /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */;
 			buildSettings = {
+				ARCHS = (
+					"$(ARCHS_STANDARD)",
+					arm64e,
+				);
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -510,6 +514,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72EF502B6438F8F18EC16DBF /* Pods-BlueBubblesHelper DyLib.release.xcconfig */;
 			buildSettings = {
+				ARCHS = (
+					"$(ARCHS_STANDARD)",
+					arm64e,
+				);
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
