@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		42BBF2562C36F51B0009FCEE /* libBlueBubblesHelper DyLib.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = A6D825152A36A089006253F5 /* libBlueBubblesHelper DyLib.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7A48E71F098345ADA8C2059A /* libPods-BlueBubblesHelper DyLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 127FB7616167BF78C35BF855 /* libPods-BlueBubblesHelper DyLib.a */; };
 		A63F3AF52A5A230B002990A8 /* IDS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A63F3AF12A5A22E5002990A8 /* IDS.framework */; };
 		A6D825212A36A110006253F5 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6D825202A36A110006253F5 /* AppKit.framework */; };
@@ -18,6 +19,19 @@
 		A6D8252F2A36A292006253F5 /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
 		A6D825312A36A2A0006253F5 /* ZKSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCE4ECB201C0F4D002F8A61 /* ZKSwizzle.m */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		42BBF2552C36F4FE0009FCEE /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "/Users/<username>/Development/BlueBubbles/bluebubbles-server/packages/server/appResources/macos/private-api/macos10";
+			dstSubfolderSpec = 0;
+			files = (
+				42BBF2562C36F51B0009FCEE /* libBlueBubblesHelper DyLib.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		127FB7616167BF78C35BF855 /* libPods-BlueBubblesHelper DyLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper DyLib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -245,6 +259,7 @@
 				A6D825112A36A089006253F5 /* Headers */,
 				A6D825122A36A089006253F5 /* Sources */,
 				A6D825132A36A089006253F5 /* Frameworks */,
+				42BBF2552C36F4FE0009FCEE /* CopyFiles */,
 			);
 			buildRules = (
 			);
