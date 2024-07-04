@@ -24,7 +24,7 @@
 		42BBF2552C36F4FE0009FCEE /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "/Users/<username>/Development/BlueBubbles/bluebubbles-server/packages/server/appResources/macos/private-api/macos10";
+			dstPath = "/Users/<username>/Development/BlueBubbles/bluebubbles-server/packages/server/appResources/private-api/macos10";
 			dstSubfolderSpec = 0;
 			files = (
 				42BBF2562C36F51B0009FCEE /* libBlueBubblesHelper DyLib.dylib in CopyFiles */,
