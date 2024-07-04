@@ -1,11 +1,3 @@
-//
-//  whosTyping.m
-//  whosTyping
-//
-//  Created by Wolfgang Baird on 1/21/18.
-//  Copyright © 2018 Wolfgang Baird. All rights reserved.
-//
-
 @import AppKit;
 
 #import <Foundation/Foundation.h>
