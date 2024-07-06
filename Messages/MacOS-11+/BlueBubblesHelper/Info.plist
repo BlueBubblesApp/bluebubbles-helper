@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>BlueBubblesHelper</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.bluebubbles.messaging</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
