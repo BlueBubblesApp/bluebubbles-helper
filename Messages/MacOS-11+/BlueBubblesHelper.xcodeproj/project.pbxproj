@@ -29,7 +29,7 @@
 		A65C21A62A9AAAE600D6FB7F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
-			dstPath = "/Users/zach.shames/Development/BlueBubbles/bluebubbles-server/packages/server/appResources/private-api/macos11";
+			dstPath = "/Users/<username>/Development/BlueBubbles/bluebubbles-server/packages/server/appResources/private-api/macos11";
 			dstSubfolderSpec = 0;
 			files = (
 				A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in CopyFiles */,
