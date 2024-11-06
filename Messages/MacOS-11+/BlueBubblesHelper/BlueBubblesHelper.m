@@ -718,7 +718,7 @@ NSMutableArray* vettedAliases;
     } else if ([event isEqualToString:@"share-nickname"]) {
         IMChat *chat = [BlueBubblesHelper getChat:data[@"chatGuid"] :transaction];
 
-        if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion == 11) {
+        if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion >= 11) {
             [[IMNicknameController sharedInstance] whitelistHandlesForNicknameSharing:[chat participants] forChat:chat];
         } else {
             [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] forChat:chat];
