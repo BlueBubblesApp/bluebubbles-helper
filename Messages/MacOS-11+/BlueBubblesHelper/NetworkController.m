@@ -15,7 +15,6 @@
 
 @synthesize messageReceivedBlock;
 
-
 #pragma mark - Singleton
 
 static id sharedInstance = nil;

@@ -14,7 +14,7 @@
 @interface IMDDController : NSObject
 
 @property (retain, nonatomic) NSObject<OS_dispatch_queue> *scannerQueue; // ivar: _scannerQueue
-
+@property (nonatomic, readonly) dispatch_queue_t queue;
 
 +(id)sharedInstance;
 -(BOOL)_scanAttributedStringWithMessage:(id)arg0 attributedString:(id)arg1 plainText:(id)arg2 ;

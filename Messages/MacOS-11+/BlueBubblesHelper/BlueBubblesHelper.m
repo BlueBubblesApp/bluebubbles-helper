@@ -65,7 +65,6 @@
 BlueBubblesHelper *plugin;
 NSMutableArray* vettedAliases;
 
-
 @implementation BlueBubblesHelper
 
 // BlueBubblesHelper is a singleton
@@ -192,9 +191,11 @@ NSMutableArray* vettedAliases;
         // Get the IMChat instance for the guid specified in eventData
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         if(chat != nil) {
-            // If the IMChat instance is not null, start typing
+            NSLog(@"Start typing on %@", data[@"chatGuid"]);
+            [chat setTypingGUID: data[@"chatGuid"]];
             [chat setLocalUserIsTyping:YES];
-
+            NSTimeInterval interval = 4.0;
+            [chat setLatestTypingIndicatorTimeInterval:interval];
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
@@ -205,9 +206,11 @@ NSMutableArray* vettedAliases;
         // Get the IMChat instance for the guid specified in eventData
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
         if(chat != nil) {
-            // If the IMChat instance is not null, stop typing
+            NSLog(@"Stop typing on %@", data[@"chatGuid"]);
+            [chat setTypingGUID:nil];
             [chat setLocalUserIsTyping:NO];
-
+            NSTimeInterval interval = 0.0;
+            [chat setLatestTypingIndicatorTimeInterval:interval];
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
@@ -340,7 +343,7 @@ NSMutableArray* vettedAliases;
     // If the server tells us to unsend a message
     } else if ([event isEqualToString:@"unsend-message"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
-
+        
         [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
             IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
             NSObject *items = messageItem._newChatItems;
@@ -369,8 +372,20 @@ NSMutableArray* vettedAliases;
             } else {
                 item = (IMMessagePartChatItem *)items;
             }
-
+            
             [chat retractMessagePart:(item)];
+        }];
+        
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        }
+    // If the server tells us to cancel a scheduled message
+    } else if ([event isEqualToString:@"cancel-scheduled-message"]) {
+        IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
+
+        [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
+            IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
+            [chat cancelScheduledMessageItem:(messageItem) cancelType:(nil)]
         }];
 
         if (transaction != nil) {
@@ -673,7 +688,8 @@ NSMutableArray* vettedAliases;
         if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion == 11) {
             [[IMNicknameController sharedInstance] whitelistHandlesForNicknameSharing:[chat participants] forChat:chat];
         } else {
-            [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] forChat:chat];
+            IMAccount *account = [[IMAccountController sharedInstance] activeIMessageAccount];
+            [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] fromHandle:[account displayName] forceSend:TRUE];
         }
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
@@ -963,6 +979,25 @@ NSMutableArray* vettedAliases;
     return newTransfer;
 }
 
++ (NSDateFormatter *)iso8601FormatterWithFormat:(NSString *)format {
+    static NSMutableDictionary<NSString *, NSDateFormatter *> *formatters;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        formatters = [NSMutableDictionary new];
+    });
+    
+    @synchronized (formatters) {
+        NSDateFormatter *formatter = formatters[format];
+        if (!formatter) {
+            formatter = [[NSDateFormatter alloc] init];
+            formatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+            formatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
+            formatter.dateFormat = format;
+            formatters[format] = formatter;
+        }
+        return formatter;
+    }
+}
 
 +(void) sendMessage: (NSDictionary *) data transfers: (NSArray *) transfers attributedString:(NSMutableAttributedString *) attributedString transaction:(NSString *) transaction {
     IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
@@ -990,6 +1025,28 @@ NSMutableArray* vettedAliases;
         effectId = data[@"effectId"];
     }
     
+    NSDate *scheduledDate = nil;
+    if (data[@"scheduled"] != [NSNull null] && [data[@"scheduled"] length] != 0) {
+        NSString *scheduledString = data[@"scheduled"];
+        NSLog(@"Found scheduled string: %@", scheduledString);
+        NSArray *dateFormats = @[
+            @"yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX",
+            @"yyyy-MM-dd'T'HH:mm:ssXXXXX"
+        ];
+
+        for (NSString *format in dateFormats) {
+            NSDateFormatter *formatter = [self iso8601FormatterWithFormat:format];
+            scheduledDate = [formatter dateFromString:scheduledString];
+            if (scheduledDate != nil) { break; }
+        }
+
+        if (scheduledDate == nil) {
+            NSLog(@"Failed to parse scheduled date string: %@", scheduledString);
+        } else {
+            NSLog(@"Scheduled date object: %@", scheduledDate);
+        }
+    }
+    
     BOOL isAudioMessage = false;
     if (data[@"isAudioMessage"] != [NSNull null]) {
         isAudioMessage = [data[@"isAudioMessage"] integerValue] == 1;
@@ -1001,20 +1058,33 @@ NSMutableArray* vettedAliases;
     }
 
     void (^createMessage)(NSAttributedString*, NSAttributedString*, NSString*, NSString*, NSString*, long long*, NSRange, NSDictionary*, NSArray*, BOOL, BOOL) = ^(NSAttributedString *message, NSAttributedString *subject, NSString *effectId, NSString *threadIdentifier, NSString *associatedMessageGuid, long long *reaction, NSRange range, NSDictionary *summaryInfo, NSArray *transferGUIDs, BOOL isAudioMessage, BOOL ddScan) {
-        IMMessage *messageToSend = [[IMMessage alloc] init];
-        if (reaction == nil) {
-            messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(transferGUIDs) flags:(isAudioMessage ? 0x300005 : (subject ? 0x10000d : 0x100005)) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
-            messageToSend.threadIdentifier = threadIdentifier;
+        IMMessage *messageToSend;
+        
+        if (scheduledDate != nil) {
+            messageToSend = [IMMessage instantMessageWithText:(message) messageSubject:(subject) flags:(isAudioMessage ? 0x300005 : (subject ? 0x10000d : 0x100005)) threadIdentifier:(threadIdentifier) associatedMessageGUID:(associatedMessageGuid) scheduledDate:(scheduledDate)];
         } else {
-            messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(0x5) error:(nil) guid:(nil) subject:(nil) associatedMessageGUID:(associatedMessageGuid) associatedMessageType:*(reaction) associatedMessageRange:(range) messageSummaryInfo:(summaryInfo)];
+            messageToSend = [[IMMessage alloc] init];
+            
+            if (reaction == nil) {
+                messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(transferGUIDs) flags:(isAudioMessage ? 0x300005 : (subject ? 0x10000d : 0x100005)) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(nil) payloadData:(nil) expressiveSendStyleID:(effectId)];
+                messageToSend.threadIdentifier = threadIdentifier;
+            } else {
+                messageToSend = [messageToSend initWithSender:(nil) time:(nil) text:(message) messageSubject:(subject) fileTransferGUIDs:(nil) flags:(0x5) error:(nil) guid:(nil) subject:(nil) associatedMessageGUID:(associatedMessageGuid) associatedMessageType:*(reaction) associatedMessageRange:(range) messageSummaryInfo:(summaryInfo)];
+            }
         }
+        
         if (ddScan) {
-            [[IMDDController sharedInstance] scanMessage:messageToSend outgoing:TRUE waitUntilDone:TRUE completionBlock:^(NSObject* temp, NSObject* ddMessageToSend) {
-                [chat sendMessage:(ddMessageToSend)];
-                if (transaction != nil) {
-                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [[chat lastSentMessage] guid]}];
-                }
-            }];
+            __strong typeof(messageToSend) strongMessage = messageToSend;
+            __strong typeof(chat) strongChat = chat;
+            
+            [[IMDDController sharedInstance] scanMessage:strongMessage outgoing:TRUE waitUntilDone:TRUE completionBlock:^(NSInteger status, BOOL success, id result) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [strongChat sendMessage:(strongMessage)];
+                    if (transaction != nil) {
+                        [[NetworkController sharedInstance]sendMessage:@{@"transactionId": transaction, @"identifier": [[strongChat lastSentMessage] guid]}];
+                    }
+                });
+             }];
         } else {
             [chat sendMessage:(messageToSend)];
             if (transaction != nil) {
@@ -1106,6 +1176,10 @@ NSMutableArray* vettedAliases;
     } else {
         createMessage(attributedString, subjectAttributedString, effectId, nil, nil, nil, NSMakeRange(0, 0), nil, transfers, isAudioMessage, ddScan);
     }
+}
+
++(void) cancelMessage: (NSString *) guid {
+    
 }
 
 - (void)searchMessages:(NSString *)searchQuery matchType:(NSString *)matchType completionBlock:(void (^)(NSMutableArray<NSString *> *results))onComplete errorBlock:(void (^)(NSString *err))onError {
@@ -1371,11 +1445,6 @@ ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
 //
 //@end
 
-
-
-
-
-
 //@interface IMDMessageStore : NSObject
 //+ (id)sharedInstance;
 //- (id)messageWithGUID:(id)arg1;
@@ -1408,5 +1477,3 @@ ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
 //}
 //
 //@end
-
-

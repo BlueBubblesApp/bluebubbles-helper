@@ -184,21 +184,34 @@
 - (BOOL)canSendCurrentLocationMessage;
 - (BOOL)canSendTransfer:(id)arg1;
 - (BOOL)canSendMessage:(id)arg1;
-@property(nonatomic) BOOL localUserIsRecording;
-@property(nonatomic) BOOL localUserIsTyping;
-@property(retain, nonatomic) NSString *localUserIsComposing;
+
+@property (assign,nonatomic) BOOL localUserIsTyping;
+@property (assign,nonatomic) BOOL localUserIsRecording;
+@property (nonatomic,retain) NSString* localUserIsComposing;
+@property (nonatomic,readonly) NSString* localTypingMessageGUID;
+@property (nonatomic,retain) NSString* typingGUID;
+- (void)setTypingGUID:(id)arg0 ;
+- (void)setLatestTypingIndicatorTimeInterval:(double)arg1 ;
+- (void)setLocalUserIsTyping:(BOOL)arg0 ;
 - (void)setLocalUserIsComposing:(BOOL)arg1 typingIndicatorData:(id)arg2;
 - (void)_setLocalUserIsComposing:(id)arg1 suppliedGUID:(id)arg2 typingIndicatorData:(id)arg3;
 - (void)_setLocalUserIsComposing:(id)arg1 suppliedGUID:(id)arg2;
 - (BOOL)_shouldSendCancelTypingIndicator;
-@property(readonly, nonatomic) NSString *localTypingMessageGUID;
 - (void)sendCurrentLocationMessage;
 - (void)sendMessage:(id)arg1;
 - (void)_fixItemForSendingMessageTime:(id)arg1;
 - (void)_sendMessage:(id)arg1 adjustingSender:(BOOL)arg2 shouldQueue:(BOOL)arg3;
-- (void)cancelMessage:(id)arg1;
 - (void)declineInvitation;
 - (void)acceptInvitation;
+
+- (bool)hasCancellableScheduledMessage;
+- (void)cancelMessage:(id)arg1;
+- (void)cancelScheduledMessageItem:(id)arg1 cancelType:(unsigned long long)arg2;
+- (void)cancelScheduledMessageWithGUID:(id)arg1 destinations:(id)arg2 cancelType:(unsigned long long)arg3;
+- (void)cancelScheduledMessageItem:(id)arg1 atPartIndex:(long long)arg2 shouldRetractSubject:(bool)arg3;
+
+@property (assign,nonatomic) bool hasCancellableScheduledMessage;                                        //@synthesize hasCancellableScheduledMessage=_hasCancellableScheduledMessage - In the implementation block
+
 @property(readonly, nonatomic) BOOL hasUnhandledInvitation;
 @property(readonly, nonatomic) NSString *roomNameWithoutSuffix;
 @property(readonly, nonatomic) NSString *deviceIndependentID;

@@ -22,14 +22,17 @@
 		A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = A62991CB29720FAC00B7E663 /* BlueBubblesHelper.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A69960EA2B1F9A700081FB69 /* FMF.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69960E92B1F9A6F0081FB69 /* FMF.framework */; };
 		A69960F52B20D89C0081FB69 /* CTBlockDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = A69960F42B20D8860081FB69 /* CTBlockDescription.m */; };
-		F8EA7496D989633D9E36BF1B /* libPods-BlueBubblesHelper DyLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */; };
+		D0DF3A132D23493E00270902 /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = D0DF3A112D23493E00270902 /* GCDAsyncUdpSocket.h */; };
+		D0DF3A142D23493E00270902 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = D0DF3A0F2D23493E00270902 /* GCDAsyncSocket.h */; };
+		D0DF3A152D23493E00270902 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = D0DF3A122D23493E00270902 /* GCDAsyncUdpSocket.m */; };
+		D0DF3A162D23493E00270902 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = D0DF3A102D23493E00270902 /* GCDAsyncSocket.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		A65C21A62A9AAAE600D6FB7F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
-			dstPath = "/Users/<username>/Development/BlueBubbles/bluebubbles-server/packages/server/appResources/private-api/macos11";
+			dstPath = "/Users/justin/Documents/bluebubbles-server/packages/server/appResources/private-api/macos11";
 			dstSubfolderSpec = 0;
 			files = (
 				A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in CopyFiles */,
@@ -39,13 +42,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper DyLib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71554C06257B2E4600296B93 /* IMChatHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMChatHistoryController.h; sourceTree = "<group>"; };
 		71554C0F257B58F100296B93 /* IMTranscriptChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMTranscriptChatItem.h; sourceTree = "<group>"; };
 		71554C17257B609B00296B93 /* IMTextMessagePartChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMTextMessagePartChatItem.h; sourceTree = "<group>"; };
 		71554C19257B616400296B93 /* IMMessagePartChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMMessagePartChatItem.h; sourceTree = "<group>"; };
 		71554C1B257B618400296B93 /* IMMessageChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMMessageChatItem.h; sourceTree = "<group>"; };
-		72EF502B6438F8F18EC16DBF /* Pods-BlueBubblesHelper DyLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.release.xcconfig"; sourceTree = "<group>"; };
 		9316AE94257600E8002AE8EE /* IMMessageItem-IMChat_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMMessageItem-IMChat_Internal.h"; sourceTree = "<group>"; };
 		9316AE962576029C002AE8EE /* IMChatRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChatRegistry.h; sourceTree = "<group>"; };
 		9316AE98257606EC002AE8EE /* IMChat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMChat.h; sourceTree = "<group>"; };
@@ -119,10 +120,10 @@
 		A6E1F4CF27166012000A0EF6 /* IMPinnedConversationsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMPinnedConversationsController.h; sourceTree = "<group>"; };
 		A6E7318229A3D37000AAED78 /* IMAggregateAttachmentMessagePartChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMAggregateAttachmentMessagePartChatItem.h; sourceTree = "<group>"; };
 		A6E7318329A3D49600AAED78 /* IMAttachmentMessagePartChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMAttachmentMessagePartChatItem.h; sourceTree = "<group>"; };
-		AE20B1F38F795C02536396EA /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.debug.xcconfig"; sourceTree = "<group>"; };
-		B6E17DF925EE5FA4CB129B31 /* Pods-BlueBubblesHelper.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.debug.xcconfig"; sourceTree = "<group>"; };
-		BFA22E41EA07AA1C37D1B255 /* Pods-BlueBubblesHelper.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper/Pods-BlueBubblesHelper.release.xcconfig"; sourceTree = "<group>"; };
-		F08C69D03543C5A2D76B772F /* libPods-BlueBubblesHelper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0DF3A0F2D23493E00270902 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
+		D0DF3A102D23493E00270902 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
+		D0DF3A112D23493E00270902 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
+		D0DF3A122D23493E00270902 /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
 		FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		FBCE4EC0201C0F4D002F8A61 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		FBCE4EC4201C0F4D002F8A61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -148,24 +149,12 @@
 				A62991D8297210D900B7E663 /* IMCore.framework in Frameworks */,
 				A62991D7297210A500B7E663 /* Foundation.framework in Frameworks */,
 				A62991D02972104E00B7E663 /* AppKit.framework in Frameworks */,
-				F8EA7496D989633D9E36BF1B /* libPods-BlueBubblesHelper DyLib.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0D15172D954906F948D51F4C /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				B6E17DF925EE5FA4CB129B31 /* Pods-BlueBubblesHelper.debug.xcconfig */,
-				BFA22E41EA07AA1C37D1B255 /* Pods-BlueBubblesHelper.release.xcconfig */,
-				AE20B1F38F795C02536396EA /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */,
-				72EF502B6438F8F18EC16DBF /* Pods-BlueBubblesHelper DyLib.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		93FD99382568E7230060D430 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
@@ -175,13 +164,23 @@
 			name = Networking;
 			sourceTree = "<group>";
 		};
+		D0DF3A0E2D23493300270902 /* CocoaAsyncSocket */ = {
+			isa = PBXGroup;
+			children = (
+				D0DF3A0F2D23493E00270902 /* GCDAsyncSocket.h */,
+				D0DF3A102D23493E00270902 /* GCDAsyncSocket.m */,
+				D0DF3A112D23493E00270902 /* GCDAsyncUdpSocket.h */,
+				D0DF3A122D23493E00270902 /* GCDAsyncUdpSocket.m */,
+			);
+			path = CocoaAsyncSocket;
+			sourceTree = "<group>";
+		};
 		FBCE4EB2201C0F4D002F8A61 = {
 			isa = PBXGroup;
 			children = (
 				FBCE4EC2201C0F4D002F8A61 /* BlueBubblesHelper */,
 				FBCE4EBD201C0F4D002F8A61 /* Frameworks */,
 				FBCE4EBC201C0F4D002F8A61 /* Products */,
-				0D15172D954906F948D51F4C /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -207,8 +206,6 @@
 				93AC09C52565E4150000C60C /* IMCore.framework */,
 				FBCE4EBE201C0F4D002F8A61 /* AppKit.framework */,
 				FBCE4EC0201C0F4D002F8A61 /* Foundation.framework */,
-				F08C69D03543C5A2D76B772F /* libPods-BlueBubblesHelper.a */,
-				2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -216,6 +213,7 @@
 		FBCE4EC2201C0F4D002F8A61 /* BlueBubblesHelper */ = {
 			isa = PBXGroup;
 			children = (
+				D0DF3A0E2D23493300270902 /* CocoaAsyncSocket */,
 				93FD99382568E7230060D430 /* Networking */,
 				FBCE4EDB201C264F002F8A61 /* IMCore */,
 				FBCE4EC9201C0F4D002F8A61 /* ZKSwizzle */,
@@ -251,6 +249,7 @@
 		FBCE4EDB201C264F002F8A61 /* IMCore */ = {
 			isa = PBXGroup;
 			children = (
+				A65C21AD2AA67C9500D6FB7F /* IMDDController.h */,
 				A65C21B22AA6CB7400D6FB7F /* IMNickname.h */,
 				A65C21B12AA6CB7400D6FB7F /* IMNicknameAvatarImage.h */,
 				A6DAE8E729CCD09F00C23C79 /* SKStatusSubscriptionServiceDelegate-Protocol.h */,
@@ -304,7 +303,6 @@
 				A61DC02C2A5A03C800EA75A5 /* IDS.h */,
 				A61DC02D2A5A045B00EA75A5 /* IDSInternalQueueController.h */,
 				A61DC02E2A5A049700EA75A5 /* _IDSIDQueryController.h */,
-				A65C21AD2AA67C9500D6FB7F /* IMDDController.h */,
 				A65C21AE2AA6800500D6FB7F /* IMNicknameController.h */,
 				A65C21B32AA96B0300D6FB7F /* IMFMFSession.h */,
 				A65C21B42AA96B3C00D6FB7F /* FMFSessionDelegate-Protocol.h */,
@@ -327,6 +325,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0DF3A132D23493E00270902 /* GCDAsyncUdpSocket.h in Headers */,
+				D0DF3A142D23493E00270902 /* GCDAsyncSocket.h in Headers */,
 				A6490A1F298DCC35002B0E1D /* VettedAliasDictionary.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -338,7 +338,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A62991CE29720FAC00B7E663 /* Build configuration list for PBXNativeTarget "BlueBubblesHelper DyLib" */;
 			buildPhases = (
-				A56C609B1DF77BC2D39B2EDF /* [CP] Check Pods Manifest.lock */,
 				A62991C729720FAC00B7E663 /* Headers */,
 				A62991C829720FAC00B7E663 /* Sources */,
 				A62991C929720FAC00B7E663 /* Frameworks */,
@@ -380,6 +379,8 @@
 				en,
 			);
 			mainGroup = FBCE4EB2201C0F4D002F8A61;
+			packageReferences = (
+			);
 			productRefGroup = FBCE4EBC201C0F4D002F8A61 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -401,28 +402,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		A56C609B1DF77BC2D39B2EDF /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-BlueBubblesHelper DyLib-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 		A6490A0F29846A3A002B0E1D /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -448,6 +427,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0DF3A152D23493E00270902 /* GCDAsyncUdpSocket.m in Sources */,
+				D0DF3A162D23493E00270902 /* GCDAsyncSocket.m in Sources */,
 				A69960F52B20D89C0081FB69 /* CTBlockDescription.m in Sources */,
 				A62991D52972107400B7E663 /* ZKSwizzle.m in Sources */,
 				A62991D22972106500B7E663 /* NetworkController.m in Sources */,
@@ -461,7 +442,6 @@
 /* Begin XCBuildConfiguration section */
 		A62991CC29720FAC00B7E663 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AE20B1F38F795C02536396EA /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = (
 					"$(ARCHS_STANDARD)",
@@ -512,7 +492,6 @@
 		};
 		A62991CD29720FAC00B7E663 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 72EF502B6438F8F18EC16DBF /* Pods-BlueBubblesHelper DyLib.release.xcconfig */;
 			buildSettings = {
 				ARCHS = (
 					"$(ARCHS_STANDARD)",
