@@ -385,7 +385,7 @@ NSMutableArray* vettedAliases;
 
         [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
             IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
-            [chat cancelScheduledMessageItem:(messageItem) cancelType:(nil)]
+            [chat cancelScheduledMessageItem:messageItem cancelType:1];
         }];
 
         if (transaction != nil) {
@@ -634,13 +634,15 @@ NSMutableArray* vettedAliases;
             }
         }];
     // If the server tells us to check iMessage availability
-    } else if ([event isEqualToString:@"check-imessage-availability"] || [event isEqualToString:@"check-facetime-availability"]) {
+    } else if ([event isEqualToString:@"check-imessage-availability"] || [event isEqualToString:@"check-facetime-availability"] || [event isEqualToString:@"check-rcs-availability"]) {
         NSString *type = data[@"aliasType"];
         IDSDestination *dest;
         NSString* serviceName;
 
         if ([event isEqualToString:@"check-imessage-availability"]) {
             serviceName = IDSServiceNameiMessage;
+        } else if ([event isEqualToString:@"check-rcs-availability"]) {
+            serviceName = @"com.apple.rcs";
         } else {
             serviceName = IDSServiceNameFaceTime;
         }
