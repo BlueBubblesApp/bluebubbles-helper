@@ -1325,6 +1325,48 @@ ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
 
 @end
 
+// macOS Tahoe (26+) typing indicator support
+ZKSwizzleInterface(BBH_CKConversationListStandardCell, CKConversationListStandardCell, NSObject)
+@implementation BBH_CKConversationListStandardCell
+
+- (void)setShowTypingIndicator:(BOOL)show {
+    ZKOrig(void, show);
+    
+    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 26) {
+        return;
+    }
+    
+    @try {
+        SEL convSel = NSSelectorFromString(@"conversation");
+        if ([self respondsToSelector:convSel]) {
+            id conversation = [self performSelector:convSel];
+            if (conversation != nil) {
+                SEL chatSel = NSSelectorFromString(@"chat");
+                if ([conversation respondsToSelector:chatSel]) {
+                    id chat = [conversation performSelector:chatSel];
+                    if (chat != nil) {
+                        SEL guidSel = NSSelectorFromString(@"guid");
+                        if ([chat respondsToSelector:guidSel]) {
+                            NSString *guid = [chat performSelector:guidSel];
+                            if (guid != nil) {
+                                if (show) {
+                                    [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": guid}];
+                                } else {
+                                    [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } @catch (NSException *e) {
+        // silently ignore
+    }
+}
+
+@end
+
 //ZKSwizzleInterface(BBH_NSNotificationCenter, NSNotificationCenter, NSObject)
 //@implementation BBH_NSNotificationCenter
 //
