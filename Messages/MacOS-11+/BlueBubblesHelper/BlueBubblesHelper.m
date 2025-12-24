@@ -283,7 +283,12 @@ NSMutableArray* vettedAliases;
         IMHandle *handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(data[@"address"])];
         
         if (handle != nil && chat != nil && [chat canAddParticipant:(handle)]) {
-            [chat inviteParticipantsToiMessageChat:(@[handle]) reason:(0)];
+            // Tahoe uses inviteParticipants:reason:, older uses inviteParticipantsToiMessageChat:reason:
+            if ([chat respondsToSelector:@selector(inviteParticipants:reason:)]) {
+                [chat inviteParticipants:(@[handle]) reason:nil];
+            } else {
+                [chat inviteParticipantsToiMessageChat:(@[handle]) reason:(0)];
+            }
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
