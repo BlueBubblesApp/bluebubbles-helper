@@ -911,6 +911,51 @@ NSMutableArray* vettedAliases;
     }];
 }
 
+// Apply text formatting ranges to an attributed string created from the message body.
++(NSMutableAttributedString *) applyTextFormatting:(NSArray *)formatting toMessage:(NSString *)message {
+    if (message == nil || message == (id)[NSNull null]) return nil;
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: message];
+    NSUInteger messageLength = [message length];
+
+    if (messageLength == 0 || formatting == nil || ![formatting isKindOfClass:[NSArray class]] || [formatting count] == 0) {
+        return attributedString;
+    }
+
+    // Always include the message part attribute across the entire string.
+    [attributedString addAttributes:@{
+        @"__kIMMessagePartAttributeName": @0
+    } range:NSMakeRange(0, messageLength)];
+
+    for (NSDictionary *rangeDict in formatting) {
+        if (![rangeDict isKindOfClass:[NSDictionary class]]) continue;
+        NSNumber *startNum = rangeDict[@"start"];
+        NSNumber *lengthNum = rangeDict[@"length"];
+        NSArray *styles = rangeDict[@"styles"];
+        if (startNum == nil || lengthNum == nil || ![styles isKindOfClass:[NSArray class]]) continue;
+
+        NSInteger start = [startNum integerValue];
+        NSInteger length = [lengthNum integerValue];
+        if (start < 0 || length <= 0) continue;
+        if ((NSUInteger)(start + length) > messageLength) continue;
+
+        NSRange range = NSMakeRange((NSUInteger)start, (NSUInteger)length);
+        if ([styles containsObject:@"bold"]) {
+            [attributedString addAttribute:@"__kIMTextBoldAttributeName" value:@1 range:range];
+        }
+        if ([styles containsObject:@"italic"]) {
+            [attributedString addAttribute:@"__kIMTextItalicAttributeName" value:@1 range:range];
+        }
+        if ([styles containsObject:@"underline"]) {
+            [attributedString addAttribute:@"__kIMTextUnderlineAttributeName" value:@1 range:range];
+        }
+        if ([styles containsObject:@"strikethrough"]) {
+            [attributedString addAttribute:@"__kIMTextStrikethroughAttributeName" value:@1 range:range];
+        }
+    }
+
+    return attributedString;
+}
+
 /**
  Creates a new file transfer & moves file to attachment location
  @param originalPath The url of the file to be transferred ( Must be in a location IMessage.app has permission to access )
@@ -978,7 +1023,8 @@ NSMutableArray* vettedAliases;
         if (message == nil) {
             message = @"TEMP";
         }
-        attributedString = [[NSMutableAttributedString alloc] initWithString: message];
+        NSArray *textFormatting = data[@"textFormatting"];
+        attributedString = [BlueBubblesHelper applyTextFormatting:textFormatting toMessage:message];
     }
 
     NSMutableAttributedString *subjectAttributedString = nil;
