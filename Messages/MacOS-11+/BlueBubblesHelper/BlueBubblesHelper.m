@@ -917,6 +917,11 @@ NSMutableArray* vettedAliases;
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString: message];
     NSUInteger messageLength = [message length];
 
+    // Text formatting attributes only available on macOS 15 (Sequoia) and later
+    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 15) {
+        return attributedString;
+    }
+    
     if (messageLength == 0 || formatting == nil || ![formatting isKindOfClass:[NSArray class]] || [formatting count] == 0) {
         return attributedString;
     }
