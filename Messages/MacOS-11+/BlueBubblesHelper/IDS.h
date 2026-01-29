@@ -5,6 +5,7 @@ IDSDestination* IDSCopyIDForEmailAddress(CFStringRef);
 IDSDestination* IDSCopyIDForBusinessID(CFStringRef);
 
 extern NSString* IDSServiceNameiMessage;
+extern NSString* IDSServiceNameiMessageLite;
 extern NSString* IDSServiceNameSMSRelay;
 extern NSString* IDSServiceNameFaceTime;
 extern NSString* IDSServiceNameFaceTimeMultiway;

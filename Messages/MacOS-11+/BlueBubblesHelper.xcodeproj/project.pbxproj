@@ -131,6 +131,7 @@
 		A6E1F4CF27166012000A0EF6 /* IMPinnedConversationsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMPinnedConversationsController.h; sourceTree = "<group>"; };
 		A6E7318229A3D37000AAED78 /* IMAggregateAttachmentMessagePartChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMAggregateAttachmentMessagePartChatItem.h; sourceTree = "<group>"; };
 		A6E7318329A3D49600AAED78 /* IMAttachmentMessagePartChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMAttachmentMessagePartChatItem.h; sourceTree = "<group>"; };
+		D08D6F492E68CC52004686D7 /* IMDServiceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMDServiceController.h; sourceTree = "<group>"; };
 		D0DF3A0F2D23493E00270902 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 		D0DF3A102D23493E00270902 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
 		D0DF3A112D23493E00270902 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
@@ -260,6 +261,7 @@
 		FBCE4EDB201C264F002F8A61 /* IMCore */ = {
 			isa = PBXGroup;
 			children = (
+				D08D6F492E68CC52004686D7 /* IMDServiceController.h */,
 				A65C21AD2AA67C9500D6FB7F /* IMDDController.h */,
 				A65C21B22AA6CB7400D6FB7F /* IMNickname.h */,
 				A65C21B12AA6CB7400D6FB7F /* IMNicknameAvatarImage.h */,

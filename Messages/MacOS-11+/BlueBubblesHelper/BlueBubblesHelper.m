@@ -26,6 +26,7 @@
 #import "Logging.h"
 #import "IMHandleRegistrar.h"
 #import "IMCore.h"
+// #import "IMDServiceController.h"
 #import "IMChatHistoryController.h"
 #import "IMPinnedConversationsController.h"
 #import "IMDPersistentAttachmentController.h"
@@ -638,23 +639,24 @@ NSMutableArray* vettedAliases;
         NSString *type = data[@"aliasType"];
         IDSDestination *dest;
         NSString* serviceName;
-
+        
         if ([event isEqualToString:@"check-imessage-availability"]) {
             serviceName = IDSServiceNameiMessage;
         } else if ([event isEqualToString:@"check-rcs-availability"]) {
-            serviceName = @"com.apple.rcs";
+            serviceName = IDSServiceNameiMessage;
         } else {
             serviceName = IDSServiceNameFaceTime;
         }
-
+        
         if ([type isEqualToString:@"phone"]) {
             dest = IDSCopyIDForPhoneNumber((__bridge CFStringRef)data[@"address"]);
         } else {
             dest = IDSCopyIDForEmailAddress((__bridge CFStringRef)data[@"address"]);
         }
-
+        
         [[IDSIDQueryController sharedInstance] forceRefreshIDStatusForDestinations:(@[dest]) service:(serviceName) listenerID:(@"SOIDSListener-com.apple.imessage-rest") queue:(dispatch_queue_create("HandleIDS", NULL)) completionBlock:^(NSDictionary *response) {
             NSInteger *status = [response.allValues.firstObject integerValue];
+            
             BOOL available = status == 1;
             DLog("BLUEBUBBLESHELPER: Status for %{public}@ is %{public}ld", data[@"address"], (long)available);
             if (transaction != nil) {

@@ -23,6 +23,7 @@
 +(id)canonicalFormOfID:(id)arg0 withIDSensitivity:(int)arg1 ;
 +(id)facetimeService;
 +(id)iMessageService;
++(id)rcsService;
 +(id)imageNameForStatus:(NSUInteger)arg0 ;
 +(id)imageURLForStatus:(NSUInteger)arg0 ;
 +(id)jabberService;
