@@ -348,6 +348,8 @@ NSMutableArray* vettedAliases;
             // sometimes items is an array so we need to account for that
             if ([items isKindOfClass:[NSArray class]]) {
                 for (IMMessagePartChatItem *i in (NSArray *) items) {
+                    // Skip items that don't have an index selector (e.g. IMMessageAcknowledgmentChatItem on Tahoe)
+                    if (![i respondsToSelector:@selector(index)]) continue;
                     // IMAggregateAttachmentMessagePartChatItem is a photo gallery and has subparts
                     // Only available Monterey+, use reference to class loaded at runtime to avoid crashes on Big Sur
                     Class cls = NSClassFromString(@"IMAggregateAttachmentMessagePartChatItem");
@@ -606,8 +608,14 @@ NSMutableArray* vettedAliases;
             IMMessagePartChatItem *item;
             // sometimes items is an array so we need to account for that
             if ([items isKindOfClass:[NSArray class]]) {
-                item = [(NSArray*) items firstObject];
-            } else {
+                // Find first actual IMMessagePartChatItem, skipping acknowledgments etc.
+                for (id obj in (NSArray *)items) {
+                    if ([obj isKindOfClass:[IMMessagePartChatItem class]]) {
+                        item = obj;
+                        break;
+                    }
+                }
+            } else if ([items isKindOfClass:[IMMessagePartChatItem class]]) {
                 item = (IMMessagePartChatItem *)items;
             }
 
@@ -1044,6 +1052,8 @@ NSMutableArray* vettedAliases;
             // sometimes items is an array so we need to account for that
             if ([items isKindOfClass:[NSArray class]]) {
                 for (IMMessagePartChatItem *i in (NSArray *) items) {
+                    // Skip items that don't have an index selector (e.g. IMMessageAcknowledgmentChatItem on Tahoe)
+                    if (![i respondsToSelector:@selector(index)]) continue;
                     // IMAggregateAttachmentMessagePartChatItem is a photo gallery and has subparts
                     // Only available Monterey+, use reference to class loaded at runtime to avoid crashes on Big Sur
                     Class cls = NSClassFromString(@"IMAggregateAttachmentMessagePartChatItem");
