@@ -445,13 +445,16 @@ NSMutableArray* vettedAliases;
         if (chat != nil) {
             [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
                 IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
-                NSObject *items = messageItem._newChatItems;
-                IMMessagePartChatItem *item;
-                // sometimes items is an array so we need to account for that
-                if ([items isKindOfClass:[NSArray class]]) {
-                    [chat deleteChatItems:(items)];
-                } else {
-                    [chat deleteChatItems:(@[items])];
+                // Use deleteIMMessageItems: (whole-message delete) rather than
+                // deleteChatItems: (message-parts delete). The latter hits
+                // IMCore's "delete subset of chat items from message → update
+                // message" path which leaves the row in place; only
+                // deleteIMMessageItems: actually removes the message and
+                // writes to sync_deleted_messages so the delete propagates
+                // via iCloud. Observed on macOS 26 Tahoe; previously the
+                // API returned 200 but chat.db was unchanged.
+                if (messageItem != nil) {
+                    [chat deleteIMMessageItems:@[messageItem]];
                 }
             }];
 
