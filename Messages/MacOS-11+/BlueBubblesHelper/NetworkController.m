@@ -7,22 +7,24 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <os/log.h>
 #import "NetworkController.h"
 #import "GCDAsyncSocket.h"
 #import "Logging.h"
+#import "BlueBubblesHelper.h"
 
 @implementation NetworkController
-
-@synthesize messageReceivedBlock;
 
 
 #pragma mark - Singleton
 
 static id sharedInstance = nil;
+os_log_t logger;
 
 + (void)initialize {
   if (self == [NetworkController class]) {
-    sharedInstance = [[self alloc] init];
+      sharedInstance = [[self alloc] init];
+      logger = os_log_create("BlueBubblesHelper", "network-socket");
   }
 }
 
@@ -33,12 +35,7 @@ static id sharedInstance = nil;
 
 #pragma mark - Public methods
 
-#define CLAMP(x, low, high) ({\
-  __typeof__(x) __x = (x); \
-  __typeof__(low) __low = (low);\
-  __typeof__(high) __high = (high);\
-  __x > __high ? __high : (__x < __low ? __low : __x);\
-  })
+#define CLAMP(x, low, high) (MAX(low, MIN(x, high)))
 
 - (void)connect {
     // we need to get the port to open the server on (to allow multiple users to use the bundle)
@@ -46,37 +43,42 @@ static id sharedInstance = nil;
     // we'll subtract 501 to get an id starting at 0, incremented for each user
     // then we add this to the base port to get a unique port for the socket
     int port = CLAMP(45670 + getuid()-501, 45670, 65535);
-    DLog("BLUEBUBBLESHELPER: Connecting to socket on port %{public}d", port);
+    os_log(logger, "Connecting to socket on port %d...", port);
+    
     // connect to socket
     asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    
     NSError *err = nil;
     if (![asyncSocket connectToHost:@"localhost" onPort:port error:&err]) {
         // If there was an error, it's likely something like "already connected" or "no delegate set"
-        DLog("BLUEBUBBLESHELPER: Error connecting to socket: %{public}@", err);
+        os_log_error(logger, "Failed to connect to socket! %@", err);
     }
+    
     // initiate the 1st read request in anticipation
     [asyncSocket readDataWithTimeout:(-1) tag:(1)];
-}
-
-
-
-- (void)disconnect {
-    [asyncSocket disconnect];
 }
 
 - (void)sendMessage:(NSDictionary*)data {
     NSError *error;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data options:0 error:&error];
-    NSString *message = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    // add a newline to the message so back-to-back messages are split and sent correctly
-    NSString *jsonMessage = [NSString stringWithFormat:(@"%@\r\n"), message];
-    NSData* finalData = [jsonMessage dataUsingEncoding:NSUTF8StringEncoding];
-    DLog("BLUEBUBBLESHELPER: Sending data: %{public}@", data);
-    [asyncSocket writeData:(finalData) withTimeout:(-1) tag:(1)];
+    if (error) {
+        os_log_error(logger, "Failed to serialize data! %@", error);
+    } else {
+        NSString *message = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        // add a newline to the message so back-to-back messages are split and sent correctly
+        NSString *jsonMessage = [NSString stringWithFormat:(@"%@\r\n"), message];
+        NSData* finalData = [jsonMessage dataUsingEncoding:NSUTF8StringEncoding];
+        
+        os_log(logger, "Sending data to server:\r\n%@", data);
+        [asyncSocket writeData:(finalData) withTimeout:(-1) tag:(1)];
+    }
 }
 
-- (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port {
-    DLog("BLUEBUBBLESHELPER: socket:%{public}p didConnectToHost:%{public}@ port:%{public}hu", sock, host, port);
+#pragma mark - Socket state change handlers
+
+- (void)socket:(GCDAsyncSocket*)sock didConnectToHost:(NSString*)host port:(UInt16)port {
+    os_log(logger, "Helper socket connected on port:%{public}hu", port);
+    
     NSDictionary *message = @{
         @"event": @"ping",
         @"message": @"Helper Connected!",
@@ -85,30 +87,20 @@ static id sharedInstance = nil;
     [self sendMessage:message];
 }
 
-- (void)socketDidSecure:(GCDAsyncSocket *)sock {
-    DLog("BLUEBUBBLESHELPER: socketDidSecure:%{public}p", sock);
-}
-
-// called when a message is sent to the server
-- (void)socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag {
-    DLog("BLUEBUBBLESHELPER: socket:%p didWriteDataWithTag:%ld", sock, tag);
-}
-
-- (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag {
+- (void)socket:(GCDAsyncSocket*)sock didReadData:(NSData*)data withTag:(long)tag {
     NSString* str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    DLog("BLUEBUBBLESHELPER: event: %{public}@ socket:%{public}p didReadData:withTag:%{public}ld", str, sock, tag);
+    os_log(logger, "Received data from server:\r\n%{public}@\r\nwith tag: %{public}ld", str, tag);
     // initiate a new read request for the next data item
     [asyncSocket readDataWithTimeout:(-1) tag:(1)];
     // send the data to the handler
-    messageReceivedBlock(self, str);
+    [[BlueBubblesHelper sharedInstance] handleMessage:self message:str];
 }
 
 - (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err {
-    DLog("BLUEBUBBLESHELPER: Disconnected from server, attempting to reconnect in 5 seconds... (%{public}@)", err);
+    os_log_error(logger, "Disconnected from server, attempting to reconnect in 5 seconds...\r\n(%{public}@)", err);
     double delayInSeconds = 5.0;
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-        DLog("BLUEBUBBLESHELPER: Attempting to reconnect");
         [self connect];
     });
 }
