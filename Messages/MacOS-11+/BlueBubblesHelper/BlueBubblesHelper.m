@@ -10,6 +10,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreSpotlight/CoreSpotlight.h>
+#import "BlueBubblesHelper.h"
 
 #import "IMTextMessagePartChatItem.h"
 #import "IMHandle.h"
@@ -53,9 +54,7 @@
 #import "FMLLocation.h"
 #import "FMFSessionDataManager.h"
 
-@interface BlueBubblesHelper : NSObject
-+ (instancetype)sharedInstance;
-@end
+#import "CKConversation.h"
 
 // This can be used to dump the methods of any class
 @interface NSObject (Private)
@@ -101,7 +100,7 @@ NSMutableArray* vettedAliases;
 
 }
 
-// Called when macforge initializes the plugin
+// Called when plugin is inserted into iMessage
 + (void)load {
     // Create the singleton
     plugin = [BlueBubblesHelper sharedInstance];
@@ -117,6 +116,17 @@ NSMutableArray* vettedAliases;
         dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
             DLog("BLUEBUBBLESHELPER: Initializing Connection...");
             [plugin initializeNetworkController];
+            
+//            NSArray* aliases = @[@"tanay@neotia.in", @"zshames2@icloud.com", @"bluebubblesapp@gmail.com", @"hijoelj@gmail.com"];
+//            CKConversation* convo = [CKConversation conversationForAddresses:aliases allowRetargeting:TRUE candidateConversation:nil];
+//            DLog("BLUEBUBBLESHELPER: %@", convo);
+//            
+//            NSAttributedString* text = [[NSAttributedString alloc] initWithString:@"https://google.com"];
+//            CKComposition* composition = [[CKComposition alloc] initWithText:text subject:nil];
+//            
+//            NSObject* message = [convo messageWithComposition:composition];
+//            //And finally, send the message in the conversation
+//            [convo sendMessage:message newComposition:YES];
         });
     } else {
         DLog("BLUEBUBBLESHELPER: Injected into non-iMessage process %@, aborting.", [[NSBundle mainBundle] bundleIdentifier]);
@@ -130,11 +140,6 @@ NSMutableArray* vettedAliases;
     // Get the network controller
     NetworkController *controller = [NetworkController sharedInstance];
     [controller connect];
-
-    // Upon receiving a message
-    controller.messageReceivedBlock =  ^(NetworkController *controller, NSString *data) {
-        [self handleMessage:controller message: data];
-    };
 
     // DEVELOPMENT ONLY, COMMENT OUT FOR RELEASE
 //    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC));

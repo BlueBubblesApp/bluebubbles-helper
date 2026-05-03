@@ -17,23 +17,21 @@
 		A62991D9297210EB00B7E663 /* IMSharedUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A68E87E128C3B18900882823 /* IMSharedUtilities.framework */; };
 		A62991DA297210F700B7E663 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69A83DF27D18385007BB936 /* IMDPersistence.framework */; };
 		A6490A0E2984697C002B0E1D /* PrefixHeader.pch in Resources */ = {isa = PBXBuildFile; fileRef = FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */; };
-		A6490A1D298DC81C002B0E1D /* VettedAliasDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = A6490A1B298DC81C002B0E1D /* VettedAliasDictionary.m */; };
-		A6490A1F298DCC35002B0E1D /* VettedAliasDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = A6490A1E298DCC35002B0E1D /* VettedAliasDictionary.h */; };
-		A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = A62991CB29720FAC00B7E663 /* BlueBubblesHelper.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = A62991CB29720FAC00B7E663 /* BlueBubblesHelper.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A69960EA2B1F9A700081FB69 /* FMF.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69960E92B1F9A6F0081FB69 /* FMF.framework */; };
 		A69960F52B20D89C0081FB69 /* CTBlockDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = A69960F42B20D8860081FB69 /* CTBlockDescription.m */; };
-		F8EA7496D989633D9E36BF1B /* libPods-BlueBubblesHelper DyLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		A65C21A62A9AAAE600D6FB7F /* CopyFiles */ = {
+		A65C21A62A9AAAE600D6FB7F /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
-			dstPath = "/Users/<username>/Development/BlueBubbles/bluebubbles-server/packages/server/appResources/private-api/macos11";
+			dstPath = "/Applications/BlueBubbles.app/Contents/Resources/appResources/private-api/macos11";
 			dstSubfolderSpec = 0;
 			files = (
-				A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in CopyFiles */,
+				A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in Copy Files */,
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -62,12 +60,18 @@
 		A61DC02C2A5A03C800EA75A5 /* IDS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDS.h; sourceTree = "<group>"; };
 		A61DC02D2A5A045B00EA75A5 /* IDSInternalQueueController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDSInternalQueueController.h; sourceTree = "<group>"; };
 		A61DC02E2A5A049700EA75A5 /* _IDSIDQueryController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _IDSIDQueryController.h; sourceTree = "<group>"; };
+		A623AA3C2F9EC6930054D931 /* libCocoaAsyncSocket.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libCocoaAsyncSocket.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		A623AA3E2F9EC7190054D931 /* libCocoaAsyncSocket.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libCocoaAsyncSocket.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A62991CB29720FAC00B7E663 /* BlueBubblesHelper.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BlueBubblesHelper.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		A62991CF2972104E00B7E663 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		A62991D6297210A500B7E663 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		A6436F332FA6DCAE00BD241F /* ChatKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ChatKit.framework; path = ../../../../../../System/iOSSupport/System/Library/PrivateFrameworks/ChatKit.framework; sourceTree = "<group>"; };
+		A6436F4F2FA6DF4400BD241F /* CKComposition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CKComposition.h; sourceTree = "<group>"; };
+		A6436F502FA6DF4400BD241F /* CKConversation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CKConversation.h; sourceTree = "<group>"; };
+		A6436F512FA6DF4400BD241F /* CKEntity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CKEntity.h; sourceTree = "<group>"; };
+		A6436F522FA6DF4400BD241F /* CKMediaObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CKMediaObject.h; sourceTree = "<group>"; };
+		A6436F532FA6DF4400BD241F /* CKMessageContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CKMessageContext.h; sourceTree = "<group>"; };
 		A6490A18298AC986002B0E1D /* SocialAppsCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocialAppsCore.framework; path = /System/Library/PrivateFrameworks/SocialAppsCore.framework; sourceTree = "<group>"; };
-		A6490A1B298DC81C002B0E1D /* VettedAliasDictionary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VettedAliasDictionary.m; sourceTree = "<group>"; };
-		A6490A1E298DCC35002B0E1D /* VettedAliasDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VettedAliasDictionary.h; sourceTree = "<group>"; };
 		A64B888C2712316900BAD446 /* IMItemsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMItemsController.h; sourceTree = "<group>"; };
 		A64B888E271231DA00BAD446 /* IMItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMItem.h; sourceTree = "<group>"; };
 		A64B888F2712320500BAD446 /* IMRemoteObjectCoding.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMRemoteObjectCoding.h; sourceTree = "<group>"; };
@@ -97,6 +101,7 @@
 		A65C21B62AA96BAF00D6FB7F /* FMFXPCInternalClientProtocol-Protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FMFXPCInternalClientProtocol-Protocol.h"; sourceTree = "<group>"; };
 		A65C21B72AAA7F5500D6FB7F /* FMFLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FMFLocation.h; sourceTree = "<group>"; };
 		A65C21B82AAA7FCF00D6FB7F /* FMFHandle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FMFHandle.h; sourceTree = "<group>"; };
+		A67F85DA2FA7EB4300F04596 /* BlueBubblesHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlueBubblesHelper.h; sourceTree = "<group>"; };
 		A68C7FF729B025C7001002B6 /* IMTranscriptPluginChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMTranscriptPluginChatItem.h; sourceTree = "<group>"; };
 		A68C7FFD29B0344A001002B6 /* ETiOSMacBalloonPluginDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ETiOSMacBalloonPluginDataSource.h; sourceTree = "<group>"; };
 		A68C7FFE29B03EC5001002B6 /* HWiOSMacBalloonDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HWiOSMacBalloonDataSource.h; sourceTree = "<group>"; };
@@ -148,7 +153,6 @@
 				A62991D8297210D900B7E663 /* IMCore.framework in Frameworks */,
 				A62991D7297210A500B7E663 /* Foundation.framework in Frameworks */,
 				A62991D02972104E00B7E663 /* AppKit.framework in Frameworks */,
-				F8EA7496D989633D9E36BF1B /* libPods-BlueBubblesHelper DyLib.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,6 +200,9 @@
 		FBCE4EBD201C0F4D002F8A61 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A6436F332FA6DCAE00BD241F /* ChatKit.framework */,
+				A623AA3E2F9EC7190054D931 /* libCocoaAsyncSocket.a */,
+				A623AA3C2F9EC6930054D931 /* libCocoaAsyncSocket.a */,
 				A69960ED2B2004540081FB69 /* FindMyLocateObjCWrapper.framework */,
 				A69960E92B1F9A6F0081FB69 /* FMF.framework */,
 				A61DC0272A59FFF200EA75A5 /* IDS.framework */,
@@ -221,6 +228,7 @@
 				FBCE4EC9201C0F4D002F8A61 /* ZKSwizzle */,
 				FBCE4EC3201C0F4D002F8A61 /* Supporting Files */,
 				93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */,
+				A67F85DA2FA7EB4300F04596 /* BlueBubblesHelper.h */,
 			);
 			path = BlueBubblesHelper;
 			sourceTree = "<group>";
@@ -231,8 +239,6 @@
 				FBCE4EC4201C0F4D002F8A61 /* Info.plist */,
 				FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */,
 				93B28EA5257399450056DAD4 /* Logging.h */,
-				A6490A1B298DC81C002B0E1D /* VettedAliasDictionary.m */,
-				A6490A1E298DCC35002B0E1D /* VettedAliasDictionary.h */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -316,6 +322,11 @@
 				A69960F62B20E46B0081FB69 /* FMLLocation.h */,
 				A69960F72B20E4AD0081FB69 /* FMLHandle.h */,
 				A6E13E352B65C8F9002983AD /* FMFSessionDataManager.h */,
+				A6436F4F2FA6DF4400BD241F /* CKComposition.h */,
+				A6436F502FA6DF4400BD241F /* CKConversation.h */,
+				A6436F512FA6DF4400BD241F /* CKEntity.h */,
+				A6436F522FA6DF4400BD241F /* CKMediaObject.h */,
+				A6436F532FA6DF4400BD241F /* CKMessageContext.h */,
 			);
 			name = IMCore;
 			sourceTree = "<group>";
@@ -327,7 +338,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A6490A1F298DCC35002B0E1D /* VettedAliasDictionary.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,7 +353,7 @@
 				A62991C829720FAC00B7E663 /* Sources */,
 				A62991C929720FAC00B7E663 /* Frameworks */,
 				A6490A0D29846973002B0E1D /* Resources */,
-				A65C21A62A9AAAE600D6FB7F /* CopyFiles */,
+				A65C21A62A9AAAE600D6FB7F /* Copy Files */,
 				A6490A0F29846A3A002B0E1D /* Run Script */,
 			);
 			buildRules = (
@@ -425,6 +435,7 @@
 		};
 		A6490A0F29846A3A002B0E1D /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -451,7 +462,6 @@
 				A69960F52B20D89C0081FB69 /* CTBlockDescription.m in Sources */,
 				A62991D52972107400B7E663 /* ZKSwizzle.m in Sources */,
 				A62991D22972106500B7E663 /* NetworkController.m in Sources */,
-				A6490A1D298DC81C002B0E1D /* VettedAliasDictionary.m in Sources */,
 				A62991D12972106200B7E663 /* BlueBubblesHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -482,6 +492,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				ENABLE_MODULE_VERIFIER = YES;
 				EXECUTABLE_PREFIX = "";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
 				INSTALL_PATH = /Users/tanay/Desktop/test;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -489,13 +500,23 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				MARKETING_VERSION = 0.0.20;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-framework",
+					"\"CoreServices\"",
+					"-framework",
+					"\"Security\"",
+					"-undefined",
+					dynamic_lookup,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = BlueBubblesHelper;
 				SDKROOT = macosx;
@@ -533,6 +554,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				ENABLE_MODULE_VERIFIER = YES;
 				EXECUTABLE_PREFIX = "";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
 				INSTALL_PATH = /Users/tanay/Desktop/test;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -540,11 +562,21 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				MARKETING_VERSION = 0.0.20;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-framework",
+					"\"CoreServices\"",
+					"-framework",
+					"\"Security\"",
+					"-undefined",
+					dynamic_lookup,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.messaging;
 				PRODUCT_NAME = BlueBubblesHelper;
 				SDKROOT = macosx;

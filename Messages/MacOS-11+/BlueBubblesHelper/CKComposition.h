@@ -24,9 +24,7 @@
 
 @property (copy, nonatomic) NSDictionary *bizIntent; // ivar: _bizIntent
 @property (readonly, nonatomic) NSArray *collaborationOptions;
-@property (retain, nonatomic) NSArray *collaborationOptions; // ivar: _collaborationOptions
 @property (readonly, nonatomic) _SWCollaborationShareOptions *collaborationShareOptions;
-@property (retain, nonatomic) _SWCollaborationShareOptions *collaborationShareOptions; // ivar: _collaborationShareOptions
 @property (readonly, nonatomic, getter=isExpirableComposition) BOOL expirableComposition;
 @property (copy, nonatomic) NSString *expressiveSendStyleID; // ivar: _expressiveSendStyleID
 @property (retain, nonatomic) TUConversationActivity *groupActivity; // ivar: _groupActivity
@@ -139,8 +137,8 @@
 -(id)messageWithGUID:(id)arg0 superFormatText:(id)arg1 superFormatSubject:(id)arg2 fileTransferGUIDs:(id)arg3 mediaObjects:(id)arg4 balloonBundleID:(id)arg5 payloadData:(id)arg6 ;
 -(id)messagesFromCompositionFirstGUIDForMessage:(id)arg0 ;
 -(id)superFormatSubject;
--(id)superFormatText:(*id)arg0 ;
--(id)superFormatText:(id)arg0 transfterGUIDs:(*id)arg1 mediaObjects:(*id)arg2 ;
+-(id)superFormatText:(id)arg0 ;
+-(id)superFormatText:(id)arg0 transfterGUIDs:(id)arg1 mediaObjects:(id)arg2 ;
 -(void)cleanupCKShareFromComposition;
 -(void)removeShareURLForComposition:(id)arg0 ;
 -(void)saveCompositionWithGUID:(id)arg0 ;

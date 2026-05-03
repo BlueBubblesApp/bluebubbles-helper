@@ -104,13 +104,13 @@
 
 
 +(BOOL)_iMessage_canAcceptMediaObjectType:(int)arg0 givenMediaObjects:(id)arg1 ;
-+(BOOL)_iMessage_canSendComposition:(id)arg0 lastAddressedHandle:(id)arg1 lastAddressedSIMID:(id)arg2 currentService:(id)arg3 forceSMS:(BOOL)arg4 error:(*id)arg5 ;
-+(BOOL)_iMessage_canSendMessageWithMediaObjectTypes:(*int)arg0 ;
-+(BOOL)_iMessage_canSendMessageWithMediaObjectTypes:(*int)arg0 errorCode:(*NSInteger)arg1 ;
++(BOOL)_iMessage_canSendComposition:(id)arg0 lastAddressedHandle:(id)arg1 lastAddressedSIMID:(id)arg2 currentService:(id)arg3 forceSMS:(BOOL)arg4 error:(id)arg5 ;
++(BOOL)_iMessage_canSendMessageWithMediaObjectTypes:(int)arg0 ;
++(BOOL)_iMessage_canSendMessageWithMediaObjectTypes:(int)arg0 errorCode:(NSInteger)arg1 ;
 +(BOOL)_sms_canAcceptMediaObjectType:(int)arg0 givenMediaObjects:(id)arg1 phoneNumber:(id)arg2 simID:(id)arg3 ;
-+(BOOL)_sms_canSendComposition:(id)arg0 lastAddressedHandle:(id)arg1 lastAddressedSIMID:(id)arg2 error:(*id)arg3 ;
-+(BOOL)_sms_canSendMessageWithMediaObjectTypes:(*int)arg0 phoneNumber:(id)arg1 simID:(id)arg2 ;
-+(BOOL)_sms_canSendMessageWithMediaObjectTypes:(*int)arg0 phoneNumber:(id)arg1 simID:(id)arg2 errorCode:(*NSInteger)arg3 ;
++(BOOL)_sms_canSendComposition:(id)arg0 lastAddressedHandle:(id)arg1 lastAddressedSIMID:(id)arg2 error:(id)arg3 ;
++(BOOL)_sms_canSendMessageWithMediaObjectTypes:(int)arg0 phoneNumber:(id)arg1 simID:(id)arg2 ;
++(BOOL)_sms_canSendMessageWithMediaObjectTypes:(int)arg0 phoneNumber:(id)arg1 simID:(id)arg2 errorCode:(NSInteger)arg3 ;
 +(BOOL)_sms_mediaObjectPassesDurationCheck:(id)arg0 ;
 +(BOOL)_sms_mediaObjectPassesRestriction:(id)arg0 ;
 +(BOOL)isSMSSpamFilteringEnabled;
@@ -139,7 +139,7 @@
 -(BOOL)canInsertMoreRecipients;
 -(BOOL)canMuteStateBeToggled;
 -(BOOL)canReadStateBeToggled;
--(BOOL)canSendComposition:(id)arg0 error:(*id)arg1 ;
+-(BOOL)canSendComposition:(id)arg0 error:(id)arg1 ;
 -(BOOL)canSendToRecipients:(id)arg0 alertIfUnable:(BOOL)arg1 ;
 -(BOOL)containsHandleWithUID:(id)arg0 ;
 -(BOOL)hasLoadedFromSpotlight;
