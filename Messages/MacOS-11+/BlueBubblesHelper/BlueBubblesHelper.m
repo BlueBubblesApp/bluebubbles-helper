@@ -53,6 +53,10 @@
 #import "FMLLocation.h"
 #import "FMFSessionDataManager.h"
 
+@interface IMChat (TahoeEdit)
+- (void)editMessageItem:(id)arg1 atPartIndex:(long)arg2 withNewPartText:(id)arg3 newPartTranslation:(id)arg4 backwardCompatabilityText:(id)arg5;
+@end
+
 @interface BlueBubblesHelper : NSObject
 + (instancetype)sharedInstance;
 @end
@@ -279,7 +283,12 @@ NSMutableArray* vettedAliases;
         IMHandle *handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(data[@"address"])];
 
         if (handle != nil && chat != nil && [chat canAddParticipant:(handle)]) {
-            [chat inviteParticipantsToiMessageChat:(@[handle]) reason:(0)];
+              // Tahoe uses inviteParticipants:reason:, older uses inviteParticipantsToiMessageChat:reason:
+            if ([chat respondsToSelector:@selector(inviteParticipants:reason:)]) {
+                [chat inviteParticipants:(@[handle]) reason:nil];
+            } else {
+                [chat inviteParticipantsToiMessageChat:(@[handle]) reason:(0)];
+            }
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
@@ -304,7 +313,11 @@ NSMutableArray* vettedAliases;
         IMHandle *handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(data[@"address"])];
 
         if (handle != nil && chat != nil && [chat canAddParticipant:(handle)]) {
-            [chat removeParticipantsFromiMessageChat:(@[handle]) reason:(0)];
+                 if ([chat respondsToSelector:@selector(removeParticipants:reason:)]) {
+                [chat removeParticipants:(@[handle]) reason:nil];
+            } else {
+                [chat removeParticipantsFromiMessageChat:(@[handle]) reason:(0)];
+            }
             if (transaction != nil) {
                 [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
             }
@@ -322,15 +335,43 @@ NSMutableArray* vettedAliases;
     } else if ([event isEqualToString:@"edit-message"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
 
+        if (chat == nil) {
+            return;
+        }
+
         [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
+            if (message == nil) {
+                DLog("BLUEBUBBLESHELPER: Edit failed - message is nil");
+                return;
+            }
+
             NSMutableAttributedString *editedString = [[NSMutableAttributedString alloc] initWithString: data[@"editedMessage"]];
             NSMutableAttributedString *bcString = [[NSMutableAttributedString alloc] initWithString: data[@"backwardsCompatibilityMessage"]];
+            NSInteger partIndex = [data[@"partIndex"] integerValue];
 
-            if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion >= 14) {
+            @try {
                 IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
-                [chat editMessageItem:(messageItem) atPartIndex:([data[@"partIndex"] longValue]) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
-            } else {
-                [chat editMessage:(message) atPartIndex:([data[@"partIndex"] integerValue]) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
+
+                // Try Tahoe method first (has newPartTranslation parameter)
+                SEL tahoeSel = @selector(editMessageItem:atPartIndex:withNewPartText:newPartTranslation:backwardCompatabilityText:);
+                if ([chat respondsToSelector:tahoeSel]) {
+                    [chat editMessageItem:(messageItem) atPartIndex:((long)partIndex) withNewPartText:(editedString) newPartTranslation:nil backwardCompatabilityText:(bcString)];
+                    DLog("BLUEBUBBLESHELPER: Edit succeeded with editMessageItem (newPartTranslation)");
+                }
+                // Try macOS 14+ method
+                else if ([chat respondsToSelector:@selector(editMessageItem:atPartIndex:withNewPartText:backwardCompatabilityText:)]) {
+                    [chat editMessageItem:(messageItem) atPartIndex:((long)partIndex) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
+                    DLog("BLUEBUBBLESHELPER: Edit succeeded with editMessageItem");
+                }
+                // Try older method
+                else if ([chat respondsToSelector:@selector(editMessage:atPartIndex:withNewPartText:backwardCompatabilityText:)]) {
+                    [chat editMessage:(message) atPartIndex:(partIndex) withNewPartText:(editedString) backwardCompatabilityText:(bcString)];
+                    DLog("BLUEBUBBLESHELPER: Edit succeeded with editMessage");
+                } else {
+                    DLog("BLUEBUBBLESHELPER: No edit selector found");
+                }
+            } @catch (NSException *e) {
+                DLog("BLUEBUBBLESHELPER: Edit message exception: %@", e);
             }
         }];
 
@@ -562,13 +603,20 @@ NSMutableArray* vettedAliases;
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
         }
     // If server tells us to leave a chat
-    } else if ([event isEqualToString:@"leave-chat"]) {
+   } else if ([event isEqualToString:@"leave-chat"]) {
         IMChat *chat = [BlueBubblesHelper getChat: data[@"chatGuid"] :transaction];
-
-        if (chat != nil && [chat canLeaveChat]) {
-            [chat leaveiMessageGroup];
-            if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        if (chat != nil) {
+            @try {
+                if ([chat respondsToSelector:@selector(leave)]) {
+                    [chat leave];
+                } else if ([chat respondsToSelector:@selector(leaveiMessageGroup)]) {
+                    [chat leaveiMessageGroup];
+                }
+                if (transaction != nil) {
+                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+                }
+            } @catch (NSException *e) {
+                DLog("BLUEBUBBLESHELPER: Leave chat exception: %@", e);
             }
         }
     // If the server asks us to check the focus status of a user
@@ -859,6 +907,19 @@ NSMutableArray* vettedAliases;
     }
 
     IMChat* imChat = [[IMChatRegistry sharedInstance] existingChatWithGUID: guid];
+
+    // Tahoe fix: try "any" service if iMessage/SMS service fails
+    if (imChat == nil) {
+        NSString *tahoeGuid = nil;
+        if ([guid hasPrefix:@"iMessage;-;"]) {
+            tahoeGuid = [guid stringByReplacingOccurrencesOfString:@"iMessage;-;" withString:@"any;-;"];
+        } else if ([guid hasPrefix:@"SMS;-;"]) {
+            tahoeGuid = [guid stringByReplacingOccurrencesOfString:@"SMS;-;" withString:@"any;-;"];
+        }
+        if (tahoeGuid != nil) {
+            imChat = [[IMChatRegistry sharedInstance] existingChatWithGUID: tahoeGuid];
+        }
+    }
 
     if (imChat == nil && transaction != nil) {
         [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Chat does not exist!"}];
@@ -1324,7 +1385,49 @@ ZKSwizzleInterface(BBH_IMAccount, IMAccount, NSObject)
 }
 
 @end
+// macOS Tahoe (26+) typing indicator support
+ZKSwizzleInterface(BBH_CKConversationListStandardCell, CKConversationListStandardCell, NSObject)
+@implementation BBH_CKConversationListStandardCell
 
+- (void)setShowTypingIndicator:(BOOL)show {
+    ZKOrig(void, show);
+
+    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 26) {
+        return;
+    }
+
+    @try {
+        SEL convSel = NSSelectorFromString(@"conversation");
+        if ([self respondsToSelector:convSel]) {
+            id conversation = [self performSelector:convSel];
+            if (conversation != nil) {
+                SEL chatSel = NSSelectorFromString(@"chat");
+                if ([conversation respondsToSelector:chatSel]) {
+                    id chat = [conversation performSelector:chatSel];
+                    if (chat != nil) {
+                        SEL guidSel = NSSelectorFromString(@"guid");
+                        if ([chat respondsToSelector:guidSel]) {
+                            NSString *guid = [chat performSelector:guidSel];
+                            if (guid != nil) {
+                                if (show) {
+                                    [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": guid}];
+                                    DLog("BLUEBUBBLESHELPER: %{public}@ started typing (Tahoe)", guid);
+                                } else {
+                                    [[NetworkController sharedInstance] sendMessage: @{@"event": @"stopped-typing", @"guid": guid}];
+                                    DLog("BLUEBUBBLESHELPER: %{public}@ stopped typing (Tahoe)", guid);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } @catch (NSException *e) {
+        DLog("BLUEBUBBLESHELPER: Typing indicator exception: %@", e);
+    }
+}
+
+@end
 //ZKSwizzleInterface(BBH_NSNotificationCenter, NSNotificationCenter, NSObject)
 //@implementation BBH_NSNotificationCenter
 //
