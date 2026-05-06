@@ -356,7 +356,7 @@ NSMutableArray* vettedAliases;
                 SEL tahoeSel = @selector(editMessageItem:atPartIndex:withNewPartText:newPartTranslation:backwardCompatabilityText:);
                 if ([chat respondsToSelector:tahoeSel]) {
                     [chat editMessageItem:(messageItem) atPartIndex:((long)partIndex) withNewPartText:(editedString) newPartTranslation:nil backwardCompatabilityText:(bcString)];
-                    DLog("BLUEBUBBLESHELPER: Edit succeeded with Tahoe method");
+                    DLog("BLUEBUBBLESHELPER: Edit succeeded with editMessageItem (newPartTranslation)");
                 }
                 // Try macOS 14+ method
                 else if ([chat respondsToSelector:@selector(editMessageItem:atPartIndex:withNewPartText:backwardCompatabilityText:)]) {
@@ -619,7 +619,6 @@ NSMutableArray* vettedAliases;
                 DLog("BLUEBUBBLESHELPER: Leave chat exception: %@", e);
             }
         }
-    // If the server asks us to check the focus status of a user
     // If the server asks us to check the focus status of a user
     } else if ([event isEqualToString:@"check-focus-status"]) {
         IMHandle *handle = [[[IMAccountController sharedInstance] activeIMessageAccount] imHandleWithID:(data[@"address"])];
