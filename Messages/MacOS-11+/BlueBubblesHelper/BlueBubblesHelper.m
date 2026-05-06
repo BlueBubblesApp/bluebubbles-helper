@@ -56,7 +56,7 @@
 
 #import "CKConversation.h"
 
-# todo remove
+// todo remove
 @interface IMChat (TahoeEdit)
 - (void)editMessageItem:(id)arg1 atPartIndex:(long)arg2 withNewPartText:(id)arg3 newPartTranslation:(id)arg4 backwardCompatabilityText:(id)arg5;
 @end
