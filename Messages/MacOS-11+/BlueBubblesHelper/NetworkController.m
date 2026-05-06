@@ -19,7 +19,7 @@
 #pragma mark - Singleton
 
 static id sharedInstance = nil;
-os_log_t logger;
+static os_log_t logger;
 
 + (void)initialize {
   if (self == [NetworkController class]) {
@@ -74,6 +74,23 @@ os_log_t logger;
     }
 }
 
+#pragma mark - Private methods
+// The data from the server is in the form of a json string, so we need to convert it to a NSDictionary
+- (NSDictionary*) jsonDecode:(NSString*) json {
+    // For some reason the data is sometimes duplicated, so account for that
+    NSRange range = [json rangeOfString:@"}\n{"];
+    if (range.location != NSNotFound) {
+        json = [json substringWithRange:NSMakeRange(0, range.location + 1)];
+    }
+    
+    NSError *error;
+    NSData *jsonData = [json dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&error];
+    
+    return dictionary;
+}
+
+
 #pragma mark - Socket state change handlers
 
 - (void)socket:(GCDAsyncSocket*)sock didConnectToHost:(NSString*)host port:(UInt16)port {
@@ -92,8 +109,19 @@ os_log_t logger;
     os_log(logger, "Received data from server:\r\n%{public}@\r\nwith tag: %{public}ld", str, tag);
     // initiate a new read request for the next data item
     [asyncSocket readDataWithTimeout:(-1) tag:(1)];
-    // send the data to the handler
-    [[BlueBubblesHelper sharedInstance] handleMessage:self message:str];
+    
+    // parse and send the data to the handler
+    NSDictionary* dictionary = [self jsonDecode:str];
+    // Event is the type of packet that was sent
+    NSString *event = dictionary[@"action"];
+    // Data is the actual information that we need in the packet
+    NSDictionary *eventData = dictionary[@"data"];
+    // Transaction ID enables us to communicate back to the server that the action was complete
+    NSString *transaction = nil;
+    if ([dictionary objectForKey:(@"transactionId")] != [NSNull null]) {
+        transaction = dictionary[@"transactionId"];
+    }
+    [[BlueBubblesHelper sharedInstance] handleServerEvent:event data:eventData transactionId:transaction];
 }
 
 - (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err {

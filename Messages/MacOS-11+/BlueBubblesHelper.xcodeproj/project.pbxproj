@@ -102,6 +102,7 @@
 		A65C21B72AAA7F5500D6FB7F /* FMFLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FMFLocation.h; sourceTree = "<group>"; };
 		A65C21B82AAA7FCF00D6FB7F /* FMFHandle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FMFHandle.h; sourceTree = "<group>"; };
 		A67F85DA2FA7EB4300F04596 /* BlueBubblesHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlueBubblesHelper.h; sourceTree = "<group>"; };
+		A67F85DC2FA7FFEC00F04596 /* CKConversationList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CKConversationList.h; sourceTree = "<group>"; };
 		A68C7FF729B025C7001002B6 /* IMTranscriptPluginChatItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IMTranscriptPluginChatItem.h; sourceTree = "<group>"; };
 		A68C7FFD29B0344A001002B6 /* ETiOSMacBalloonPluginDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ETiOSMacBalloonPluginDataSource.h; sourceTree = "<group>"; };
 		A68C7FFE29B03EC5001002B6 /* HWiOSMacBalloonDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HWiOSMacBalloonDataSource.h; sourceTree = "<group>"; };
@@ -257,6 +258,7 @@
 		FBCE4EDB201C264F002F8A61 /* IMCore */ = {
 			isa = PBXGroup;
 			children = (
+				A67F85DC2FA7FFEC00F04596 /* CKConversationList.h */,
 				A65C21B22AA6CB7400D6FB7F /* IMNickname.h */,
 				A65C21B12AA6CB7400D6FB7F /* IMNicknameAvatarImage.h */,
 				A6DAE8E729CCD09F00C23C79 /* SKStatusSubscriptionServiceDelegate-Protocol.h */,

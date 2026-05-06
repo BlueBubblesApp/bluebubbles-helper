@@ -17,7 +17,7 @@
 +(instancetype) sharedInstance;
 
 // Methods
--(void) handleMessage: (NetworkController*)controller  message: (NSString*)message;
+-(void) handleServerEvent: (NSString*)event data: (NSDictionary*)data transactionId: (NSString*)transaction;
 
 @end
 
