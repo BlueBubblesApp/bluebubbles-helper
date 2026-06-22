@@ -355,26 +355,35 @@ static NSMutableArray* vettedAliases;
             IMMessagePartChatItem *item;
             // sometimes items is an array so we need to account for that
             if ([items isKindOfClass:[NSArray class]]) {
-                for (IMMessagePartChatItem *i in (NSArray *) items) {
+                for (id i in (NSArray *) items) {
                     // IMAggregateAttachmentMessagePartChatItem is a photo gallery and has subparts
                     // Only available Monterey+, use reference to class loaded at runtime to avoid crashes on Big Sur
                     Class cls = NSClassFromString(@"IMAggregateAttachmentMessagePartChatItem");
-                    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && [i isKindOfClass:cls]) {
-                        IMAggregateAttachmentMessagePartChatItem *aggregate = i;
+                    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && cls != nil && [i isKindOfClass:cls]) {
+                        IMAggregateAttachmentMessagePartChatItem *aggregate = (IMAggregateAttachmentMessagePartChatItem *)i;
                         for (IMMessagePartChatItem *i2 in [aggregate aggregateAttachmentParts]) {
                             if ([i2 index] == [data[@"partIndex"] integerValue]) {
                                 item = i2;
                                 break;
                             }
                         }
-                    } else {
-                        if ([i index] == [data[@"partIndex"] integerValue]) {
-                            item = i;
+                    } else if ([i isKindOfClass:[IMMessagePartChatItem class]]) {
+                        // Only message-part chat items have an -index/-messagePartRange. macOS 26
+                        // (Tahoe) started returning other chat-item kinds here (e.g. IMTypingChatItem),
+                        // which do NOT respond to -index — sending -index to them throws
+                        // "unrecognized selector" and aborts Messages. Skip anything that isn't a
+                        // message-part item.
+                        IMMessagePartChatItem *mpi = (IMMessagePartChatItem *)i;
+                        if ([mpi index] == [data[@"partIndex"] integerValue]) {
+                            item = mpi;
                             break;
                         }
                     }
                 }
-            } else {
+            } else if ([items isKindOfClass:[IMMessagePartChatItem class]]) {
+                // Single object (not an array). Guard the cast: on Tahoe this can be a
+                // non-message chat item (e.g. IMTypingChatItem) that would later crash
+                // IMCreateThreadIdentifierForMessagePartChatItem().
                 item = (IMMessagePartChatItem *)items;
             }
 
@@ -1090,26 +1099,35 @@ static NSMutableArray* vettedAliases;
             IMMessagePartChatItem *item;
             // sometimes items is an array so we need to account for that
             if ([items isKindOfClass:[NSArray class]]) {
-                for (IMMessagePartChatItem *i in (NSArray *) items) {
+                for (id i in (NSArray *) items) {
                     // IMAggregateAttachmentMessagePartChatItem is a photo gallery and has subparts
                     // Only available Monterey+, use reference to class loaded at runtime to avoid crashes on Big Sur
                     Class cls = NSClassFromString(@"IMAggregateAttachmentMessagePartChatItem");
-                    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && [i isKindOfClass:cls]) {
-                        IMAggregateAttachmentMessagePartChatItem *aggregate = i;
+                    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && cls != nil && [i isKindOfClass:cls]) {
+                        IMAggregateAttachmentMessagePartChatItem *aggregate = (IMAggregateAttachmentMessagePartChatItem *)i;
                         for (IMMessagePartChatItem *i2 in [aggregate aggregateAttachmentParts]) {
                             if ([i2 index] == [data[@"partIndex"] integerValue]) {
                                 item = i2;
                                 break;
                             }
                         }
-                    } else {
-                        if ([i index] == [data[@"partIndex"] integerValue]) {
-                            item = i;
+                    } else if ([i isKindOfClass:[IMMessagePartChatItem class]]) {
+                        // Only message-part chat items have an -index/-messagePartRange. macOS 26
+                        // (Tahoe) started returning other chat-item kinds here (e.g. IMTypingChatItem),
+                        // which do NOT respond to -index — sending -index to them throws
+                        // "unrecognized selector" and aborts Messages. Skip anything that isn't a
+                        // message-part item.
+                        IMMessagePartChatItem *mpi = (IMMessagePartChatItem *)i;
+                        if ([mpi index] == [data[@"partIndex"] integerValue]) {
+                            item = mpi;
                             break;
                         }
                     }
                 }
-            } else {
+            } else if ([items isKindOfClass:[IMMessagePartChatItem class]]) {
+                // Single object (not an array). Guard the cast: on Tahoe this can be a
+                // non-message chat item (e.g. IMTypingChatItem) that would later crash
+                // IMCreateThreadIdentifierForMessagePartChatItem().
                 item = (IMMessagePartChatItem *)items;
             }
             if (data[@"reactionType"] != [NSNull null] && [data[@"reactionType"] length] != 0) {
@@ -1157,7 +1175,11 @@ static NSMutableArray* vettedAliases;
                 // either reply to an existing thread or create a new thread
                 if (message.threadIdentifier != nil) {
                     identifier = message.threadIdentifier;
-                } else if (item != nil) {
+                } else if (item != nil && [item isKindOfClass:[IMMessagePartChatItem class]]) {
+                    // Guard: IMCreateThreadIdentifierForMessagePartChatItem() sends -index to
+                    // the item; on macOS 26 (Tahoe) a non-message chat item here (e.g.
+                    // IMTypingChatItem) throws "unrecognized selector" and aborts Messages.
+                    // If we don't have a real message-part item, just send without threading.
                     identifier = IMCreateThreadIdentifierForMessagePartChatItem(item);
                 }
                 createMessage(attributedString, subjectAttributedString, effectId, identifier, nil, nil, NSMakeRange(0, 0), nil, transfers, isAudioMessage, ddScan);
