@@ -356,6 +356,11 @@ static NSMutableArray* vettedAliases;
             // sometimes items is an array so we need to account for that
             if ([items isKindOfClass:[NSArray class]]) {
                 for (IMMessagePartChatItem *i in (NSArray *) items) {
+                    // macOS 26 (Tahoe): _newChatItems may include IMMessageAcknowledgmentChatItem
+                    // instances, which inherit from IMChatItem (not IMMessagePartChatItem) and do not
+                    // respond to -index. Calling [i index] on those throws an unrecognized selector
+                    // exception that crashes Messages. Skip any chat item that isn't part-indexable.
+                    if (![i respondsToSelector:@selector(index)]) { continue; }
                     // IMAggregateAttachmentMessagePartChatItem is a photo gallery and has subparts
                     // Only available Monterey+, use reference to class loaded at runtime to avoid crashes on Big Sur
                     Class cls = NSClassFromString(@"IMAggregateAttachmentMessagePartChatItem");
@@ -1091,6 +1096,11 @@ static NSMutableArray* vettedAliases;
             // sometimes items is an array so we need to account for that
             if ([items isKindOfClass:[NSArray class]]) {
                 for (IMMessagePartChatItem *i in (NSArray *) items) {
+                    // macOS 26 (Tahoe): _newChatItems may include IMMessageAcknowledgmentChatItem
+                    // instances, which inherit from IMChatItem (not IMMessagePartChatItem) and do not
+                    // respond to -index. Calling [i index] on those throws an unrecognized selector
+                    // exception that crashes Messages. Skip any chat item that isn't part-indexable.
+                    if (![i respondsToSelector:@selector(index)]) { continue; }
                     // IMAggregateAttachmentMessagePartChatItem is a photo gallery and has subparts
                     // Only available Monterey+, use reference to class loaded at runtime to avoid crashes on Big Sur
                     Class cls = NSClassFromString(@"IMAggregateAttachmentMessagePartChatItem");
