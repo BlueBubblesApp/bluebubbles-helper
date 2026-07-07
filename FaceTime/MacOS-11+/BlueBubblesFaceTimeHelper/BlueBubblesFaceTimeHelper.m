@@ -145,6 +145,57 @@ BLUEBUBBLESFACETIMEHELPER *plugin;
     [[NetworkController sharedInstance] sendMessage: @{@"event": @"ft-call-status-changed", @"data": data}];
 }
 
+-(NSArray<TUConversation*>*) conversationCandidatesForManager:(TUConversationManager*)manager {
+    NSMutableArray<TUConversation*> *conversations = [[NSMutableArray alloc] init];
+    NSMutableSet<NSString*> *seen = [[NSMutableSet alloc] init];
+
+    void (^addConversation)(TUConversation*) = ^(TUConversation *convo) {
+        if (convo == nil) return;
+        NSString *uuid = [[convo groupUUID] UUIDString] ?: [[convo UUID] UUIDString] ?: [convo description];
+        if ([seen containsObject:uuid]) return;
+        [seen addObject:uuid];
+        [conversations addObject:convo];
+    };
+
+    for (TUConversation *convo in [manager activeConversations]) {
+        addConversation(convo);
+    }
+
+    if ([manager respondsToSelector:@selector(incomingPendingConversations)]) {
+        for (TUConversation *convo in [manager incomingPendingConversations]) {
+            addConversation(convo);
+        }
+    }
+
+    return conversations;
+}
+
+-(NSDictionary*) conversationDebugDictionary:(TUConversation*)convo {
+    NSMutableArray *pendingMembers = [[NSMutableArray alloc] init];
+    for (TUConversationMember *member in [convo pendingMembers]) {
+        [pendingMembers addObject:@{
+            @"handleUUID": [[[member handle] value] description] ?: [NSNull null],
+            @"description": [member description] ?: [NSNull null],
+            @"joinedFromLetMeIn": [NSNumber numberWithBool:[member joinedFromLetMeIn]],
+            @"dateReceivedLetMeIn": [member dateReceivedLetMeIn] ? [NSNumber numberWithDouble:[[member dateReceivedLetMeIn] timeIntervalSince1970] * 1000] : [NSNull null],
+        }];
+    }
+
+    return @{
+        @"uuid": [[convo UUID] UUIDString] ?: [NSNull null],
+        @"groupUUID": [[convo groupUUID] UUIDString] ?: [NSNull null],
+        @"state": [NSNumber numberWithInteger:[convo state]],
+        @"pendingConversation": [NSNumber numberWithBool:[convo isPendingConversation]],
+        @"hasJoined": [NSNumber numberWithBool:[convo hasJoined]],
+        @"hasReceivedLetMeInRequest": [NSNumber numberWithBool:[convo hasReceivedLetMeInRequest]],
+        @"letMeInRequestState": [NSNumber numberWithInteger:[convo letMeInRequestState]],
+        @"pendingMemberCount": [NSNumber numberWithUnsignedInteger:[[convo pendingMembers] count]],
+        @"remoteMemberCount": [NSNumber numberWithUnsignedInteger:[[convo remoteMembers] count]],
+        @"activeRemoteParticipantCount": [NSNumber numberWithUnsignedInteger:[[convo activeRemoteParticipants] count]],
+        @"pendingMembers": pendingMembers,
+    };
+}
+
 // Run when receiving a new message from the tcp socket
 -(void) handleMessage: (NetworkController*)controller  message:(NSString *)message {
     // The data is in the form of a json string, so we need to convert it to a NSDictionary
@@ -241,6 +292,46 @@ BLUEBUBBLESFACETIMEHELPER *plugin;
                     break;
                 }
             }
+        }
+    } else if ([event isEqualToString:@"admit-any-pending-member"]) {
+        TUConversationManager *manager = [[TUConversationManager alloc] init];
+        NSMutableArray *admittedMembers = [[NSMutableArray alloc] init];
+
+        for (TUConversation *convo in [self conversationCandidatesForManager:manager]) {
+            for (TUConversationMember *member in [convo pendingMembers]) {
+                DLog("BLUEBUBBLESFACETIMEHELPER: approving pending member %{public}@", member);
+                [manager approvePendingMember:member forConversation:convo];
+                [admittedMembers addObject:@{
+                    @"conversationUUID": [[convo groupUUID] UUIDString] ?: [NSNull null],
+                    @"handleUUID": [[[member handle] value] description] ?: [NSNull null],
+                }];
+            }
+        }
+
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{
+                @"transactionId": transaction,
+                @"data": @{
+                    @"admittedCount": @([admittedMembers count]),
+                    @"admittedMembers": admittedMembers,
+                },
+            }];
+        }
+    } else if ([event isEqualToString:@"get-conversation-state"]) {
+        TUConversationManager *manager = [[TUConversationManager alloc] init];
+        NSMutableArray *conversations = [[NSMutableArray alloc] init];
+        for (TUConversation *convo in [self conversationCandidatesForManager:manager]) {
+            [conversations addObject:[self conversationDebugDictionary:convo]];
+        }
+
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{
+                @"transactionId": transaction,
+                @"data": @{
+                    @"conversationCount": @([conversations count]),
+                    @"conversations": conversations,
+                },
+            }];
         }
     } else if ([event isEqualToString:@"get-active-links"]) {
         NSArray<TUConversationLink*>* links = [[[[TUConversationManager alloc] init] activatedConversationLinks] allObjects];
