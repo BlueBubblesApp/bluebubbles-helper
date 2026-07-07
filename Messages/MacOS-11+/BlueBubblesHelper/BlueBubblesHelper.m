@@ -97,6 +97,14 @@ static os_log_t logger;
 static NetworkController *networkController;
 static NSMutableArray* vettedAliases;
 
+static void SendTransactionResponse(NSString *transaction, NSDictionary *extra) {
+    NSMutableDictionary *payload = [NSMutableDictionary dictionaryWithDictionary:(extra ?: @{})];
+    if (transaction != nil) {
+        payload[@"transactionId"] = transaction;
+    }
+    [[NetworkController sharedInstance] sendMessage:payload];
+}
+
 // BlueBubblesHelper is a singleton
 + (instancetype)sharedInstance {
     static BlueBubblesHelper *plugin = nil;
@@ -152,14 +160,14 @@ static NSMutableArray* vettedAliases;
 // Uses the chat registry to get an existing instance of a chat based on the chat guid
 - (IMChat *) getIMChatFromGuid:(NSString *)guid transaction:(NSString *)transaction {
     if (guid == nil) {
-        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Provide a chat GUID! (chatGuid parameter missing)"}];
+        SendTransactionResponse(transaction, @{@"error": @"Provide a chat GUID! (chatGuid parameter missing)"});
         return nil;
     }
 
     IMChat* imChat = [[IMChatRegistry sharedInstance] existingChatWithGUID: guid];
 
     if (imChat == nil) {
-        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Chat does not exist in IMChatRegistry!"}];
+        SendTransactionResponse(transaction, @{@"error": @"Chat does not exist in IMChatRegistry!"});
     }
     return imChat;
 }
@@ -169,7 +177,7 @@ static NSMutableArray* vettedAliases;
 // Uses the chat-kit conversation list to get an existing instance of a chat based on the chat guid
 - (CKConversation *) getCKConversationFromGuid:(NSString *)guid transaction:(NSString *)transaction {
     if (guid == nil) {
-        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Provide a chat GUID! (chatGuid parameter missing)"}];
+        SendTransactionResponse(transaction, @{@"error": @"Provide a chat GUID! (chatGuid parameter missing)"});
         return nil;
     }
 
@@ -179,7 +187,7 @@ static NSMutableArray* vettedAliases;
     CKConversation* ckConversation = [list conversationForExistingChatWithGUID: guid];
 
     if (ckConversation == nil) {
-        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Chat does not exist in CKConversationList!"}];
+        SendTransactionResponse(transaction, @{@"error": @"Chat does not exist in CKConversationList!"});
     }
     return ckConversation;
 }
@@ -194,7 +202,7 @@ static NSMutableArray* vettedAliases;
         [chat setLocalUserIsTyping:isTyping];
         os_log(logger, "Set local user is typing %d on chat %@", isTyping, chatGuid);
         
-        [networkController sendMessage: @{@"transactionId": transaction}];
+        SendTransactionResponse(transaction, nil);
     }
 }
 
@@ -220,7 +228,7 @@ static NSMutableArray* vettedAliases;
         
         os_log(logger, "Set chat read status %d on chat %@", isRead, chatGuid);
 
-        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        SendTransactionResponse(transaction, nil);
     }
 }
 
@@ -238,7 +246,7 @@ static NSMutableArray* vettedAliases;
         
         os_log(logger, "Set new display name '%@' on chat %@", newName, chatGuid);
         
-        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        SendTransactionResponse(transaction, nil);
     }
 }
 
@@ -267,7 +275,7 @@ static NSMutableArray* vettedAliases;
             }
             
             os_log(logger, "%@ participant '%@' to chat %{public}@", isAdding ? @"Added" : @"Removed", chatGuid, address);
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            SendTransactionResponse(transaction, nil);
         } else {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"Failed to find handle!"}];
             os_log(logger, "Failed to find handle '%@' (%@ participant)", address, isAdding ? @"add" : @"remove");
@@ -343,7 +351,7 @@ static NSMutableArray* vettedAliases;
         }];
 
         if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            SendTransactionResponse(transaction, nil);
         }
     // If the server tells us to unsend a message
     } else if ([event isEqualToString:@"unsend-message"]) {
@@ -355,26 +363,35 @@ static NSMutableArray* vettedAliases;
             IMMessagePartChatItem *item;
             // sometimes items is an array so we need to account for that
             if ([items isKindOfClass:[NSArray class]]) {
-                for (IMMessagePartChatItem *i in (NSArray *) items) {
+                for (id i in (NSArray *) items) {
                     // IMAggregateAttachmentMessagePartChatItem is a photo gallery and has subparts
                     // Only available Monterey+, use reference to class loaded at runtime to avoid crashes on Big Sur
                     Class cls = NSClassFromString(@"IMAggregateAttachmentMessagePartChatItem");
-                    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && [i isKindOfClass:cls]) {
-                        IMAggregateAttachmentMessagePartChatItem *aggregate = i;
+                    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && cls != nil && [i isKindOfClass:cls]) {
+                        IMAggregateAttachmentMessagePartChatItem *aggregate = (IMAggregateAttachmentMessagePartChatItem *)i;
                         for (IMMessagePartChatItem *i2 in [aggregate aggregateAttachmentParts]) {
                             if ([i2 index] == [data[@"partIndex"] integerValue]) {
                                 item = i2;
                                 break;
                             }
                         }
-                    } else {
-                        if ([i index] == [data[@"partIndex"] integerValue]) {
-                            item = i;
+                    } else if ([i isKindOfClass:[IMMessagePartChatItem class]]) {
+                        // Only message-part chat items have an -index/-messagePartRange. macOS 26
+                        // (Tahoe) started returning other chat-item kinds here (e.g. IMTypingChatItem),
+                        // which do NOT respond to -index — sending -index to them throws
+                        // "unrecognized selector" and aborts Messages. Skip anything that isn't a
+                        // message-part item.
+                        IMMessagePartChatItem *mpi = (IMMessagePartChatItem *)i;
+                        if ([mpi index] == [data[@"partIndex"] integerValue]) {
+                            item = mpi;
                             break;
                         }
                     }
                 }
-            } else {
+            } else if ([items isKindOfClass:[IMMessagePartChatItem class]]) {
+                // Single object (not an array). Guard the cast: on Tahoe this can be a
+                // non-message chat item (e.g. IMTypingChatItem) that would later crash
+                // IMCreateThreadIdentifierForMessagePartChatItem().
                 item = (IMMessagePartChatItem *)items;
             }
 
@@ -382,7 +399,7 @@ static NSMutableArray* vettedAliases;
         }];
 
         if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            SendTransactionResponse(transaction, nil);
         }
     // If the server tells us to mark a chat as read
     } else if ([event isEqualToString:@"update-chat-pinned"]) {
@@ -443,7 +460,7 @@ static NSMutableArray* vettedAliases;
         if (chat != nil) {
             [[IMChatRegistry sharedInstance] _chat_remove:(chat)];
             if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+                SendTransactionResponse(transaction, nil);
             }
         }
     // If server tells us to delete a message
@@ -453,18 +470,21 @@ static NSMutableArray* vettedAliases;
         if (chat != nil) {
             [BlueBubblesHelper getMessageItem:(chat) :(data[@"messageGuid"]) completionBlock:^(IMMessage *message) {
                 IMMessageItem *messageItem = (IMMessageItem *)message._imMessageItem;
-                NSObject *items = messageItem._newChatItems;
-                IMMessagePartChatItem *item;
-                // sometimes items is an array so we need to account for that
-                if ([items isKindOfClass:[NSArray class]]) {
-                    [chat deleteChatItems:(items)];
-                } else {
-                    [chat deleteChatItems:(@[items])];
+                // Use deleteIMMessageItems: (whole-message delete) rather than
+                // deleteChatItems: (message-parts delete). The latter hits
+                // IMCore's "delete subset of chat items from message → update
+                // message" path which leaves the row in place; only
+                // deleteIMMessageItems: actually removes the message and
+                // writes to sync_deleted_messages so the delete propagates
+                // via iCloud. Observed on macOS 26 Tahoe; previously the
+                // API returned 200 but chat.db was unchanged.
+                if (messageItem != nil) {
+                    [chat deleteIMMessageItems:@[messageItem]];
                 }
             }];
 
             if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+                SendTransactionResponse(transaction, nil);
             }
         }
     // If the server tells us to send a single attachment
@@ -567,7 +587,7 @@ static NSMutableArray* vettedAliases;
             [chat sendGroupPhotoUpdate:nil];
         }
         if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            SendTransactionResponse(transaction, nil);
         }
     // If server tells us to leave a chat
    } else if ([event isEqualToString:@"leave-chat"]) {
@@ -580,7 +600,7 @@ static NSMutableArray* vettedAliases;
                     [chat leaveiMessageGroup];
                 }
                 if (transaction != nil) {
-                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+                    SendTransactionResponse(transaction, nil);
                 }
             } @catch (NSException *e) {
                 DLog("BLUEBUBBLESHELPER: Leave chat exception: %@", e);
@@ -629,7 +649,7 @@ static NSMutableArray* vettedAliases;
             if (item != nil) {
                 [chat markChatItemAsNotifyRecipient:item];
                 if (transaction != nil) {
-                    [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+                    SendTransactionResponse(transaction, nil);
                 }
             }
         }];
@@ -671,7 +691,7 @@ static NSMutableArray* vettedAliases;
         [[IMFileTransferCenter sharedInstance] registerTransferWithDaemon:([transfer guid])];
         [[IMFileTransferCenter sharedInstance] acceptTransfer:([transfer guid])];
         if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            SendTransactionResponse(transaction, nil);
         }
     // If the server asks us if the chat can have a nickname shared
     } else if ([event isEqualToString:@"should-offer-nickname-sharing"]) {
@@ -691,7 +711,7 @@ static NSMutableArray* vettedAliases;
             [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] forChat:chat];
         }
         if (transaction != nil) {
-            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+            SendTransactionResponse(transaction, nil);
         }
     // If the server tells us to get nickname info
     } else if ([event isEqualToString:@"get-nickname-info"]) {
@@ -747,7 +767,7 @@ static NSMutableArray* vettedAliases;
             [account setDisplayName:alias];
             
             if (transaction != nil) {
-                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+                SendTransactionResponse(transaction, nil);
             }
         } else {
             DLog("BLUEBUBBLESHELPER: Can't modify aliases, account not enabled");
@@ -1090,26 +1110,35 @@ static NSMutableArray* vettedAliases;
             IMMessagePartChatItem *item;
             // sometimes items is an array so we need to account for that
             if ([items isKindOfClass:[NSArray class]]) {
-                for (IMMessagePartChatItem *i in (NSArray *) items) {
+                for (id i in (NSArray *) items) {
                     // IMAggregateAttachmentMessagePartChatItem is a photo gallery and has subparts
                     // Only available Monterey+, use reference to class loaded at runtime to avoid crashes on Big Sur
                     Class cls = NSClassFromString(@"IMAggregateAttachmentMessagePartChatItem");
-                    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && [i isKindOfClass:cls]) {
-                        IMAggregateAttachmentMessagePartChatItem *aggregate = i;
+                    if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && cls != nil && [i isKindOfClass:cls]) {
+                        IMAggregateAttachmentMessagePartChatItem *aggregate = (IMAggregateAttachmentMessagePartChatItem *)i;
                         for (IMMessagePartChatItem *i2 in [aggregate aggregateAttachmentParts]) {
                             if ([i2 index] == [data[@"partIndex"] integerValue]) {
                                 item = i2;
                                 break;
                             }
                         }
-                    } else {
-                        if ([i index] == [data[@"partIndex"] integerValue]) {
-                            item = i;
+                    } else if ([i isKindOfClass:[IMMessagePartChatItem class]]) {
+                        // Only message-part chat items have an -index/-messagePartRange. macOS 26
+                        // (Tahoe) started returning other chat-item kinds here (e.g. IMTypingChatItem),
+                        // which do NOT respond to -index — sending -index to them throws
+                        // "unrecognized selector" and aborts Messages. Skip anything that isn't a
+                        // message-part item.
+                        IMMessagePartChatItem *mpi = (IMMessagePartChatItem *)i;
+                        if ([mpi index] == [data[@"partIndex"] integerValue]) {
+                            item = mpi;
                             break;
                         }
                     }
                 }
-            } else {
+            } else if ([items isKindOfClass:[IMMessagePartChatItem class]]) {
+                // Single object (not an array). Guard the cast: on Tahoe this can be a
+                // non-message chat item (e.g. IMTypingChatItem) that would later crash
+                // IMCreateThreadIdentifierForMessagePartChatItem().
                 item = (IMMessagePartChatItem *)items;
             }
             if (data[@"reactionType"] != [NSNull null] && [data[@"reactionType"] length] != 0) {
@@ -1157,7 +1186,11 @@ static NSMutableArray* vettedAliases;
                 // either reply to an existing thread or create a new thread
                 if (message.threadIdentifier != nil) {
                     identifier = message.threadIdentifier;
-                } else if (item != nil) {
+                } else if (item != nil && [item isKindOfClass:[IMMessagePartChatItem class]]) {
+                    // Guard: IMCreateThreadIdentifierForMessagePartChatItem() sends -index to
+                    // the item; on macOS 26 (Tahoe) a non-message chat item here (e.g.
+                    // IMTypingChatItem) throws "unrecognized selector" and aborts Messages.
+                    // If we don't have a real message-part item, just send without threading.
                     identifier = IMCreateThreadIdentifierForMessagePartChatItem(item);
                 }
                 createMessage(attributedString, subjectAttributedString, effectId, identifier, nil, nil, NSMakeRange(0, 0), nil, transfers, isAudioMessage, ddScan);
