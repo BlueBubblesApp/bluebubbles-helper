@@ -3,7 +3,7 @@
 #import <os/log.h>
 #import <unistd.h>
 
-#import "FindMyFriendsHelper.h"
+#import "FindMyHelper.h"
 
 static const uint16_t BBPrivateApiBasePort = 45670;
 static const uint16_t BBMaximumPort = UINT16_MAX;
@@ -153,7 +153,7 @@ static os_log_t connectionLog;
     os_log(connectionLog, "Connected to BlueBubbles Server on port %{public}hu", port);
     [self sendMessage:@{
         @"event": @"ping",
-        @"message": @"Find My Friends helper connected",
+        @"message": @"Find My helper connected",
         @"process": [[NSBundle mainBundle] bundleIdentifier] ?: BBFindMyBundleIdentifier,
     }];
     [self flushPendingMessages];
@@ -175,8 +175,8 @@ static os_log_t connectionLog;
     NSString *transactionIdentifier = [serverMessage[@"transactionId"] isKindOfClass:[NSString class]]
         ? serverMessage[@"transactionId"] : nil;
 
-    [[FindMyFriendsHelper sharedInstance] handleServerAction:action
-                                      transactionIdentifier:transactionIdentifier];
+    [[FindMyHelper sharedInstance] handleServerAction:action
+                               transactionIdentifier:transactionIdentifier];
 }
 
 - (void)socketDidDisconnect:(GCDAsyncSocket *)socket withError:(nullable NSError *)error {

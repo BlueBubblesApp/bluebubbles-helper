@@ -1,7 +1,9 @@
 #import <Foundation/Foundation.h>
 
 #import "FindMyFriendPayload.h"
-#import "FindMyFriendsHelper.h"
+#import "FindMyDevicesDataSourceCapture.h"
+#import "FindMyDevicesRefreshCoordinator.h"
+#import "FindMyHelper.h"
 #import "FindMyFriendsRefreshCoordinator.h"
 #import "ServerConnection.h"
 
@@ -129,10 +131,23 @@
 
 @end
 
-@implementation FindMyFriendsHelper
+@interface FMDevicesListDataSource : NSObject
+@property(nonatomic) NSUInteger rowCountCallCount;
+@end
+
+@implementation FMDevicesListDataSource
+
+- (NSInteger)tableView:(id __unused)tableView numberOfRowsInSection:(NSInteger)section {
+    self.rowCountCallCount += 1;
+    return section + 7;
+}
+
+@end
+
+@implementation FindMyHelper
 
 + (instancetype)sharedInstance {
-    static FindMyFriendsHelper *helper = nil;
+    static FindMyHelper *helper = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         helper = [[self alloc] init];
@@ -466,6 +481,84 @@ static void BBTestReconnectQueue(void) {
     BBAssert(firstSocket.recordedWrites.count == 2, @"a stale socket callback must not register or flush again");
 }
 
+static void BBTestDeviceDataSourceReadiness(void) {
+    NSObject *dataSource = [[NSObject alloc] init];
+    __block id availableDataSource = nil;
+    NSMutableArray<NSDictionary *> *capturedResponses = [[NSMutableArray alloc] init];
+    FindMyDevicesRefreshCoordinator *coordinator = [[FindMyDevicesRefreshCoordinator alloc]
+        initWithTransactionIdentifier:@"devices-ready"
+        dataSourceTimeout:0.05
+        pollInterval:0.001
+        dataSourceProvider:^id _Nullable {
+            return availableDataSource;
+        }
+        snapshotProvider:^NSDictionary *(id capturedDataSource) {
+            BBAssert(capturedDataSource == dataSource, @"the captured Devices data source must reach the snapshot");
+            return @{
+                @"devices": @[],
+                @"partial": @NO,
+                @"skippedDevices": @0,
+            };
+        }
+        responseHandler:^(NSDictionary *response) {
+            [capturedResponses addObject:response];
+        }];
+    [coordinator start];
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.005 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        availableDataSource = dataSource;
+    });
+
+    BBAssert(BBWaitUntil(^BOOL { return capturedResponses.count == 1; }, 0.2),
+             @"Devices refresh must wait for the app-owned data source");
+    BBAssert([capturedResponses.firstObject[@"transactionId"] isEqualToString:@"devices-ready"],
+             @"Devices refresh must preserve its transaction identifier");
+    BBAssert([capturedResponses.firstObject[@"devices"] count] == 0,
+             @"an empty initialized Devices collection must be a valid response");
+}
+
+static void BBTestDeviceDataSourceCapture(void) {
+    FindMyDevicesDataSourceCapture *capture = [FindMyDevicesDataSourceCapture sharedInstance];
+    [capture installCapture];
+
+    __weak FMDevicesListDataSource *releasedDataSource = nil;
+    @autoreleasepool {
+        FMDevicesListDataSource *dataSource = [[FMDevicesListDataSource alloc] init];
+        releasedDataSource = dataSource;
+
+        NSInteger rowCount = [dataSource tableView:nil numberOfRowsInSection:2];
+        BBAssert(rowCount == 9, @"Devices capture must preserve the original row-count result");
+        BBAssert(dataSource.rowCountCallCount == 1, @"Devices capture must forward to the original method once");
+        BBAssert(capture.devicesDataSource == dataSource, @"Devices capture must retain the current weak reference");
+    }
+
+    BBAssert(releasedDataSource == nil, @"the mock Devices data source must be released after its owner exits");
+    BBAssert(capture.devicesDataSource == nil, @"Devices capture must not extend the data-source lifetime");
+}
+
+static void BBTestDeviceDataSourceTimeout(void) {
+    NSMutableArray<NSDictionary *> *capturedResponses = [[NSMutableArray alloc] init];
+    FindMyDevicesRefreshCoordinator *coordinator = [[FindMyDevicesRefreshCoordinator alloc]
+        initWithTransactionIdentifier:@"devices-timeout"
+        dataSourceTimeout:0.005
+        pollInterval:0.001
+        dataSourceProvider:^id _Nullable {
+            return nil;
+        }
+        snapshotProvider:^NSDictionary *(id __unused dataSource) {
+            return @{};
+        }
+        responseHandler:^(NSDictionary *response) {
+            [capturedResponses addObject:response];
+        }];
+    [coordinator start];
+
+    BBAssert(BBWaitUntil(^BOOL { return capturedResponses.count == 1; }, 0.2),
+             @"Devices refresh must terminate when its data source never appears");
+    BBAssert([capturedResponses.firstObject[@"error"] isKindOfClass:[NSString class]],
+             @"a missing Devices data source must return an explicit error");
+}
+
 int main(void) {
     @autoreleasepool {
         BBTestPayload();
@@ -477,6 +570,9 @@ int main(void) {
         BBTestCachedAndUpdatedLocationCompletions();
         BBTestNilAndEmptyFriendListResponses();
         BBTestReconnectQueue();
+        BBTestDeviceDataSourceCapture();
+        BBTestDeviceDataSourceReadiness();
+        BBTestDeviceDataSourceTimeout();
         NSLog(@"PASS: FindMyFriendsTests");
     }
 

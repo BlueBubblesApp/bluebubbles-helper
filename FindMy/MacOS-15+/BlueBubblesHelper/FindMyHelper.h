@@ -1,11 +1,11 @@
-#ifndef FindMyFriendsHelper_h
-#define FindMyFriendsHelper_h
+#ifndef FindMyHelper_h
+#define FindMyHelper_h
 
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface FindMyFriendsHelper : NSObject
+@interface FindMyHelper : NSObject
 
 + (instancetype)sharedInstance;
 

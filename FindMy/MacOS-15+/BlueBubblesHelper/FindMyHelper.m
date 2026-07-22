@@ -1,47 +1,55 @@
-#import "FindMyFriendsHelper.h"
+#import "FindMyHelper.h"
 
 #import <os/log.h>
 
 #import "FindMyLocateSession.h"
+#import "FindMyDeviceSnapshotBridge.h"
+#import "FindMyDevicesDataSourceCapture.h"
+#import "FindMyDevicesRefreshCoordinator.h"
 #import "FindMyFriendsRefreshCoordinator.h"
 #import "ServerConnection.h"
 
 static const NSTimeInterval BBConnectionDelaySeconds = 5.0;
 static const NSTimeInterval BBFriendListTimeoutSeconds = 5.0;
 static const NSTimeInterval BBLocationRefreshTimeoutSeconds = 8.0;
+static const NSTimeInterval BBDevicesDataSourceTimeoutSeconds = 5.0;
+static const NSTimeInterval BBDevicesDataSourcePollIntervalSeconds = 0.1;
 
-@interface FindMyFriendsHelper ()
+@interface FindMyHelper ()
 @property(nonatomic, strong, nullable) FindMyLocateSession *activeLocateSession;
-@property(nonatomic, strong) NSMutableSet<FindMyFriendsRefreshCoordinator *> *activeRefreshes;
+@property(nonatomic, strong) NSMutableSet<FindMyFriendsRefreshCoordinator *> *activeFriendRefreshes;
+@property(nonatomic, strong) NSMutableSet<FindMyDevicesRefreshCoordinator *> *activeDeviceRefreshes;
 - (nullable FindMyLocateSession *)locateSession;
 - (void)handleFriendsRefreshForTransactionIdentifier:(nullable NSString *)transactionIdentifier;
+- (void)handleDevicesRefreshForTransactionIdentifier:(nullable NSString *)transactionIdentifier;
 - (void)sendError:(NSString *)errorMessage transactionIdentifier:(nullable NSString *)transactionIdentifier;
 @end
 
-@implementation FindMyFriendsHelper
+@implementation FindMyHelper
 
 static os_log_t helperLog;
 
 - (instancetype)init {
     self = [super init];
     if (self != nil) {
-        _activeRefreshes = [[NSMutableSet alloc] init];
+        _activeFriendRefreshes = [[NSMutableSet alloc] init];
+        _activeDeviceRefreshes = [[NSMutableSet alloc] init];
     }
     return self;
 }
 
 + (instancetype)sharedInstance {
-    static FindMyFriendsHelper *sharedHelper = nil;
+    static FindMyHelper *sharedHelper = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedHelper = [[self alloc] init];
-        helperLog = os_log_create("BlueBubblesFindMyHelper", "friends-helper");
+        helperLog = os_log_create("BlueBubblesFindMyHelper", "helper");
     });
     return sharedHelper;
 }
 
 + (void)load {
-    [FindMyFriendsHelper sharedInstance];
+    [FindMyHelper sharedInstance];
 
     NSString *hostBundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     if (![hostBundleIdentifier isEqualToString:@"com.apple.findmy"]) {
@@ -58,10 +66,13 @@ static os_log_t helperLog;
         (long)operatingSystemVersion.patchVersion
     );
 
+    [[FindMyDevicesDataSourceCapture sharedInstance] installCapture];
+
     dispatch_after(
         dispatch_time(DISPATCH_TIME_NOW, (int64_t)(BBConnectionDelaySeconds * NSEC_PER_SEC)),
         dispatch_get_main_queue(),
         ^{
+            [[FindMyDevicesDataSourceCapture sharedInstance] installCapture];
             [[ServerConnection sharedInstance] connect];
         }
     );
@@ -71,6 +82,11 @@ static os_log_t helperLog;
      transactionIdentifier:(nullable NSString *)transactionIdentifier {
     if ([action isEqualToString:@"refresh-findmy-friends"]) {
         [self handleFriendsRefreshForTransactionIdentifier:transactionIdentifier];
+        return;
+    }
+
+    if ([action isEqualToString:@"refresh-findmy-devices"]) {
+        [self handleDevicesRefreshForTransactionIdentifier:transactionIdentifier];
         return;
     }
 
@@ -154,13 +170,42 @@ static os_log_t helperLog;
         locationRefreshTimeout:BBLocationRefreshTimeoutSeconds
         responseHandler:^(NSDictionary *response) {
             [[ServerConnection sharedInstance] sendMessage:response];
-            FindMyFriendsHelper *strongSelf = weakSelf;
+            FindMyHelper *strongSelf = weakSelf;
             if (strongSelf != nil && weakCoordinator != nil) {
-                [strongSelf.activeRefreshes removeObject:weakCoordinator];
+                [strongSelf.activeFriendRefreshes removeObject:weakCoordinator];
             }
         }];
     weakCoordinator = coordinator;
-    [self.activeRefreshes addObject:coordinator];
+    [self.activeFriendRefreshes addObject:coordinator];
+    [coordinator start];
+}
+
+- (void)handleDevicesRefreshForTransactionIdentifier:(nullable NSString *)transactionIdentifier {
+    FindMyDevicesDataSourceCapture *dataSourceCapture = [FindMyDevicesDataSourceCapture sharedInstance];
+    [dataSourceCapture installCapture];
+
+    __weak typeof(self) weakSelf = self;
+    __block __weak FindMyDevicesRefreshCoordinator *weakCoordinator = nil;
+    FindMyDevicesRefreshCoordinator *coordinator = [[FindMyDevicesRefreshCoordinator alloc]
+        initWithTransactionIdentifier:transactionIdentifier
+        dataSourceTimeout:BBDevicesDataSourceTimeoutSeconds
+        pollInterval:BBDevicesDataSourcePollIntervalSeconds
+        dataSourceProvider:^id _Nullable {
+            [dataSourceCapture installCapture];
+            return dataSourceCapture.devicesDataSource;
+        }
+        snapshotProvider:^NSDictionary *(id dataSource) {
+            return [FindMyDeviceSnapshotBridge snapshotForDataSource:dataSource];
+        }
+        responseHandler:^(NSDictionary *response) {
+            [[ServerConnection sharedInstance] sendMessage:response];
+            FindMyHelper *strongSelf = weakSelf;
+            if (strongSelf != nil && weakCoordinator != nil) {
+                [strongSelf.activeDeviceRefreshes removeObject:weakCoordinator];
+            }
+        }];
+    weakCoordinator = coordinator;
+    [self.activeDeviceRefreshes addObject:coordinator];
     [coordinator start];
 }
 

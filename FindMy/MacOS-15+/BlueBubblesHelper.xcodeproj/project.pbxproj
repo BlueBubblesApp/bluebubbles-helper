@@ -7,27 +7,40 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A62991D12972106200B7E663 /* FindMyFriendsHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* FindMyFriendsHelper.m */; };
+		A62991D12972106200B7E663 /* FindMyHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* FindMyHelper.m */; };
 		A62991D22972106500B7E663 /* ServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* ServerConnection.m */; };
 		A62991D7297210A500B7E663 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A62991D6297210A500B7E663 /* Foundation.framework */; };
 		BBF100000000000000000001 /* FindMyFriendPayload.m in Sources */ = {isa = PBXBuildFile; fileRef = BBF100000000000000000003 /* FindMyFriendPayload.m */; };
 		BBF200000000000000000001 /* FindMyFriendsRefreshCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = BBF200000000000000000003 /* FindMyFriendsRefreshCoordinator.m */; };
+		BBD100000000000000000001 /* FindMyDevicesDataSourceCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = BBD100000000000000000003 /* FindMyDevicesDataSourceCapture.m */; };
+		BBD200000000000000000001 /* FindMyDeviceSnapshotBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = BBD200000000000000000003 /* FindMyDeviceSnapshotBridge.m */; };
+		BBD300000000000000000001 /* FindMyDevicesRefreshCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = BBD300000000000000000003 /* FindMyDevicesRefreshCoordinator.m */; };
+		BBD400000000000000000001 /* FindMyDeviceSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBD400000000000000000002 /* FindMyDeviceSnapshot.swift */; };
+		BBD500000000000000000001 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBD500000000000000000002 /* CoreLocation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper DyLib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		72EF502B6438F8F18EC16DBF /* Pods-BlueBubblesHelper DyLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.release.xcconfig"; sourceTree = "<group>"; };
-		93AC09CB2565E45F0000C60C /* FindMyFriendsHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FindMyFriendsHelper.m; sourceTree = "<group>"; };
+		93AC09CB2565E45F0000C60C /* FindMyHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FindMyHelper.m; sourceTree = "<group>"; };
 		93FD99392568E7360060D430 /* ServerConnection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ServerConnection.m; sourceTree = "<group>"; };
 		93FD993D2568E7500060D430 /* ServerConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ServerConnection.h; sourceTree = "<group>"; };
 		A62991CB29720FAC00B7E663 /* BlueBubblesFindMyHelper.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BlueBubblesFindMyHelper.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		A62991D6297210A500B7E663 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		A67F85DA2FA7EB4300F04596 /* FindMyFriendsHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindMyFriendsHelper.h; sourceTree = "<group>"; };
+		A67F85DA2FA7EB4300F04596 /* FindMyHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindMyHelper.h; sourceTree = "<group>"; };
 		A69960F12B2005100081FB69 /* FindMyLocateSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindMyLocateSession.h; sourceTree = "<group>"; };
 		BBF100000000000000000002 /* FindMyFriendPayload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindMyFriendPayload.h; sourceTree = "<group>"; };
 		BBF100000000000000000003 /* FindMyFriendPayload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FindMyFriendPayload.m; sourceTree = "<group>"; };
 		BBF200000000000000000002 /* FindMyFriendsRefreshCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindMyFriendsRefreshCoordinator.h; sourceTree = "<group>"; };
 		BBF200000000000000000003 /* FindMyFriendsRefreshCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FindMyFriendsRefreshCoordinator.m; sourceTree = "<group>"; };
+		BBD100000000000000000002 /* FindMyDevicesDataSourceCapture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindMyDevicesDataSourceCapture.h; sourceTree = "<group>"; };
+		BBD100000000000000000003 /* FindMyDevicesDataSourceCapture.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FindMyDevicesDataSourceCapture.m; sourceTree = "<group>"; };
+		BBD200000000000000000002 /* FindMyDeviceSnapshotBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindMyDeviceSnapshotBridge.h; sourceTree = "<group>"; };
+		BBD200000000000000000003 /* FindMyDeviceSnapshotBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FindMyDeviceSnapshotBridge.m; sourceTree = "<group>"; };
+		BBD300000000000000000002 /* FindMyDevicesRefreshCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindMyDevicesRefreshCoordinator.h; sourceTree = "<group>"; };
+		BBD300000000000000000003 /* FindMyDevicesRefreshCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FindMyDevicesRefreshCoordinator.m; sourceTree = "<group>"; };
+		BBD400000000000000000002 /* FindMyDeviceSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindMyDeviceSnapshot.swift; sourceTree = "<group>"; };
+		BBD500000000000000000002 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		AE20B1F38F795C02536396EA /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.debug.xcconfig"; sourceTree = "<group>"; };
 		FBCE4EC4201C0F4D002F8A61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -38,6 +51,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A62991D7297210A500B7E663 /* Foundation.framework in Frameworks */,
+				BBD500000000000000000001 /* CoreLocation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +98,7 @@
 			isa = PBXGroup;
 			children = (
 				A62991D6297210A500B7E663 /* Foundation.framework */,
+				BBD500000000000000000002 /* CoreLocation.framework */,
 				2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */,
 			);
 			name = Frameworks;
@@ -99,8 +114,15 @@
 				BBF100000000000000000003 /* FindMyFriendPayload.m */,
 				BBF200000000000000000002 /* FindMyFriendsRefreshCoordinator.h */,
 				BBF200000000000000000003 /* FindMyFriendsRefreshCoordinator.m */,
-				93AC09CB2565E45F0000C60C /* FindMyFriendsHelper.m */,
-				A67F85DA2FA7EB4300F04596 /* FindMyFriendsHelper.h */,
+				BBD100000000000000000002 /* FindMyDevicesDataSourceCapture.h */,
+				BBD100000000000000000003 /* FindMyDevicesDataSourceCapture.m */,
+				BBD200000000000000000002 /* FindMyDeviceSnapshotBridge.h */,
+				BBD200000000000000000003 /* FindMyDeviceSnapshotBridge.m */,
+				BBD300000000000000000002 /* FindMyDevicesRefreshCoordinator.h */,
+				BBD300000000000000000003 /* FindMyDevicesRefreshCoordinator.m */,
+				BBD400000000000000000002 /* FindMyDeviceSnapshot.swift */,
+				93AC09CB2565E45F0000C60C /* FindMyHelper.m */,
+				A67F85DA2FA7EB4300F04596 /* FindMyHelper.h */,
 			);
 			path = BlueBubblesHelper;
 			sourceTree = "<group>";
@@ -182,7 +204,11 @@
 				A62991D22972106500B7E663 /* ServerConnection.m in Sources */,
 				BBF100000000000000000001 /* FindMyFriendPayload.m in Sources */,
 				BBF200000000000000000001 /* FindMyFriendsRefreshCoordinator.m in Sources */,
-				A62991D12972106200B7E663 /* FindMyFriendsHelper.m in Sources */,
+				BBD100000000000000000001 /* FindMyDevicesDataSourceCapture.m in Sources */,
+				BBD200000000000000000001 /* FindMyDeviceSnapshotBridge.m in Sources */,
+				BBD300000000000000000001 /* FindMyDevicesRefreshCoordinator.m in Sources */,
+				BBD400000000000000000001 /* FindMyDeviceSnapshot.swift in Sources */,
+				A62991D12972106200B7E663 /* FindMyHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,6 +247,7 @@
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
 				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -255,6 +282,7 @@
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
 				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

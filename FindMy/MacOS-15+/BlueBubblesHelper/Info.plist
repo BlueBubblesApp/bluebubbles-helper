@@ -27,7 +27,7 @@
 	<key>LSMinimumSystemVersion</key>
 	<string>15.0</string>
 	<key>NSPrincipalClass</key>
-	<string>FindMyFriendsHelper</string>
+	<string>FindMyHelper</string>
 	<key>SIMBLTargetApplications</key>
 	<array>
 		<dict>

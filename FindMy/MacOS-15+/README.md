@@ -1,14 +1,18 @@
-# Find My Friends helper (macOS 15+)
+# Find My helper (macOS 15+)
 
-This target injects into `com.apple.findmy` and reads the People data exposed by
-`FindMyLocateObjCWrapper.framework`. It is the helper half of the newer-macOS
-Find My Friends integration in BlueBubbles Server.
+This target injects into `com.apple.findmy` and supports Friends and Devices on
+newer macOS releases. Friends use `FindMyLocateObjCWrapper.framework`. Devices
+come from the app-owned FMIP object graph:
+
+```text
+FMDevicesListDataSource -> mediator -> devicesProvider -> fmipManager -> dataManager -> devices
+```
 
 The implementation intentionally exports an allowlisted payload. It does not
 send private-framework `description` or `debugDescription` strings over the
 socket.
 
-## Response contract
+## Friends response
 
 `refresh-findmy-friends` returns:
 
@@ -33,6 +37,21 @@ obtained a newer fix: valid cached or shallow locations retain their original
 timestamp and status. The helper does not replace timestamps with the request
 time or promote cached records to `live`. A new location fix is demonstrated by
 new native location data, separately from a completed RPC or callback.
+
+## Devices response
+
+`refresh-findmy-devices` returns:
+
+- `devices`: deterministic records with stable identity, model, OS, battery,
+  connection state, address, and location fields when available
+- `partial`: whether an FMIP record was skipped because it had no stable
+  identifier
+- `skippedDevices`: number of skipped records
+
+The helper captures only `FMDevicesListDataSource` and uses Swift reflection to
+read its existing FMIP manager. It does not create another manager or depend on
+visible list cells. Offline devices remain in the response without a fabricated
+location.
 
 ## Build
 
@@ -62,8 +81,9 @@ My:
 ```
 
 They cover stable-handle selection, missing and live locations, allowlisted
-fields, deterministic ordering, friend-list and per-handle timeouts, duplicate
-and late callbacks, and response delivery across a server reconnect.
+fields, deterministic ordering, friend-list and per-handle timeouts, device
+data-source readiness, populated/offline/empty/partial device snapshots,
+duplicate and late callbacks, and response delivery across a server reconnect.
 
 A separate executable compiles the production helper entry point and refresh
 coordinators with fake transport and private-framework providers. It checks
