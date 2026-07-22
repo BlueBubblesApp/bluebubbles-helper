@@ -1,0 +1,7 @@
+platform :macos, '15.0'
+
+target 'BlueBubblesHelper DyLib' do
+  pod 'CocoaAsyncSocket'
+end
+
+workspace 'BlueBubblesHelper'
