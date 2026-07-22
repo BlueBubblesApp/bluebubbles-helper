@@ -1,0 +1,395 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A62991D12972106200B7E663 /* FindMyFriendsHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* FindMyFriendsHelper.m */; };
+		A62991D22972106500B7E663 /* ServerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FD99392568E7360060D430 /* ServerConnection.m */; };
+		A62991D7297210A500B7E663 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A62991D6297210A500B7E663 /* Foundation.framework */; };
+		BBF100000000000000000001 /* FindMyFriendPayload.m in Sources */ = {isa = PBXBuildFile; fileRef = BBF100000000000000000003 /* FindMyFriendPayload.m */; };
+		BBF200000000000000000001 /* FindMyFriendsRefreshCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = BBF200000000000000000003 /* FindMyFriendsRefreshCoordinator.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper DyLib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		72EF502B6438F8F18EC16DBF /* Pods-BlueBubblesHelper DyLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.release.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.release.xcconfig"; sourceTree = "<group>"; };
+		93AC09CB2565E45F0000C60C /* FindMyFriendsHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FindMyFriendsHelper.m; sourceTree = "<group>"; };
+		93FD99392568E7360060D430 /* ServerConnection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ServerConnection.m; sourceTree = "<group>"; };
+		93FD993D2568E7500060D430 /* ServerConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ServerConnection.h; sourceTree = "<group>"; };
+		A62991CB29720FAC00B7E663 /* BlueBubblesFindMyHelper.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = BlueBubblesFindMyHelper.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		A62991D6297210A500B7E663 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		A67F85DA2FA7EB4300F04596 /* FindMyFriendsHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindMyFriendsHelper.h; sourceTree = "<group>"; };
+		A69960F12B2005100081FB69 /* FindMyLocateSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindMyLocateSession.h; sourceTree = "<group>"; };
+		BBF100000000000000000002 /* FindMyFriendPayload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindMyFriendPayload.h; sourceTree = "<group>"; };
+		BBF100000000000000000003 /* FindMyFriendPayload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FindMyFriendPayload.m; sourceTree = "<group>"; };
+		BBF200000000000000000002 /* FindMyFriendsRefreshCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindMyFriendsRefreshCoordinator.h; sourceTree = "<group>"; };
+		BBF200000000000000000003 /* FindMyFriendsRefreshCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FindMyFriendsRefreshCoordinator.m; sourceTree = "<group>"; };
+		AE20B1F38F795C02536396EA /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlueBubblesHelper DyLib.debug.xcconfig"; path = "Target Support Files/Pods-BlueBubblesHelper DyLib/Pods-BlueBubblesHelper DyLib.debug.xcconfig"; sourceTree = "<group>"; };
+		FBCE4EC4201C0F4D002F8A61 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A62991C929720FAC00B7E663 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A62991D7297210A500B7E663 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0D15172D954906F948D51F4C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				AE20B1F38F795C02536396EA /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */,
+				72EF502B6438F8F18EC16DBF /* Pods-BlueBubblesHelper DyLib.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		93FD99382568E7230060D430 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				93FD99392568E7360060D430 /* ServerConnection.m */,
+				93FD993D2568E7500060D430 /* ServerConnection.h */,
+			);
+			name = Networking;
+			sourceTree = "<group>";
+		};
+		FBCE4EB2201C0F4D002F8A61 = {
+			isa = PBXGroup;
+			children = (
+				FBCE4EC2201C0F4D002F8A61 /* BlueBubblesHelper */,
+				FBCE4EBD201C0F4D002F8A61 /* Frameworks */,
+				FBCE4EBC201C0F4D002F8A61 /* Products */,
+				0D15172D954906F948D51F4C /* Pods */,
+			);
+			sourceTree = "<group>";
+		};
+		FBCE4EBC201C0F4D002F8A61 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A62991CB29720FAC00B7E663 /* BlueBubblesFindMyHelper.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FBCE4EBD201C0F4D002F8A61 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A62991D6297210A500B7E663 /* Foundation.framework */,
+				2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FBCE4EC2201C0F4D002F8A61 /* BlueBubblesHelper */ = {
+			isa = PBXGroup;
+			children = (
+				93FD99382568E7230060D430 /* Networking */,
+				FBCE4EDB201C264F002F8A61 /* Find My */,
+				FBCE4EC3201C0F4D002F8A61 /* Supporting Files */,
+				BBF100000000000000000002 /* FindMyFriendPayload.h */,
+				BBF100000000000000000003 /* FindMyFriendPayload.m */,
+				BBF200000000000000000002 /* FindMyFriendsRefreshCoordinator.h */,
+				BBF200000000000000000003 /* FindMyFriendsRefreshCoordinator.m */,
+				93AC09CB2565E45F0000C60C /* FindMyFriendsHelper.m */,
+				A67F85DA2FA7EB4300F04596 /* FindMyFriendsHelper.h */,
+			);
+			path = BlueBubblesHelper;
+			sourceTree = "<group>";
+		};
+		FBCE4EC3201C0F4D002F8A61 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				FBCE4EC4201C0F4D002F8A61 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		FBCE4EDB201C264F002F8A61 /* Find My */ = {
+			isa = PBXGroup;
+			children = (
+				A69960F12B2005100081FB69 /* FindMyLocateSession.h */,
+			);
+			name = "Find My";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A62991CA29720FAC00B7E663 /* BlueBubblesHelper DyLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A62991CE29720FAC00B7E663 /* Build configuration list for PBXNativeTarget "BlueBubblesHelper DyLib" */;
+			buildPhases = (
+				A62991C829720FAC00B7E663 /* Sources */,
+				A62991C929720FAC00B7E663 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "BlueBubblesHelper DyLib";
+			productName = "BlueBubblesHelper DyLib";
+			productReference = A62991CB29720FAC00B7E663 /* BlueBubblesFindMyHelper.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FBCE4EB3201C0F4D002F8A61 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1520;
+				ORGANIZATIONNAME = BlueBubbleMessaging;
+				TargetAttributes = {
+					A62991CA29720FAC00B7E663 = {
+						CreatedOnToolsVersion = 14.1;
+						LastSwiftMigration = 1410;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = FBCE4EB6201C0F4D002F8A61 /* Build configuration list for PBXProject "BlueBubblesHelper" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = FBCE4EB2201C0F4D002F8A61;
+			productRefGroup = FBCE4EBC201C0F4D002F8A61 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A62991CA29720FAC00B7E663 /* BlueBubblesHelper DyLib */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A62991C829720FAC00B7E663 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A62991D22972106500B7E663 /* ServerConnection.m in Sources */,
+				BBF100000000000000000001 /* FindMyFriendPayload.m in Sources */,
+				BBF200000000000000000001 /* FindMyFriendsRefreshCoordinator.m in Sources */,
+				A62991D12972106200B7E663 /* FindMyFriendsHelper.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A62991CC29720FAC00B7E663 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AE20B1F38F795C02536396EA /* Pods-BlueBubblesHelper DyLib.debug.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 22;
+				DEAD_CODE_STRIPPING = YES;
+				DSTROOT = /;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = "";
+				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
+				INSTALL_PATH = "@rpath";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.0.20;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.findmy;
+				PRODUCT_NAME = BlueBubblesFindMyHelper;
+				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
+				SUPPORTED_PLATFORMS = macosx;
+			};
+			name = Debug;
+		};
+		A62991CD29720FAC00B7E663 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72EF502B6438F8F18EC16DBF /* Pods-BlueBubblesHelper DyLib.release.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 22;
+				DEAD_CODE_STRIPPING = YES;
+				DSTROOT = /;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = "";
+				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
+				INSTALL_PATH = "@rpath";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.0.20;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bluebubbles.findmy;
+				PRODUCT_NAME = BlueBubblesFindMyHelper;
+				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
+				SUPPORTED_PLATFORMS = macosx;
+			};
+			name = Release;
+		};
+		FBCE4ECF201C0F4D002F8A61 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = NO;
+			};
+			name = Debug;
+		};
+		FBCE4ED0201C0F4D002F8A61 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A62991CE29720FAC00B7E663 /* Build configuration list for PBXNativeTarget "BlueBubblesHelper DyLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A62991CC29720FAC00B7E663 /* Debug */,
+				A62991CD29720FAC00B7E663 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FBCE4EB6201C0F4D002F8A61 /* Build configuration list for PBXProject "BlueBubblesHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FBCE4ECF201C0F4D002F8A61 /* Debug */,
+				FBCE4ED0201C0F4D002F8A61 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FBCE4EB3201C0F4D002F8A61 /* Project object */;
+}
