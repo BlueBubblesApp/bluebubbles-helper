@@ -11,6 +11,19 @@
 // ChatKit
 #import <CKChatController.h>
 #import <CKChatItem.h>
+#import <objc/runtime.h>
+// --- macOS 26 (Tahoe) fix: resolve ChatKit (CK*) classes at runtime ---
+// A DYLD_INSERT_LIBRARIES image is bound before the target's own dependent
+// frameworks are mapped. ChatKit is not in Messages' initial dyld closure at
+// inject time, so referencing CK* classes as compile-time literals leaves
+// undefined _OBJC_CLASS_$_CK* flat-namespace externals; Tahoe's dyld treats the
+// missing bind as a hard abort, killing the image before +load. Resolve the
+// classes at runtime instead (the imported headers still supply the method
+// prototypes, so selector ABI/arg types are unchanged).
+#define CKChatControllerClass     ((Class)objc_getClass("CKChatController"))
+#define CKChatItemClass           ((Class)objc_getClass("CKChatItem"))
+#define CKCompositionClass        ((Class)objc_getClass("CKComposition"))
+#define CKMediaObjectManagerClass ((Class)objc_getClass("CKMediaObjectManager"))
 #import <CKComposition.h>
 #import <CKConversation.h>
 #import <CKConversationList.h>
@@ -240,7 +253,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 /// @param transaction transaction ID
 /// @return CKChatController instance
 - (CKChatController *)getCKChatControllerFromConversation:(CKConversation *)conversation transaction:(NSString *)transaction {
-    CKChatController* chatController = [[CKChatController alloc] initWithConversation: conversation];
+    CKChatController* chatController = [[CKChatControllerClass alloc] initWithConversation: conversation];
     
     if (chatController == nil) {
         [NSException raise:NSGenericException format:@"Unable to create CKChatController!"];
@@ -515,7 +528,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
         NSString *filePath = data[@"filePath"];
         NSURL *fileUrl = [NSURL fileURLWithPath:filePath];
         
-        CKMediaObject *mediaObject = [[CKMediaObjectManager sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
+        CKMediaObject *mediaObject = [[CKMediaObjectManagerClass sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
         [chat sendGroupPhotoUpdate:([mediaObject transferGUID])];
     } else {
         [chat sendGroupPhotoUpdate:nil];
@@ -1016,8 +1029,8 @@ static NSMutableDictionary *handleAvailabilityStatuses;
         NSString *filePath = data[@"filePath"];
         NSURL * fileUrl = [NSURL fileURLWithPath:filePath];
         
-        CKMediaObject *mediaObject = [[CKMediaObjectManager sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
-        CKComposition* composition = [CKComposition audioCompositionWithMediaObject:mediaObject];
+        CKMediaObject *mediaObject = [[CKMediaObjectManagerClass sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
+        CKComposition* composition = [CKCompositionClass audioCompositionWithMediaObject:mediaObject];
         IMMessage* newMessage = [convo messageWithComposition:composition];
         [convo sendMessage:newMessage newComposition:YES];
         [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [newMessage guid]}];
@@ -1031,7 +1044,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
     }
     
     // initialize with an empty string (helps for multipart messages)
-    CKComposition *composition = [[CKComposition alloc] initWithText:[[NSAttributedString alloc] initWithString:@""] subject:subjectAttributedString];
+    CKComposition *composition = [[CKCompositionClass alloc] initWithText:[[NSAttributedString alloc] initWithString:@""] subject:subjectAttributedString];
     
     if (data[@"parts"] && data[@"parts"] != [NSNull null]) {
         // if multipart, add the parts in the specified order
@@ -1040,7 +1053,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
                 // add attachemnt objects
                 NSString *filePath = dict[@"filePath"];
                 NSURL * fileUrl = [NSURL fileURLWithPath:filePath];
-                CKMediaObject *mediaObject = [[CKMediaObjectManager sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
+                CKMediaObject *mediaObject = [[CKMediaObjectManagerClass sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
                 
                 composition = [composition compositionByAppendingMediaObject:mediaObject];
             } else {
@@ -1060,7 +1073,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
         if (data[@"filePath"] && data[@"filePath"] != [NSNull null]) {
             NSString *filePath = data[@"filePath"];
             NSURL * fileUrl = [NSURL fileURLWithPath:filePath];
-            CKMediaObject *mediaObject = [[CKMediaObjectManager sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
+            CKMediaObject *mediaObject = [[CKMediaObjectManagerClass sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
             
             composition = [composition compositionByAppendingMediaObject:mediaObject];
         }
@@ -1115,10 +1128,10 @@ static NSMutableDictionary *handleAvailabilityStatuses;
         [self getIMMessagePartChatItemFromGuid:data[@"selectedMessageGuid"] atPartIndex:[data[@"partIndex"] unsignedIntValue] completionBlock:^(IMMessagePartChatItem *chatItem) {
             // make a "fake" CKChatItem so the [chat sendTapback] or [chat sendMessageAcknowledgment] selectors can be used
             CKChatItem *ckChatItem = nil;
-            if ([CKChatItem respondsToSelector:@selector(chatItemWithIMChatItem:balloonMaxWidth:)]) {
-                ckChatItem = [CKChatItem chatItemWithIMChatItem:chatItem balloonMaxWidth:100];
+            if ([CKChatItemClass respondsToSelector:@selector(chatItemWithIMChatItem:balloonMaxWidth:)]) {
+                ckChatItem = [CKChatItemClass chatItemWithIMChatItem:chatItem balloonMaxWidth:100];
             } else {
-                ckChatItem = [CKChatItem chatItemWithIMChatItem:chatItem balloonMaxWidth:100 fullMaxWidth:100 transcriptTraitCollection:nil overlayLayout:FALSE];
+                ckChatItem = [CKChatItemClass chatItemWithIMChatItem:chatItem balloonMaxWidth:100 fullMaxWidth:100 transcriptTraitCollection:nil overlayLayout:FALSE];
             }
 
             // emoji tapbacks (macOS 26+)
@@ -1145,7 +1158,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 
         NSAttributedString *editedString = [[NSAttributedString alloc] initWithString: data[@"editedMessage"]];
         NSInteger partIndex = [data[@"partIndex"] integerValue];
-        CKComposition* composition = [[CKComposition alloc] initWithText:editedString subject:nil];
+        CKComposition* composition = [[CKCompositionClass alloc] initWithText:editedString subject:nil];
         
         CKConversation* convo = [self getCKConversationFromGuid:chatGuid transaction:transaction];
         if (convo != nil) {
