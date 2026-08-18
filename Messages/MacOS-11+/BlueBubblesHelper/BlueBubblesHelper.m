@@ -587,13 +587,17 @@ static NSMutableDictionary *handleAvailabilityStatuses;
     if (forceNew) {
         IMChatRegistry *chatRegistry = [IMChatRegistry sharedInstance];
         SEL forcedSelector = @selector(_ck_chatForHandles:displayName:lastAddressedHandle:lastAddressedSIMID:joinedChatsOnly:findMatchingNamedGroups:createIfNecessary:);
+        NSString *creationToken = [data[@"creationToken"] isKindOfClass:[NSString class]] ? data[@"creationToken"] : nil;
 
         if (![chatRegistry respondsToSelector:forcedSelector]) {
             [NSException raise:NSGenericException format:@"Forced group creation is not supported by this version of IMCore!"];
         }
+        if (creationToken == nil || [creationToken length] == 0) {
+            [NSException raise:NSInvalidArgumentException format:@"Forced group creation requires a creation token!"];
+        }
 
         IMChat *newChat = [chatRegistry _ck_chatForHandles:handles
-                                               displayName:nil
+                                               displayName:creationToken
                                        lastAddressedHandle:nil
                                           lastAddressedSIMID:nil
                                           joinedChatsOnly:NO
