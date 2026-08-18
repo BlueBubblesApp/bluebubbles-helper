@@ -596,6 +596,9 @@ static NSMutableDictionary *handleAvailabilityStatuses;
             [NSException raise:NSInvalidArgumentException format:@"Forced group creation requires a creation token!"];
         }
 
+        // ChatKit uses displayName as matching metadata here, but does not persist it as the
+        // chat's visible display name. Reusing a value can return the same unnamed group, while
+        // a fresh creation token forces a distinct group without naming it.
         IMChat *newChat = [chatRegistry _ck_chatForHandles:handles
                                                displayName:creationToken
                                        lastAddressedHandle:nil
