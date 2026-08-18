@@ -240,7 +240,11 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 /// @param transaction transaction ID
 /// @return CKChatController instance
 - (CKChatController *)getCKChatControllerFromConversation:(CKConversation *)conversation transaction:(NSString *)transaction {
-    CKChatController* chatController = [[CKChatController alloc] initWithConversation: conversation];
+    Class CKChatControllerClass = NSClassFromString(@"CKChatController");
+    if (CKChatControllerClass == Nil) {
+        [NSException raise:@"UnsupportedChatKitException" format:@"CKChatController is unavailable on this version of macOS!"];
+    }
+    CKChatController* chatController = [[CKChatControllerClass alloc] initWithConversation: conversation];
     
     if (chatController == nil) {
         [NSException raise:NSGenericException format:@"Unable to create CKChatController!"];
@@ -514,8 +518,12 @@ static NSMutableDictionary *handleAvailabilityStatuses;
     if (data[@"filePath"] && data[@"filePath"] != [NSNull null]) {
         NSString *filePath = data[@"filePath"];
         NSURL *fileUrl = [NSURL fileURLWithPath:filePath];
-        
-        CKMediaObject *mediaObject = [[CKMediaObjectManager sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
+
+        Class CKMediaObjectManagerClass = NSClassFromString(@"CKMediaObjectManager");
+        if (CKMediaObjectManagerClass == Nil) {
+            [NSException raise:@"UnsupportedChatKitException" format:@"CKMediaObjectManager is unavailable on this version of macOS!"];
+        }
+        CKMediaObject *mediaObject = [[CKMediaObjectManagerClass sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
         [chat sendGroupPhotoUpdate:([mediaObject transferGUID])];
     } else {
         [chat sendGroupPhotoUpdate:nil];
@@ -1006,6 +1014,12 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 # pragma mark Message Actions
 
 - (void)sendMessageToChat:(NSString *)chatGuid newConversationObject:(CKConversation *)convo withData:(NSDictionary *)data transaction:(NSString *)transaction {
+    Class CKCompositionClass = NSClassFromString(@"CKComposition");
+    Class CKMediaObjectManagerClass = NSClassFromString(@"CKMediaObjectManager");
+    if (CKCompositionClass == Nil) {
+        [NSException raise:@"UnsupportedChatKitException" format:@"CKComposition is unavailable on this version of macOS!"];
+    }
+
     // not creating a new chat (use existing guid)
     if (convo == nil) {
         convo = [self getCKConversationFromGuid:chatGuid transaction:transaction];
@@ -1013,11 +1027,14 @@ static NSMutableDictionary *handleAvailabilityStatuses;
     
     // audio messages have a simpler pipeline
     if (data[@"isAudioMessage"] && data[@"isAudioMessage"] != [NSNull null] && [data[@"isAudioMessage"] integerValue] == 1) {
+        if (CKMediaObjectManagerClass == Nil) {
+            [NSException raise:@"UnsupportedChatKitException" format:@"CKMediaObjectManager is unavailable on this version of macOS!"];
+        }
         NSString *filePath = data[@"filePath"];
         NSURL * fileUrl = [NSURL fileURLWithPath:filePath];
         
-        CKMediaObject *mediaObject = [[CKMediaObjectManager sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
-        CKComposition* composition = [CKComposition audioCompositionWithMediaObject:mediaObject];
+        CKMediaObject *mediaObject = [[CKMediaObjectManagerClass sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
+        CKComposition* composition = [CKCompositionClass audioCompositionWithMediaObject:mediaObject];
         IMMessage* newMessage = [convo messageWithComposition:composition];
         [convo sendMessage:newMessage newComposition:YES];
         [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": [newMessage guid]}];
@@ -1031,16 +1048,19 @@ static NSMutableDictionary *handleAvailabilityStatuses;
     }
     
     // initialize with an empty string (helps for multipart messages)
-    CKComposition *composition = [[CKComposition alloc] initWithText:[[NSAttributedString alloc] initWithString:@""] subject:subjectAttributedString];
+    CKComposition *composition = [[CKCompositionClass alloc] initWithText:[[NSAttributedString alloc] initWithString:@""] subject:subjectAttributedString];
     
     if (data[@"parts"] && data[@"parts"] != [NSNull null]) {
         // if multipart, add the parts in the specified order
         for (NSDictionary *dict in data[@"parts"]) {
             if (dict[@"filePath"] != [NSNull null] && [dict[@"filePath"] length] != 0) {
+                if (CKMediaObjectManagerClass == Nil) {
+                    [NSException raise:@"UnsupportedChatKitException" format:@"CKMediaObjectManager is unavailable on this version of macOS!"];
+                }
                 // add attachemnt objects
                 NSString *filePath = dict[@"filePath"];
                 NSURL * fileUrl = [NSURL fileURLWithPath:filePath];
-                CKMediaObject *mediaObject = [[CKMediaObjectManager sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
+                CKMediaObject *mediaObject = [[CKMediaObjectManagerClass sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
                 
                 composition = [composition compositionByAppendingMediaObject:mediaObject];
             } else {
@@ -1058,9 +1078,12 @@ static NSMutableDictionary *handleAvailabilityStatuses;
     } else {
         // if normal message, attachments should appear before the message string
         if (data[@"filePath"] && data[@"filePath"] != [NSNull null]) {
+            if (CKMediaObjectManagerClass == Nil) {
+                [NSException raise:@"UnsupportedChatKitException" format:@"CKMediaObjectManager is unavailable on this version of macOS!"];
+            }
             NSString *filePath = data[@"filePath"];
             NSURL * fileUrl = [NSURL fileURLWithPath:filePath];
-            CKMediaObject *mediaObject = [[CKMediaObjectManager sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
+            CKMediaObject *mediaObject = [[CKMediaObjectManagerClass sharedInstance] mediaObjectWithFileURL:fileUrl filename:nil transcoderUserInfo:nil];
             
             composition = [composition compositionByAppendingMediaObject:mediaObject];
         }
@@ -1114,11 +1137,16 @@ static NSMutableDictionary *handleAvailabilityStatuses;
     if (chat != nil) {
         [self getIMMessagePartChatItemFromGuid:data[@"selectedMessageGuid"] atPartIndex:[data[@"partIndex"] unsignedIntValue] completionBlock:^(IMMessagePartChatItem *chatItem) {
             // make a "fake" CKChatItem so the [chat sendTapback] or [chat sendMessageAcknowledgment] selectors can be used
+            Class CKChatItemClass = NSClassFromString(@"CKChatItem");
+            if (CKChatItemClass == Nil) {
+                [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"UnsupportedChatKitException", @"reason": @"CKChatItem is unavailable on this version of macOS!"}];
+                return;
+            }
             CKChatItem *ckChatItem = nil;
-            if ([CKChatItem respondsToSelector:@selector(chatItemWithIMChatItem:balloonMaxWidth:)]) {
-                ckChatItem = [CKChatItem chatItemWithIMChatItem:chatItem balloonMaxWidth:100];
+            if ([CKChatItemClass respondsToSelector:@selector(chatItemWithIMChatItem:balloonMaxWidth:)]) {
+                ckChatItem = [CKChatItemClass chatItemWithIMChatItem:chatItem balloonMaxWidth:100];
             } else {
-                ckChatItem = [CKChatItem chatItemWithIMChatItem:chatItem balloonMaxWidth:100 fullMaxWidth:100 transcriptTraitCollection:nil overlayLayout:FALSE];
+                ckChatItem = [CKChatItemClass chatItemWithIMChatItem:chatItem balloonMaxWidth:100 fullMaxWidth:100 transcriptTraitCollection:nil overlayLayout:FALSE];
             }
 
             // emoji tapbacks (macOS 26+)
@@ -1145,7 +1173,12 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 
         NSAttributedString *editedString = [[NSAttributedString alloc] initWithString: data[@"editedMessage"]];
         NSInteger partIndex = [data[@"partIndex"] integerValue];
-        CKComposition* composition = [[CKComposition alloc] initWithText:editedString subject:nil];
+        Class CKCompositionClass = NSClassFromString(@"CKComposition");
+        if (CKCompositionClass == Nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": @"UnsupportedChatKitException", @"reason": @"CKComposition is unavailable on this version of macOS!"}];
+            return;
+        }
+        CKComposition* composition = [[CKCompositionClass alloc] initWithText:editedString subject:nil];
         
         CKConversation* convo = [self getCKConversationFromGuid:chatGuid transaction:transaction];
         if (convo != nil) {
