@@ -138,6 +138,7 @@
 - (id)registryChangeHistoryChatsToUnregisterSet;
 - (id)_createdChatForRoom:(id)arg1 onAccount:(id)arg2;
 - (id)_createdChatForIMHandles:(id)arg1 style:(unsigned char)arg2 groupID:(id)arg3 displayName:(id)arg4 joinedChatsOnly:(BOOL)arg5;
+- (id)_ck_chatForHandles:(id)arg1 displayName:(id)arg2 lastAddressedHandle:(id)arg3 lastAddressedSIMID:(id)arg4 joinedChatsOnly:(BOOL)arg5 findMatchingNamedGroups:(BOOL)arg6 createIfNecessary:(BOOL)arg7;
 - (id)_createdChatForIMHandle:(id)arg1;
 - (id)_createdChatWithIdentifier:(id)arg1 style:(unsigned char)arg2 account:(id)arg3;
 - (NSArray<IMChat*>*)_allCreatedChats;

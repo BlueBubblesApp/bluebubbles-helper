@@ -543,6 +543,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 ///     "data": {
 ///         "addresses": ["<str array of addresses (e164)>"],
 ///         "service": "iMessage" OR "SMS",
+///         "forceNew": "BOOL (optional)",
 ///         <see docs for sendMessageToChat for other allowable data>
 ///     },
 ///     "transactionId": "<transaction ID>",
@@ -580,7 +581,42 @@ static NSMutableDictionary *handleAvailabilityStatuses;
     // necessary due to runtime checking (CKConversationList not loaded at time of dylib load)
     Class CKConversationListClass = NSClassFromString(@"CKConversationList");
     id list = [CKConversationListClass performSelector:@selector(sharedConversationList)];
-    CKConversation *newConvo = [list conversationForHandles:handles displayName:nil joinedChatsOnly:FALSE create:TRUE];
+    BOOL forceNew = [data[@"forceNew"] isKindOfClass:[NSNumber class]] && [data[@"forceNew"] boolValue];
+    CKConversation *newConvo;
+
+    if (forceNew) {
+        IMChatRegistry *chatRegistry = [IMChatRegistry sharedInstance];
+        SEL forcedSelector = @selector(_ck_chatForHandles:displayName:lastAddressedHandle:lastAddressedSIMID:joinedChatsOnly:findMatchingNamedGroups:createIfNecessary:);
+
+        if (![chatRegistry respondsToSelector:forcedSelector]) {
+            [NSException raise:NSGenericException format:@"Forced group creation is not supported by this version of IMCore!"];
+        }
+
+        IMChat *newChat = [chatRegistry _ck_chatForHandles:handles
+                                               displayName:nil
+                                       lastAddressedHandle:nil
+                                          lastAddressedSIMID:nil
+                                          joinedChatsOnly:NO
+                                findMatchingNamedGroups:NO
+                                        createIfNecessary:YES];
+        if (newChat == nil) {
+            [NSException raise:NSGenericException format:@"Failed to create chat!"];
+        }
+
+        newConvo = [list conversationForExistingChatWithGUID:[newChat guid]];
+    } else {
+        newConvo = [list conversationForHandles:handles displayName:nil joinedChatsOnly:FALSE create:TRUE];
+    }
+
+    if (newConvo == nil || [newConvo chat] == nil) {
+        [NSException raise:NSGenericException format:@"Failed to resolve created chat!"];
+    }
+
+    NSString *firstMessage = [data[@"message"] isKindOfClass:[NSString class]] ? data[@"message"] : nil;
+    if (firstMessage == nil || [firstMessage length] == 0) {
+        [[NetworkController sharedInstance] sendMessage:@{@"transactionId": transaction, @"identifier": [[newConvo chat] guid]}];
+        return;
+    }
     
     [self sendMessageToChat:nil newConversationObject:newConvo withData:data transaction:transaction];
 }
