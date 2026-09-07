@@ -93,6 +93,24 @@
 
 @implementation BlueBubblesHelper
 
+// Chat guids whose outgoing read receipts are dropped for a short window while
+// the server marks them read (suppressReceipt option on "mark-chat-read").
+static NSMutableSet<NSString *> *_suppressedReceiptChats = nil;
+
++(void) suppressReceiptsForChat:(NSString *)chatGuid {
+    if (chatGuid == nil) return;
+    if (_suppressedReceiptChats == nil) _suppressedReceiptChats = [NSMutableSet set];
+    [_suppressedReceiptChats addObject:chatGuid];
+    NSLog(@"BlueBubblesHelper: Suppressing read receipts for chat %@ (15s window)", chatGuid);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [_suppressedReceiptChats removeObject:chatGuid];
+    });
+}
+
++(BOOL) shouldSuppressReceiptForChat:(NSString *)chatGuid {
+    return chatGuid != nil && [_suppressedReceiptChats containsObject:chatGuid];
+}
+
 static os_log_t logger;
 static NetworkController *networkController;
 static NSMutableArray* vettedAliases;
@@ -214,13 +232,30 @@ static NSMutableArray* vettedAliases;
     if (chat != nil) {
         if (isRead) {
             [chat markAllMessagesAsRead];
+
+            // The read state flushes to the daemon on a timer that only fires
+            // while Messages is active; on a headless server it never fires and
+            // the read never persists (or syncs). Flush it immediately.
+            @try {
+                IMChatRegistry *registry = [NSClassFromString(@"IMChatRegistry") sharedInstance];
+                NSTimer *flushTimer = [registry valueForKey:@"markAsReadTimer"];
+                if (flushTimer != nil) [flushTimer fire];
+                if ([chat respondsToSelector:NSSelectorFromString(@"__clearReadMessageCache")]) {
+                    [chat performSelector:NSSelectorFromString(@"__clearReadMessageCache")];
+                }
+            } @catch (NSException *e) {
+                os_log(logger, "Failed to flush read state for %{public}@: %{public}@", chatGuid, e);
+            }
         } else {
             [chat markLastMessageAsUnread];
         }
         
         os_log(logger, "Set chat read status %d on chat %@", isRead, chatGuid);
 
-        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        // transaction is nil for fire-and-forget requests; an unguarded nil insert crashes
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        }
     }
 }
 
@@ -285,6 +320,9 @@ static NSMutableArray* vettedAliases;
     } else if ([event isEqualToString:@"check-typing-status"]) {
         [self checkTypingIndicatorForChat:chatGuid transaction:transaction];
     } else if ([event isEqualToString:@"mark-chat-read"]) {
+        if ([data[@"suppressReceipt"] boolValue]) {
+            [BlueBubblesHelper suppressReceiptsForChat:chatGuid];
+        }
         [self handleReadStatusForChat:chatGuid isRead:YES transaction:transaction];
     } else if ([event isEqualToString:@"mark-chat-unread"]) {
         [self handleReadStatusForChat:chatGuid isRead:NO transaction:transaction];
@@ -1411,6 +1449,41 @@ ZKSwizzleInterface(BBH_CKConversationListStandardCell, CKConversationListStandar
     } @catch (NSException *e) {
         DLog("BLUEBUBBLESHELPER: Typing indicator exception: %@", e);
     }
+}
+
+@end
+
+// Drops outgoing read receipts for chats in the suppression set. markAllMessagesAsRead
+// triggers the receipt send inside IMCore; no-op'ing it here keeps the local read
+// state (and own-device sync) without notifying the sender. Suppression is requested
+// per chat by the server via "mark-chat-read" with suppressReceipt=true.
+ZKSwizzleInterface(BBH_IMChatRegistry_Receipts, IMChatRegistry, NSObject)
+@implementation BBH_IMChatRegistry_Receipts
+
+- (void)_chat:(id)chat sendReadReceiptForMessages:(id)messages {
+    NSString *guid = nil;
+    if ([chat respondsToSelector:@selector(guid)]) {
+        guid = [chat performSelector:@selector(guid)];
+    }
+    if ([BlueBubblesHelper shouldSuppressReceiptForChat:guid]) {
+        NSLog(@"BlueBubblesHelper: Suppressed read receipt for chat %@", guid);
+        return;
+    }
+    NSLog(@"BlueBubblesHelper: Sending read receipt for chat %@", guid);
+    ZKOrig(void, chat, messages);
+}
+
+- (void)_chat_sendReadReceiptForAllMessages:(id)chat {
+    NSString *guid = nil;
+    if ([chat respondsToSelector:@selector(guid)]) {
+        guid = [chat performSelector:@selector(guid)];
+    }
+    if ([BlueBubblesHelper shouldSuppressReceiptForChat:guid]) {
+        NSLog(@"BlueBubblesHelper: Suppressed read receipt for chat %@", guid);
+        return;
+    }
+    NSLog(@"BlueBubblesHelper: Sending read receipt for chat %@", guid);
+    ZKOrig(void, chat);
 }
 
 @end
