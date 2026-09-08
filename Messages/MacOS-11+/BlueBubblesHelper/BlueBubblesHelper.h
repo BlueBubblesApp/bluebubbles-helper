@@ -19,6 +19,10 @@
 // Methods
 -(void) handleServerEvent: (NSString*)event data: (NSDictionary*)data transactionId: (NSString*)transaction;
 
+// Read-receipt suppression used by "mark-chat-read" (suppressReceipt option)
++(void) suppressReceiptsForChat:(NSString *)chatGuid;
++(BOOL) shouldSuppressReceiptForChat:(NSString *)chatGuid;
+
 @end
 
 #endif /* BlueBubblesHelper_h */
