@@ -25,6 +25,7 @@ This is the repo for the bundle containing code to perform various tasks not acc
 - Retrieve Digital Touch and Handwritten message previews (requires MacOS 11+)
 - Create chats
 - Delete chats
+- Move chats to Recently Deleted (requires MacOS 13+)
 - Delete messages
 - Check user iMessage and FaceTime status
 

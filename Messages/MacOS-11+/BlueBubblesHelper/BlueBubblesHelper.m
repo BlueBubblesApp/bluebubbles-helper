@@ -611,6 +611,70 @@ static NSMutableDictionary *handleAvailabilityStatuses;
     [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
 }
 
+/// @brief Move a chat to Recently Deleted (requires macOS 13+)
+///
+/// Unlike `delete-chat`, the conversation stays recoverable for 30 days from Recently Deleted
+/// in Messages, and the deletion syncs to the user's other devices through Messages in iCloud.
+///
+/// @return Sends socket message once ChatKit confirms the deletion, or an error after 30 seconds.
+///
+/// SOCKET MESSAGE:
+/// @code
+/// {
+///     "action": "recoverable-delete-chat",
+///     "data": {
+///         "chatGuid": "<chat GUID>",
+///     },
+///     "transactionId": "<transaction ID>",
+/// }
+/// @endcode
+///
+/// SOCKET RESPONSE:
+/// @code
+/// {
+///     "transactionId": "<Transaction ID>",
+/// }
+/// @endcode
+- (void)recoverablyDeleteChat:(NSString *)chatGuid transaction:(NSString *)transaction {
+    CKConversation *chat = [self getCKConversationFromGuid:chatGuid transaction:transaction];
+    
+    // necessary due to runtime checking (CKConversationList not loaded at time of dylib load)
+    Class CKConversationListClass = NSClassFromString(@"CKConversationList");
+    id list = [CKConversationListClass performSelector:@selector(sharedConversationList)];
+    if (![list respondsToSelector:@selector(recoverableDeleteForConversations:deleteDate:synchronousQuery:completionHandler:)]) {
+        [NSException raise:@"IllegalCommandException" format:@"Recently Deleted is unavailable on this version of Messages"];
+    }
+    
+    // Exactly one response per request. Both callers below run on the main queue, so the
+    // flag needs no further synchronization.
+    __block BOOL responded = NO;
+    void (^respond)(NSString *) = ^(NSString *error) {
+        if (responded) return;
+        responded = YES;
+        if (error != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": error}];
+        } else {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
+        }
+    };
+    
+    // The completion handler is typed `id` in the header. A no-argument block avoids guessing
+    // undocumented result parameters; being called is ChatKit's completion signal.
+    void (^completionHandler)(void) = ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            os_log(logger, "Moved chat %{public}@ to Recently Deleted", chatGuid);
+            respond(nil);
+        });
+    };
+    
+    // If ChatKit never calls back, report that instead of leaving the request hanging.
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(30 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        respond(@"Recently Deleted did not confirm within 30 seconds; check Recently Deleted in Messages");
+    });
+    
+    [list recoverableDeleteForConversations:@[chat] deleteDate:[NSDate date] synchronousQuery:NO completionHandler:completionHandler];
+}
+
 /// @brief Leave a group chat
 ///
 /// @return Sends socket message.
@@ -1330,6 +1394,8 @@ static NSMutableDictionary *handleAvailabilityStatuses;
         [self createChatWithData:data transaction:transaction];
     } else if ([event isEqualToString:@"delete-chat"]) {
         [self deleteChat:chatGuid transaction:transaction];
+    } else if ([event isEqualToString:@"recoverable-delete-chat"]) {
+        [self recoverablyDeleteChat:chatGuid transaction:transaction];
     } else if ([event isEqualToString:@"leave-chat"]) {
         [self leaveChat:chatGuid transaction:transaction];
     } else if ([event isEqualToString:@"check-focus-status"]) {
