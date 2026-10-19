@@ -5,6 +5,10 @@
 #import "BlueBubblesHelper.h"
 #import "Logging.h"
 #import "NetworkController.h"
+#import <Foundation/Foundation.h>
+
+extern BOOL BBSupportsEmojiTapbacks(void);
+extern NSString *BBEmojiTapbackRequestError(NSDictionary *data, BOOL supported);
 #import "ZKSwizzle.h"
 
 // import system headers with angle brackets to prevent Xcode analysis
@@ -1109,10 +1113,19 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 }
 
 - (void)sendTapbackToChat:(NSString *)chatGuid withData:(NSDictionary *)data transaction:(NSString *)transaction {
+    NSString *validationError = BBEmojiTapbackRequestError(data, BBSupportsEmojiTapbacks());
+    if (validationError != nil) {
+        [[NetworkController sharedInstance] sendMessage:@{@"transactionId": transaction ?: @"", @"error": validationError}];
+        return;
+    }
     IMChat *chat = [self getIMChatFromGuid:chatGuid transaction:transaction];
     
     if (chat != nil) {
         [self getIMMessagePartChatItemFromGuid:data[@"selectedMessageGuid"] atPartIndex:[data[@"partIndex"] unsignedIntValue] completionBlock:^(IMMessagePartChatItem *chatItem) {
+            if (chatItem == nil) {
+                [[NetworkController sharedInstance] sendMessage:@{@"transactionId": transaction ?: @"", @"error": @"Tapback target message part was not found"}];
+                return;
+            }
             // make a "fake" CKChatItem so the [chat sendTapback] or [chat sendMessageAcknowledgment] selectors can be used
             CKChatItem *ckChatItem = nil;
             if ([CKChatItem respondsToSelector:@selector(chatItemWithIMChatItem:balloonMaxWidth:)]) {
@@ -1121,12 +1134,20 @@ static NSMutableDictionary *handleAvailabilityStatuses;
                 ckChatItem = [CKChatItem chatItemWithIMChatItem:chatItem balloonMaxWidth:100 fullMaxWidth:100 transcriptTraitCollection:nil overlayLayout:FALSE];
             }
 
+            if (ckChatItem == nil) {
+                [[NetworkController sharedInstance] sendMessage:@{@"transactionId": transaction ?: @"", @"error": @"Could not construct Tapback target"}];
+                return;
+            }
             // emoji tapbacks (macOS 26+)
-            if ([data[@"reactionType"] containsString:@"emoji"]) {
+            if ([data[@"reactionType"] isEqual:@"emoji"] || [data[@"reactionType"] isEqual:@"-emoji"]) {
                 // necessary due to runtime checking (IMEmojiTapback only exists on macOS 26+)
                 Class IMEmojiTapbackClass = NSClassFromString(@"IMEmojiTapback");
                 id instance = [IMEmojiTapbackClass alloc];
                 id tapback = [instance initWithEmoji:data[@"reactionEmoji"] isRemoved:[data[@"reactionType"] containsString:@"-"]];
+                if (tapback == nil) {
+                    [[NetworkController sharedInstance] sendMessage:@{@"transactionId": transaction ?: @"", @"error": @"Could not construct emoji Tapback"}];
+                    return;
+                }
                 [chat sendTapback:tapback forChatItem:ckChatItem];
             // normal tapbacks
             } else {

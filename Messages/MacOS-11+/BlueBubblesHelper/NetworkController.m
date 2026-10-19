@@ -12,6 +12,9 @@
 #import "GCDAsyncSocket.h"
 #import "Logging.h"
 #import "BlueBubblesHelper.h"
+#import <Foundation/Foundation.h>
+
+extern BOOL BBSupportsEmojiTapbacks(void);
 
 @implementation NetworkController
 
@@ -100,6 +103,7 @@ static os_log_t logger;
         @"event": @"ping",
         @"message": @"Helper Connected!",
         @"process": [[NSBundle mainBundle] bundleIdentifier],
+        @"capabilities": @{@"custom_emoji_reactions": @(BBSupportsEmojiTapbacks())},
     };
     [self sendMessage:message];
 }

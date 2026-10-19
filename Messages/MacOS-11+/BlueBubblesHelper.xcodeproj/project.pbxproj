@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C0DE00000000000000000001 /* EmojiTapbackSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00000000000000000002 /* EmojiTapbackSupport.m */; };
 		A61DC02F2A5A078500EA75A5 /* IDS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A61DC0272A59FFF200EA75A5 /* IDS.framework */; };
 		A62991D02972104E00B7E663 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A62991CF2972104E00B7E663 /* AppKit.framework */; };
 		A62991D12972106200B7E663 /* BlueBubblesHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */; };
@@ -36,6 +37,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C0DE00000000000000000002 /* EmojiTapbackSupport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmojiTapbackSupport.m; sourceTree = "<group>"; };
 		2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper DyLib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71554C06257B2E4600296B93 /* IMChatHistoryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMChatHistoryController.h; sourceTree = "<group>"; };
 		71554C0F257B58F100296B93 /* IMTranscriptChatItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMTranscriptChatItem.h; sourceTree = "<group>"; };
@@ -233,6 +235,7 @@
 				FBCE4EC9201C0F4D002F8A61 /* ZKSwizzle */,
 				FBCE4EC3201C0F4D002F8A61 /* Supporting Files */,
 				93AC09CB2565E45F0000C60C /* BlueBubblesHelper.m */,
+				C0DE00000000000000000002 /* EmojiTapbackSupport.m */,
 				A67F85DA2FA7EB4300F04596 /* BlueBubblesHelper.h */,
 			);
 			path = BlueBubblesHelper;
@@ -473,6 +476,7 @@
 				A62991D52972107400B7E663 /* ZKSwizzle.m in Sources */,
 				A62991D22972106500B7E663 /* NetworkController.m in Sources */,
 				A62991D12972106200B7E663 /* BlueBubblesHelper.m in Sources */,
+				C0DE00000000000000000001 /* EmojiTapbackSupport.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
