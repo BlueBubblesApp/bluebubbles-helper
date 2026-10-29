@@ -9,6 +9,10 @@
 @import AppKit;
 
 #import <Foundation/Foundation.h>
+#import <objc/runtime.h>
+#import <dlfcn.h>
+#import <pwd.h>
+#import <unistd.h>
 #import <CoreSpotlight/CoreSpotlight.h>
 #import "BlueBubblesHelper.h"
 
@@ -60,6 +64,11 @@
 // todo remove
 @interface IMChat (TahoeEdit)
 - (void)editMessageItem:(id)arg1 atPartIndex:(long)arg2 withNewPartText:(id)arg3 newPartTranslation:(id)arg4 backwardCompatabilityText:(id)arg5;
+@end
+
+// LPImage comes from LinkPresentation, which is loaded at runtime (see send-rich-link)
+@protocol RichLinkImageInit <NSObject>
+- (id)initWithData:(NSData *)data MIMEType:(NSString *)mime;
 @end
 
 // This can be used to dump the methods of any class
@@ -519,6 +528,9 @@ static NSMutableArray* vettedAliases;
             }
         }
         [BlueBubblesHelper sendMessage:(data) transfers:[transfers copy] attributedString:attributedString transaction:(transaction)];
+    // If the server tells us to send a link with a preview balloon
+    } else if ([event isEqualToString:@"send-rich-link"]) {
+        [BlueBubblesHelper sendRichLink:(data) transaction:(transaction)];
     // If the server wants to get media for a balloon bundle item
     } else if ([event isEqualToString:@"balloon-bundle-media-path"]) {
         IMChat *chat = [self getIMChatFromGuid: data[@"chatGuid"] transaction: transaction];
@@ -1009,6 +1021,284 @@ static NSMutableArray* vettedAliases;
     return newTransfer;
 }
 
+
+#pragma mark - Rich link sending
+
+// One log line per step so a failed rich link can be diagnosed from the Messages log (NSLog, so it shows in release builds).
+// Read it with: log stream --predicate 'eventMessage CONTAINS "HLP-LINK"'
+static void RichLinkStep(NSString *step, id result) {
+    NSLog(@"HLP-LINK step=%@ result=%@", step, (result != nil ? result : @"nil"));
+}
+
+// Largest image the helper reads for a link preview (the server caps images at the same size)
+static const unsigned long long kRichLinkMaxImageBytes = 5 * 1024 * 1024;
+
+// The folder an imagePath has to be in: ~/Library/Messages/Attachments of the real user (where the server saves
+// attachments). NSHomeDirectory() is the app container inside Messages, so the home comes from getpwuid.
++ (NSString *) richLinkImageRoot {
+    struct passwd *pw = getpwuid(getuid());
+    if (pw == NULL || pw->pw_dir == NULL) return nil;
+    return [[NSString stringWithUTF8String:pw->pw_dir] stringByAppendingPathComponent:@"Library/Messages/Attachments"];
+}
+
+// Replies to the server with an error for this transaction (if there is one). Nothing is sent to the chat.
++ (void) richLinkFail: (NSString *) why transaction: (NSString *) transaction {
+    RichLinkStep(@"failed", why);
+    if (transaction != nil) {
+        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": [@"send-rich-link: " stringByAppendingString:why]}];
+    }
+}
+
+// Sends the link as plain text instead. This also sends the reply for the transaction.
++ (void) richLinkFallback: (NSString *) why data: (NSDictionary *) data url: (NSURL *) url transaction: (NSString *) transaction {
+    RichLinkStep(@"fallback", [@"plain url, " stringByAppendingString:why]);
+    [BlueBubblesHelper sendMessage:@{@"chatGuid": data[@"chatGuid"], @"message": [url absoluteString]} transfers:nil attributedString:nil transaction:transaction];
+}
+
+// Builds the RichLink keyed archive Messages uses for a link balloon (an LPLinkMetadata, with the image
+// replaced by an attachment substitute). Returns nil and sets *err on failure.
+// The substituted image data is returned in *outAttachments, in archive order.
++ (NSData *) richLinkPayloadForUrl: (NSURL *) url title: (NSString *) title siteName: (NSString *) siteName summary: (NSString *) summary imageData: (NSData *) imageData imageMime: (NSString *) imageMime attachments: (NSArray **) outAttachments error: (NSString **) err {
+    // LinkPresentation is not linked into the bundle, so the classes are looked up at runtime
+    void *lp = dlopen("/System/Library/Frameworks/LinkPresentation.framework/LinkPresentation", RTLD_NOW);
+    Class metadataClass = NSClassFromString(@"LPLinkMetadata");
+    Class imageClass = NSClassFromString(@"LPImage");
+    Class substituterClass = NSClassFromString(@"RichLinkAttachmentSubstituter");
+    Class substituteImageClass = NSClassFromString(@"LPImageAttachmentSubstitute");
+    if (lp == NULL || metadataClass == nil || imageClass == nil || substituterClass == nil || substituteImageClass == nil) {
+        *err = @"LinkPresentation classes missing";
+        return nil;
+    }
+
+    id metadata = [[metadataClass alloc] init];
+    [metadata setValue:url forKey:@"URL"];
+    [metadata setValue:url forKey:@"originalURL"];
+    if ([title length] > 0) { [metadata setValue:title forKey:@"title"]; }
+    if ([summary length] > 0) { [metadata setValue:summary forKey:@"summary"]; }
+    if ([siteName length] > 0) { [metadata setValue:siteName forKey:@"siteName"]; }
+    [metadata setValue:@"object" forKey:@"itemType"];
+
+    if (imageData != nil) {
+        id image = [(id<RichLinkImageInit>)[imageClass alloc] initWithData:imageData MIMEType:imageMime];
+        if (image == nil) {
+            *err = @"image decode failed";
+            return nil;
+        }
+        [metadata setValue:image forKey:@"image"];
+        [metadata setValue:@"summary_large_image" forKey:@"twitterCard"];
+    }
+
+    // The root object has to be called "RichLink" in the archive, like the payloads Messages writes.
+    // There is no public class for it, so one is registered here that encodes the metadata the same way.
+    Class rootClass = objc_allocateClassPair([NSObject class], "BBRichLinkRoot", 0);
+    if (rootClass == Nil) {
+        rootClass = NSClassFromString(@"BBRichLinkRoot");
+    } else {
+        IMP encode = imp_implementationWithBlock(^(id self_, NSCoder *coder) {
+            [coder encodeBool:NO forKey:@"richLinkIsPlaceholder"];
+            [coder encodeObject:objc_getAssociatedObject(self_, "metadata") forKey:@"richLinkMetadata"];
+        });
+        class_addMethod(rootClass, @selector(encodeWithCoder:), encode, "v@:@");
+        IMP secure = imp_implementationWithBlock(^BOOL(id self_) { return YES; });
+        class_addMethod(object_getClass(rootClass), @selector(supportsSecureCoding), secure, "c@:");
+        class_addProtocol(rootClass, @protocol(NSSecureCoding));
+        objc_registerClassPair(rootClass);
+    }
+    id root = [[rootClass alloc] init];
+    objc_setAssociatedObject(root, "metadata", metadata, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+
+    id substituter = [[substituterClass alloc] init];
+    [substituter setValue:@YES forKey:@"shouldSubstituteAttachments"];
+
+    NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:NO];
+    [archiver setClassName:@"RichLink" forClass:rootClass];
+    [archiver setClassName:@"RichLinkImageAttachmentSubstitute" forClass:substituteImageClass];
+    archiver.delegate = (id<NSKeyedArchiverDelegate>)substituter;
+    [archiver encodeObject:root forKey:NSKeyedArchiveRootObjectKey];
+    [archiver finishEncoding];
+    NSData *payload = archiver.encodedData;
+    if (payload == nil || [payload length] == 0) {
+        *err = @"archive failed";
+        return nil;
+    }
+    *outAttachments = [substituter valueForKey:@"archivedAttachments"];
+    return payload;
+}
+
+// Registers one substituted image as a hidden IMFileTransfer, the way Messages does for a link balloon: the file is
+// named <UUID>.pluginPayloadAttachment and sits in the attachment store (<store>/xx/yy/<transfer GUID>/<name>).
+// imagent refuses a transfer whose file is outside the store, so the file is copied there before registering.
+// stagingDir must be inside ~/Library/Messages (the folder the server keeps its attachments in).
+// Returns the transfer GUID, or nil on any failure (nothing is left behind in that case).
++ (NSString *) richLinkTransferGuidForBlob: (NSData *) blob stagingDir: (NSString *) stagingDir {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSURL *stagedURL = nil;
+    @try {
+        NSString *name = [[[NSUUID UUID] UUIDString] stringByAppendingString:@".pluginPayloadAttachment"];
+        stagedURL = [NSURL fileURLWithPath:[stagingDir stringByAppendingPathComponent:name]];
+        NSError *error = nil;
+        BOOL ok = [blob writeToURL:stagedURL options:NSDataWritingAtomic error:&error];
+        RichLinkStep(@"stage-write", ok ? [NSString stringWithFormat:@"ok %lu bytes", (unsigned long)[blob length]] : [NSString stringWithFormat:@"FAILED %@", error]);
+        if (!ok) { stagedURL = nil; return nil; }
+
+        IMFileTransferCenter *center = [IMFileTransferCenter sharedInstance];
+        NSString *guid = [center guidForNewOutgoingTransferWithLocalURL:stagedURL];
+        IMFileTransfer *transfer = (guid != nil ? [center transferForGUID:guid] : nil);
+        RichLinkStep(@"transfer-object", transfer != nil ? guid : nil);
+        if (transfer == nil) { [fm removeItemAtURL:stagedURL error:nil]; return nil; }
+
+        // Ask the daemon where the file belongs. Inside Messages it can answer nil, so build the same layout here then.
+        NSString *persistentPath = [[IMDPersistentAttachmentController sharedInstance] _persistentPathForTransfer:transfer filename:name highQuality:TRUE chatGUID:nil storeAtExternalPath:TRUE];
+        RichLinkStep(@"persistent-path-daemon", persistentPath);
+        if (![persistentPath isKindOfClass:[NSString class]] || [persistentPath length] == 0) {
+            // NSHomeDirectory() is the app container inside Messages, so the real home comes from getpwuid
+            struct passwd *pw = getpwuid(getuid());
+            NSString *home = (pw != NULL && pw->pw_dir != NULL) ? [NSString stringWithUTF8String:pw->pw_dir] : NSHomeDirectory();
+            NSString *store = [home stringByAppendingPathComponent:@"Library/Messages/Attachments"];
+            // xx/yy as in the attachment rows Messages writes: two hex digits, then a small decimal number
+            NSString *xx = [NSString stringWithFormat:@"%02x", arc4random_uniform(256)];
+            NSString *yy = [NSString stringWithFormat:@"%02u", arc4random_uniform(16)];
+            persistentPath = [[[[store stringByAppendingPathComponent:xx] stringByAppendingPathComponent:yy] stringByAppendingPathComponent:[transfer guid]] stringByAppendingPathComponent:name];
+            RichLinkStep(@"persistent-path-own", persistentPath);
+        }
+        NSURL *persistentURL = [NSURL fileURLWithPath:persistentPath];
+        error = nil;
+        ok = [fm createDirectoryAtURL:[persistentURL URLByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:&error];
+        RichLinkStep(@"store-dir-create", ok ? @"ok" : [NSString stringWithFormat:@"FAILED %@", error]);
+        if (!ok) { [fm removeItemAtURL:stagedURL error:nil]; return nil; }
+        error = nil;
+        ok = [fm copyItemAtURL:stagedURL toURL:persistentURL error:&error];
+        RichLinkStep(@"file-copy", ok ? @"ok" : [NSString stringWithFormat:@"FAILED %@", error]);
+        [fm removeItemAtURL:stagedURL error:nil];
+        stagedURL = nil;
+        if (!ok) { return nil; }
+
+        [center retargetTransfer:[transfer guid] toPath:persistentPath];
+        transfer.localURL = persistentURL;
+        // The payload image must not show up as a separate attachment in the chat. Set before registering so the daemon sees it.
+        transfer.hideAttachment = 1;
+        // The file must be in its final place before this
+        [center registerTransferWithDaemon:[transfer guid]];
+        RichLinkStep(@"transfer-register", [transfer guid]);
+        return [transfer guid];
+    } @catch (NSException *ex) {
+        RichLinkStep(@"transfer-exception", ex.reason);
+        if (stagedURL != nil) { [fm removeItemAtURL:stagedURL error:nil]; }
+        return nil;
+    }
+}
+
+// Sends a link with a preview balloon (title, site name, summary and an optional image) instead of plain text.
+// data: chatGuid, url, title, siteName, summary (all but chatGuid and url optional), imagePath (optional, a PNG or
+// JPEG inside ~/Library/Messages/Attachments, at most 5 MB). Replies like the other send actions: transactionId and identifier.
+// If the image can not be attached, the link is sent with the text fields only. If anything else fails (unreadable
+// image, archive error, exception), the URL is sent as plain text. Only a chat or URL that can not be resolved
+// returns an error and sends nothing. Once the message has been handed to Messages the reply never carries an error
+// (an exception after that point replies with an empty identifier), so the server does not send the link twice.
++ (void) sendRichLink: (NSDictionary *) data transaction: (NSString *) transaction {
+    NSURL *url = nil;
+    BOOL sent = NO;
+    @try {
+        NSString *chatGuid = data[@"chatGuid"];
+        IMChat *chat = ([chatGuid isKindOfClass:[NSString class]] ? [[IMChatRegistry sharedInstance] existingChatWithGUID:chatGuid] : nil);
+        if (chat == nil) { [self richLinkFail:@"chat not found" transaction:transaction]; return; }
+
+        NSString *urlString = data[@"url"];
+        url = ([urlString isKindOfClass:[NSString class]] ? [NSURL URLWithString:urlString] : nil);
+        if (url == nil || url.scheme == nil || url.host == nil) { [self richLinkFail:@"bad url" transaction:transaction]; return; }
+
+        // Optional text fields are NSNull when the server has nothing for them
+        NSString *title = ([data[@"title"] isKindOfClass:[NSString class]] ? data[@"title"] : nil);
+        NSString *siteName = ([data[@"siteName"] isKindOfClass:[NSString class]] ? data[@"siteName"] : nil);
+        NSString *summary = ([data[@"summary"] isKindOfClass:[NSString class]] ? data[@"summary"] : nil);
+
+        NSData *imageData = nil;
+        NSString *imageMime = nil;
+        NSString *imagePath = ([data[@"imagePath"] isKindOfClass:[NSString class]] && [data[@"imagePath"] length] > 0 ? data[@"imagePath"] : nil);
+        NSString *imageDir = nil;
+        if (imagePath != nil) {
+            // Only files inside the Messages attachment store are read (real path, symlinks resolved), up to a size cap
+            NSString *resolved = [[imagePath stringByStandardizingPath] stringByResolvingSymlinksInPath];
+            NSString *root = [[[BlueBubblesHelper richLinkImageRoot] stringByStandardizingPath] stringByResolvingSymlinksInPath];
+            NSError *readError = nil;
+            NSString *rejected = nil;
+            if (root == nil || ![resolved hasPrefix:[root stringByAppendingString:@"/"]]) {
+                rejected = @"path outside the attachment store";
+            } else {
+                NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfItemAtPath:resolved error:&readError];
+                if (attrs == nil || ![[attrs fileType] isEqualToString:NSFileTypeRegular]) {
+                    rejected = @"not a regular file";
+                } else if ([attrs fileSize] > kRichLinkMaxImageBytes) {
+                    rejected = [NSString stringWithFormat:@"file too large (%llu bytes)", [attrs fileSize]];
+                }
+            }
+            if (rejected == nil) {
+                imageData = [NSData dataWithContentsOfFile:resolved options:0 error:&readError];
+                // PNG or JPEG only, by the first bytes (the extension is not trusted)
+                const unsigned char *b = (const unsigned char *)[imageData bytes];
+                if (imageData != nil) {
+                    if ([imageData length] > 8 && memcmp(b, "\x89PNG\r\n\x1a\n", 8) == 0) { imageMime = @"image/png"; }
+                    else if ([imageData length] > 3 && b[0] == 0xff && b[1] == 0xd8 && b[2] == 0xff) { imageMime = @"image/jpeg"; }
+                    else { rejected = @"not a PNG or JPEG"; imageData = nil; }
+                }
+            }
+            RichLinkStep(@"image-read", imageData != nil ? [NSString stringWithFormat:@"ok %lu bytes", (unsigned long)[imageData length]] : [NSString stringWithFormat:@"FAILED %@", rejected ?: readError]);
+            if (imageData == nil) { [self richLinkFallback:@"image unreadable" data:data url:url transaction:transaction]; return; }
+            imageDir = [resolved stringByDeletingLastPathComponent];
+        }
+
+        NSArray *attachments = nil;
+        NSString *buildError = nil;
+        NSData *payload = [self richLinkPayloadForUrl:url title:title siteName:siteName summary:summary imageData:imageData imageMime:imageMime attachments:&attachments error:&buildError];
+        RichLinkStep(@"payload-build", payload != nil ? [NSString stringWithFormat:@"ok %lu bytes, %lu substituted attachments", (unsigned long)[payload length], (unsigned long)[attachments count]] : [@"FAILED " stringByAppendingString:(buildError ?: @"unknown")]);
+        if (payload == nil) { [self richLinkFallback:(buildError ?: @"payload build failed") data:data url:url transaction:transaction]; return; }
+
+        // One hidden file transfer per substituted image, in archive order. If one fails, the preview goes out without
+        // its image (the archive is the same, only the transfers are dropped).
+        NSMutableArray<NSString *> *transferGuids = [[NSMutableArray alloc] init];
+        for (NSData *blob in attachments) {
+            NSString *transferGuid = [self richLinkTransferGuidForBlob:blob stagingDir:imageDir];
+            if (transferGuid == nil) {
+                [transferGuids removeAllObjects];
+                RichLinkStep(@"fallback", @"sending without the image");
+                break;
+            }
+            [transferGuids addObject:transferGuid];
+        }
+
+        // The message text is the URL itself, marked as a rich link
+        NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:[url absoluteString]];
+        [text addAttributes:@{
+            @"__kIMBaseWritingDirectionAttributeName": @(-1),
+            @"__kIMLinkIsRichLinkAttributeName": @YES,
+            @"__kIMLinkAttributeName": url,
+            @"__kIMMessagePartAttributeName": @0,
+        } range:NSMakeRange(0, [text length])];
+
+        IMMessage *message = [[IMMessage alloc] init];
+        message = [message initWithSender:(nil) time:(nil) text:(text) messageSubject:(nil) fileTransferGUIDs:([transferGuids copy]) flags:(0x100005) error:(nil) guid:(nil) subject:(nil) balloonBundleID:(@"com.apple.messages.URLBalloonProvider") payloadData:(payload) expressiveSendStyleID:(nil)];
+        if (message == nil) { [self richLinkFallback:@"IMMessage init failed" data:data url:url transaction:transaction]; return; }
+        // From here on the message may be out, so no path below may make the server send the link again
+        sent = YES;
+        [chat sendMessage:message];
+        NSString *sentGuid = [[chat lastSentMessage] guid];
+        RichLinkStep(@"send", sentGuid);
+        if (transaction != nil) {
+            [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": (sentGuid ?: @"")}];
+        }
+    } @catch (NSException *ex) {
+        NSString *why = [NSString stringWithFormat:@"exception %@", ex.reason];
+        if (sent) {
+            // Already handed to Messages: reply with an empty identifier, not an error, so the server does not send it again
+            RichLinkStep(@"failed-after-send", why);
+            if (transaction != nil) { [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"identifier": @""}]; }
+        } else if (url != nil) {
+            [self richLinkFallback:why data:data url:url transaction:transaction];
+        } else {
+            [self richLinkFail:why transaction:transaction];
+        }
+    }
+}
 
 + (void) sendMessage: (NSDictionary *) data transfers: (NSArray *) transfers attributedString:(NSMutableAttributedString *) attributedString transaction:(NSString *) transaction {
     IMChat *chat = [[BlueBubblesHelper sharedInstance] getIMChatFromGuid: data[@"chatGuid"] transaction: transaction];

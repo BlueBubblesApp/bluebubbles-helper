@@ -100,6 +100,8 @@ static os_log_t logger;
         @"event": @"ping",
         @"message": @"Helper Connected!",
         @"process": [[NSBundle mainBundle] bundleIdentifier],
+        // Actions added after the first release of the helper, so the server knows what it can ask for
+        @"capabilities": @[@"send-rich-link"],
     };
     [self sendMessage:message];
 }
