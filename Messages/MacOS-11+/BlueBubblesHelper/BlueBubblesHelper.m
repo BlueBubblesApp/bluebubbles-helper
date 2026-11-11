@@ -9,6 +9,7 @@
 @import AppKit;
 
 #import <Foundation/Foundation.h>
+#import <objc/message.h>
 #import <CoreSpotlight/CoreSpotlight.h>
 #import "BlueBubblesHelper.h"
 
@@ -685,10 +686,18 @@ static NSMutableArray* vettedAliases;
     } else if ([event isEqualToString:@"share-nickname"]) {
         IMChat *chat = [self getIMChatFromGuid:data[@"chatGuid"] transaction: transaction];
 
-        if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion >= 11) {
-            [[IMNicknameController sharedInstance] whitelistHandlesForNicknameSharing:[chat participants] forChat:chat];
+        IMNicknameController *nicknames = [IMNicknameController sharedInstance];
+        // macOS 15.6+ (and 26) renamed the call, adding the address it's shared from and whether to send it now;
+        // the old names no longer exist there, and calling them crashed Messages.
+        SEL modern = NSSelectorFromString(@"allowHandlesForNicknameSharing:forChat:fromHandle:forceSend:");
+        if ([nicknames respondsToSelector:modern]) {
+            NSString *from = [chat lastAddressedHandleID];
+            if (from == nil) from = [[[IMAccountController sharedInstance] activeIMessageAccount] strippedLogin];
+            ((void (*)(id, SEL, id, id, id, BOOL))objc_msgSend)(nicknames, modern, [chat participants], chat, from, YES);
+        } else if ([nicknames respondsToSelector:@selector(whitelistHandlesForNicknameSharing:forChat:)]) {
+            [nicknames whitelistHandlesForNicknameSharing:[chat participants] forChat:chat];
         } else {
-            [[IMNicknameController sharedInstance] allowHandlesForNicknameSharing:[chat participants] forChat:chat];
+            [nicknames allowHandlesForNicknameSharing:[chat participants] forChat:chat];
         }
         if (transaction != nil) {
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
