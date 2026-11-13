@@ -131,6 +131,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
             NSString *contactHandle = [[[subscription ownerHandles] firstObject] handleString];
             NSDictionary *payloadDict = [[[subscription currentStatus] statusPayload] payloadDictionary];
             NSNumber *availabilityValue = payloadDict[@"a"];
+            if (contactHandle.length == 0 || ![availabilityValue respondsToSelector:@selector(boolValue)]) return;
             BOOL isFocusModeOn = ![availabilityValue boolValue];
             
             [handleAvailabilityStatuses setValue:@(isFocusModeOn) forKey:contactHandle];
@@ -180,6 +181,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
         os_log(logger, "Helper caught notification: %@", note.name);
         
         IMChat *chat = (IMChat *)note.object;
+        if (![chat isKindOfClass:[IMChat class]] || chat.guid.length == 0) return;
             
         if ([[chat lastIncomingMessage] isTypingMessage]) {
             [[NetworkController sharedInstance] sendMessage: @{@"event": @"started-typing", @"guid": [chat guid]}];
@@ -252,10 +254,17 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 /// @param guid message GUID
 /// @param block block which will complete with the IMMessage
 /// @return IMMessage instance
-- (void)getIMMessageFromGuid:(NSString *)guid completionBlock:(void (^)(IMMessage *message))block {
+- (void)getIMMessageFromGuid:(NSString *)guid transaction:(NSString *)transaction completionBlock:(void (^)(IMMessage *message))block {
     [[IMChatHistoryController sharedInstance] loadMessageWithGUID:(guid) completionBlock:^(IMMessage *message) {
-        os_log(logger, "Got message with guid %{public}@", guid);
-        block(message);
+        // This callback runs after NetworkController's dispatch-time @try has returned.
+        @try {
+            if (message == nil) [NSException raise:@"MissingMessageException" format:@"Message does not exist in chat history!"];
+            os_log(logger, "Got message with guid %{public}@", guid);
+            block(message);
+        } @catch (NSException *exception) {
+            [[NetworkController sharedInstance] sendMessage:@{@"transactionId": transaction ?: (id)[NSNull null],
+                @"error": exception.name ?: @"Exception", @"reason": exception.reason ?: @""}];
+        }
     }];
 }
 
@@ -264,26 +273,29 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 /// @param partIndex index [0, ...] of the message item in the message parts
 /// @param block block which will complete with the IMMessage
 /// @return IMMessagePartChatItem instance
-- (void)getIMMessagePartChatItemFromGuid:(NSString *)guid atPartIndex:(NSUInteger)partIndex completionBlock:(void (^)(IMMessagePartChatItem *messageItem))block {
-    [[IMChatHistoryController sharedInstance] loadMessageWithGUID:(guid) completionBlock:^(IMMessage *message) {
+- (void)getIMMessagePartChatItemFromGuid:(NSString *)guid atPartIndex:(NSUInteger)partIndex transaction:(NSString *)transaction completionBlock:(void (^)(IMMessagePartChatItem *messageItem))block {
+    [self getIMMessageFromGuid:guid transaction:transaction completionBlock:^(IMMessage *message) {
         os_log(logger, "Got message with guid %{public}@", guid);
         IMMessageItem *imMessageItem = message._imMessageItem;
         os_log(logger, "Got IMMessageItem for IMMessage: %@", imMessageItem);
         // This can be an array, or a singular IMMessagePartChatItem
         NSObject *chatItems = imMessageItem._newChatItems;
         os_log(logger, "Got IMMessagePartChatItem(s) for IMMessageItem: %@", chatItems);
-        IMMessagePartChatItem *chatItem;
+        IMMessagePartChatItem *chatItem = nil;
         
         if ([chatItems isKindOfClass:[NSArray class]]) {
-            NSUInteger arrayCount = [(NSArray *)chatItems count] - 1;
+            NSUInteger arrayCount = [(NSArray *)chatItems count];
             // usually indicates a photo gallery (IMAggregateAttachmentMessagePartChatItem) which is a single
             // message item but has the subparts within the class
-            if (partIndex > arrayCount) {
+            if (partIndex >= arrayCount) {
                 os_log(logger, "Part index greater than items in array, checking if type is IMAggregateAttachmentMessage");
                 // Only available on macOS 12+, use reference to class loaded at runtime to avoid crashes on macOS 11
                 Class cls = NSClassFromString(@"IMAggregateAttachmentMessagePartChatItem");
                 if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion > 11 && [[(NSArray *)chatItems firstObject] isKindOfClass:cls]) {
                     IMAggregateAttachmentMessagePartChatItem *aggregate = [(NSArray *)chatItems firstObject];
+                    if (partIndex >= [[aggregate aggregateAttachmentParts] count]) {
+                        [NSException raise:@"InvalidValueException" format:@"Part index is greater than number of aggregate parts in the message!"];
+                    }
                     chatItem = [[aggregate aggregateAttachmentParts] objectAtIndex:partIndex];
                     os_log(logger, "Found IMAggregateAttachmentMessage, extracted chat item from subparts!");
                 } else {
@@ -295,6 +307,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
         } else {
             chatItem = (IMMessagePartChatItem *)chatItems;
         }
+        if (chatItem == nil) [NSException raise:@"MissingMessagePartException" format:@"Message has no chat item!"];
         os_log(logger, "Extracted IMMessagePartChatItem at partIndex: %@", chatItem);
         block(chatItem);
     }];
@@ -1081,7 +1094,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
     // Replies (macOS 13+)
     // TODO FIX ISSUE OF REPLYING TO EXISTING THREAD ON MULTIPART MSG SHOWS ON THE FIRST PART NOT ON THE SPECIFIED ONE
     if (data[@"selectedMessageGuid"] && data[@"selectedMessageGuid"] != [NSNull null]) {
-        [self getIMMessagePartChatItemFromGuid:data[@"selectedMessageGuid"] atPartIndex:[data[@"partIndex"] unsignedIntValue] completionBlock:^(IMMessagePartChatItem *chatItem) {
+        [self getIMMessagePartChatItemFromGuid:data[@"selectedMessageGuid"] atPartIndex:[data[@"partIndex"] unsignedIntValue] transaction:transaction completionBlock:^(IMMessagePartChatItem *chatItem) {
             NSString *identifier;
             IMMessage *originator;
             // if an existing thread exists, use it's thread identifier, otherwise create a new one
@@ -1112,7 +1125,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
     IMChat *chat = [self getIMChatFromGuid:chatGuid transaction:transaction];
     
     if (chat != nil) {
-        [self getIMMessagePartChatItemFromGuid:data[@"selectedMessageGuid"] atPartIndex:[data[@"partIndex"] unsignedIntValue] completionBlock:^(IMMessagePartChatItem *chatItem) {
+        [self getIMMessagePartChatItemFromGuid:data[@"selectedMessageGuid"] atPartIndex:[data[@"partIndex"] unsignedIntValue] transaction:transaction completionBlock:^(IMMessagePartChatItem *chatItem) {
             // make a "fake" CKChatItem so the [chat sendTapback] or [chat sendMessageAcknowledgment] selectors can be used
             CKChatItem *ckChatItem = nil;
             if ([CKChatItem respondsToSelector:@selector(chatItemWithIMChatItem:balloonMaxWidth:)]) {
@@ -1140,7 +1153,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 }
 
 - (void)editMessageInChat:(NSString *)chatGuid withData:(NSDictionary *)data transaction:(NSString *)transaction {
-    [self getIMMessageFromGuid:data[@"messageGuid"] completionBlock:^(IMMessage *message) {
+    [self getIMMessageFromGuid:data[@"messageGuid"] transaction:transaction completionBlock:^(IMMessage *message) {
         IMMessageItem *imMessageItem = message._imMessageItem;
 
         NSAttributedString *editedString = [[NSAttributedString alloc] initWithString: data[@"editedMessage"]];
@@ -1160,7 +1173,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 }
 
 - (void)unsendMessageInChat:(NSString *)chatGuid withData:(NSDictionary *)data transaction:(NSString *)transaction {
-    [self getIMMessagePartChatItemFromGuid:data[@"messageGuid"] atPartIndex:[data[@"partIndex"] unsignedIntValue] completionBlock:^(IMMessagePartChatItem *chatItem) {
+    [self getIMMessagePartChatItemFromGuid:data[@"messageGuid"] atPartIndex:[data[@"partIndex"] unsignedIntValue] transaction:transaction completionBlock:^(IMMessagePartChatItem *chatItem) {
         CKConversation* convo = [self getCKConversationFromGuid:chatGuid transaction:transaction];
         if (convo != nil) {
             [convo retractMessagePart:chatItem];
@@ -1174,7 +1187,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
     IMChat *chat = [self getIMChatFromGuid:chatGuid transaction:transaction];
     
     if (chat != nil) {
-        [self getIMMessagePartChatItemFromGuid:data[@"messageGuid"] atPartIndex:0 completionBlock:^(IMMessagePartChatItem *chatItem) {
+        [self getIMMessagePartChatItemFromGuid:data[@"messageGuid"] atPartIndex:0 transaction:transaction completionBlock:^(IMMessagePartChatItem *chatItem) {
             [chat markChatItemAsNotifyRecipient:chatItem];
             [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction}];
         }];
@@ -1183,7 +1196,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 
 // TODO TEST THIS
 - (void)deleteMessageInChat:(NSString *)chatGuid withData:(NSDictionary *)data transaction:(NSString *)transaction {
-    [self getIMMessageFromGuid:data[@"messageGuid"] completionBlock:^(IMMessage *message) {
+    [self getIMMessageFromGuid:data[@"messageGuid"] transaction:transaction completionBlock:^(IMMessage *message) {
         CKConversation *convo = [self getCKConversationFromGuid:chatGuid transaction:transaction];
         CKChatController *controller = [self getCKChatControllerFromConversation:convo transaction:transaction];
         
@@ -1266,7 +1279,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 
 // TODO TEST THIS
 - (void)getBalloonBundleMediaPathForMessage:(NSString *)messageGuid transaction:(NSString *)transaction {
-    [self getIMMessagePartChatItemFromGuid:messageGuid atPartIndex:0 completionBlock:^(IMMessagePartChatItem *chatItem) {
+    [self getIMMessagePartChatItemFromGuid:messageGuid atPartIndex:0 transaction:transaction completionBlock:^(IMMessagePartChatItem *chatItem) {
         // balloon items will only be an IMTranscriptPluginChatItem
         if ([chatItem isKindOfClass:[IMTranscriptPluginChatItem class]]) {
             NSObject *dataSource = [(IMTranscriptPluginChatItem *)chatItem dataSource];
@@ -1356,7 +1369,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
         [self editMessageInChat:chatGuid withData:data transaction:transaction];
     } else if ([event isEqualToString:@"unsend-message"]) {
         [self unsendMessageInChat:chatGuid withData:data transaction:transaction];
-    } else if ([event isEqualToString:@"notify-anyway"]) {
+    } else if ([event isEqualToString:@"notify-anyway"] || [event isEqualToString:@"notify-anyways"]) {
         [self forceNotifyMessageInChat:chatGuid withData:data transaction:transaction];
     } else if ([event isEqualToString:@"delete-message"]) {
         [self deleteMessageInChat:chatGuid withData:data transaction:transaction];
