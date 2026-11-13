@@ -365,7 +365,6 @@
 				A62991C929720FAC00B7E663 /* Frameworks */,
 				A6490A0D29846973002B0E1D /* Resources */,
 				A65C21A62A9AAAE600D6FB7F /* Copy Files */,
-				A6490A0F29846A3A002B0E1D /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -444,25 +443,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A6490A0F29846A3A002B0E1D /* Run Script */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Run Script";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "killall -q Messages; exit 0;\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -504,7 +484,7 @@
 				EXECUTABLE_PREFIX = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
-				INSTALL_PATH = /Users/tanay/Desktop/test;
+				INSTALL_PATH = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -541,7 +521,7 @@
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 				);
-				SYSTEM_HEADER_SEARCH_PATHS = "/Users/tanay/StudioProjects/bluebubbles-helper/Messages/MacOS-11+/BlueBubblesHelper";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(SRCROOT)/BlueBubblesHelper";
 			};
 			name = Debug;
 		};
@@ -570,7 +550,7 @@
 				EXECUTABLE_PREFIX = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/BlueBubblesHelper/Info.plist";
-				INSTALL_PATH = /Users/tanay/Desktop/test;
+				INSTALL_PATH = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -604,7 +584,7 @@
 					"$(inherited)",
 					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
 				);
-				SYSTEM_HEADER_SEARCH_PATHS = "/Users/tanay/StudioProjects/bluebubbles-helper/Messages/MacOS-11+/BlueBubblesHelper";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(SRCROOT)/BlueBubblesHelper";
 			};
 			name = Release;
 		};
