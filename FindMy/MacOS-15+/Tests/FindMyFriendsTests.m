@@ -42,9 +42,11 @@
 @property(nonatomic, copy) NSArray *cachedFriends;
 @property(nonatomic, strong) NSMutableDictionary<NSString *, id> *locationsByIdentifier;
 @property(nonatomic, strong) NSMutableDictionary<NSString *, FindMyCompletion> *pendingRefreshes;
+@property(nonatomic, copy) NSDictionary<NSString *, id> *locationsOnRefreshByIdentifier;
 @property(nonatomic, copy) NSSet<NSString *> *immediateRefreshIdentifiers;
 @property(nonatomic) BOOL withholdFriendList;
 @property(nonatomic) BOOL duplicateImmediateRefreshCallbacks;
+@property(nonatomic, copy) FindMyFriendsCompletion pendingFriendList;
 @end
 
 @implementation BBMockFindMySession
@@ -73,6 +75,8 @@
 - (void)getFriendsSharingLocationsWithMeWithCompletion:(FindMyFriendsCompletion)completion {
     if (!self.withholdFriendList) {
         completion(self.friends);
+    } else {
+        self.pendingFriendList = completion;
     }
 }
 
@@ -83,6 +87,10 @@
                                 completion:(FindMyCompletion)completion {
     NSString *identifier = [FindMyFriendPayload identifierForHandle:locationHandles.firstObject];
     if ([self.immediateRefreshIdentifiers containsObject:identifier]) {
+        id refreshedLocation = self.locationsOnRefreshByIdentifier[identifier];
+        if (refreshedLocation != nil) {
+            self.locationsByIdentifier[identifier] = refreshedLocation;
+        }
         completion();
         if (self.duplicateImmediateRefreshCallbacks) {
             completion();
@@ -215,7 +223,7 @@ static void BBTestPayload(void) {
                       friendListTimedOut:NO
                unidentifiedFriendCount:1];
     NSArray *completeLocations = completeResponse[@"locations"];
-    BBAssert([completeResponse[@"partial"] isEqual:@NO], @"completed refreshes must not be partial");
+    BBAssert([completeResponse[@"partial"] isEqual:@YES], @"skipped friends must mark the response partial");
     BBAssert([completeLocations[0][@"handle"] isEqualToString:@"alice@example.com"],
              @"responses must be sorted by stable handle");
     BBAssert([completeResponse[@"skippedFriends"] isEqual:@1], @"skipped friend count must be retained");
@@ -303,6 +311,97 @@ static void BBTestDuplicateImmediateCallback(void) {
     BBAssert([responses.firstObject[@"partial"] isEqual:@NO], @"duplicate callbacks must not create a partial response");
 }
 
+static void BBTestCoordinatorReleaseAfterDeadline(void) {
+    for (NSNumber *withholdFriendList in @[@NO, @YES]) {
+        FMLHandle *handle = BBHandleWithIdentifier(@"timeout@example.test");
+        BBMockFindMySession *session = [[BBMockFindMySession alloc] init];
+        session.friends = @[handle];
+        session.cachedFriends = @[handle];
+        session.withholdFriendList = withholdFriendList.boolValue;
+        if (session.withholdFriendList) {
+            session.immediateRefreshIdentifiers = [NSSet setWithObject:handle.identifier];
+        }
+        __block NSUInteger responseCount = 0;
+        __weak FindMyFriendsRefreshCoordinator *releasedCoordinator = nil;
+        @autoreleasepool {
+            FindMyFriendsRefreshCoordinator *coordinator = [[FindMyFriendsRefreshCoordinator alloc]
+                initWithSession:session
+                transactionIdentifier:@"release-after-timeout"
+                friendListTimeout:0.005
+                locationRefreshTimeout:0.005
+                responseHandler:^(NSDictionary * __unused response) {
+                    responseCount += 1;
+                }];
+            releasedCoordinator = coordinator;
+            [coordinator start];
+            BBAssert(BBWaitUntil(^BOOL { return responseCount == 1; }, 0.2), @"timed-out refresh must respond once");
+            coordinator = nil;
+        }
+        BBAssert(BBWaitUntil(^BOOL { return releasedCoordinator == nil; }, 0.2),
+                 @"a retained native callback must not keep a finished coordinator alive");
+        if (session.pendingFriendList != nil) {
+            session.pendingFriendList(session.friends);
+        }
+        FindMyCompletion locationCompletion = session.pendingRefreshes[handle.identifier];
+        if (locationCompletion != nil) {
+            locationCompletion();
+            locationCompletion();
+        }
+        [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+        BBAssert(responseCount == 1, @"callbacks after coordinator release must not send another response");
+    }
+}
+
+static void BBTestSkippedFriendCoordinatorResponse(void) {
+    FMLHandle *handle = BBHandleWithIdentifier(@"identified@example.test");
+    BBMockFindMySession *session = [[BBMockFindMySession alloc] init];
+    session.friends = @[handle, [[NSObject alloc] init]];
+    session.immediateRefreshIdentifiers = [NSSet setWithObject:handle.identifier];
+    __block NSDictionary *capturedResponse = nil;
+    FindMyFriendsRefreshCoordinator *coordinator = [[FindMyFriendsRefreshCoordinator alloc]
+        initWithSession:session transactionIdentifier:@"skipped-friend"
+        friendListTimeout:0.01 locationRefreshTimeout:0.01
+        responseHandler:^(NSDictionary *response) { capturedResponse = response; }];
+    [coordinator start];
+    BBAssert(BBWaitUntil(^BOOL { return capturedResponse != nil; }, 0.2), @"identified friends must still return");
+    BBAssert([capturedResponse[@"locations"] count] == 1, @"unidentifiable records must stay excluded");
+    BBAssert([capturedResponse[@"skippedFriends"] isEqual:@1], @"skipped records must be counted");
+    BBAssert([capturedResponse[@"partial"] isEqual:@YES], @"skipped records must prevent a complete snapshot claim");
+}
+
+static void BBTestCachedAndUpdatedLocationCompletions(void) {
+    FMLHandle *handle = BBHandleWithIdentifier(@"freshness@example.test");
+    BBMockLocation *cached = [[BBMockLocation alloc] init];
+    cached.locationType = 1;
+    cached.timestamp = 1234;
+    BBMockLocation *updated = [[BBMockLocation alloc] init];
+    updated.locationType = 2;
+    updated.timestamp = 1235;
+    for (NSNumber *hasUpdate in @[@NO, @YES]) {
+        BBMockFindMySession *session = [[BBMockFindMySession alloc] init];
+        session.friends = @[handle];
+        session.locationsByIdentifier[handle.identifier] = cached;
+        session.immediateRefreshIdentifiers = [NSSet setWithObject:handle.identifier];
+        if (hasUpdate.boolValue) {
+            session.locationsOnRefreshByIdentifier = @{handle.identifier: updated};
+        }
+        __block NSDictionary *capturedResponse = nil;
+        FindMyFriendsRefreshCoordinator *coordinator = [[FindMyFriendsRefreshCoordinator alloc]
+            initWithSession:session transactionIdentifier:@"location-completion"
+            friendListTimeout:0.01 locationRefreshTimeout:0.01
+            responseHandler:^(NSDictionary *response) { capturedResponse = response; }];
+        [coordinator start];
+        BBAssert(BBWaitUntil(^BOOL { return capturedResponse != nil; }, 0.2), @"requested refresh must finish");
+        NSDictionary *location = [capturedResponse[@"locations"] firstObject];
+        BBAssert([location[@"status"] isEqual:hasUpdate.boolValue ? @"live" : @"shallow"],
+                 @"callback completion must not fabricate a live location status");
+        BBAssert([location[@"last_updated"] isEqual:hasUpdate.boolValue ? @1235000 : @1234000],
+                 @"the response must use the native cached or updated timestamp");
+        BBAssert([capturedResponse[@"partial"] isEqual:@NO],
+                 @"callback completeness is separate from obtaining a newer fix");
+    }
+}
+
 static void BBTestReconnectQueue(void) {
     ServerConnection *connection = [[ServerConnection alloc] init];
     [connection sendMessage:@{@"transactionId": @"queued-before-connect"}];
@@ -340,6 +439,9 @@ int main(void) {
         BBTestFriendListTimeout();
         BBTestLocationTimeoutAndLateCallbacks();
         BBTestDuplicateImmediateCallback();
+        BBTestCoordinatorReleaseAfterDeadline();
+        BBTestSkippedFriendCoordinatorResponse();
+        BBTestCachedAndUpdatedLocationCompletions();
         BBTestReconnectQueue();
         NSLog(@"PASS: FindMyFriendsTests");
     }

@@ -101,6 +101,7 @@ static os_log_t refreshLog;
     NSMutableArray<void (^)(void)> *completeLocationRefreshBlocks = [[NSMutableArray alloc] init];
     dispatch_group_t locationRefreshGroup = dispatch_group_create();
     __block NSUInteger unidentifiedFriendCount = 0;
+    __weak typeof(self) weakSelf = self;
 
     for (id friendRecord in friendRecords) {
         id locationHandle = [self locationHandleForFriend:friendRecord];
@@ -140,7 +141,7 @@ static os_log_t refreshLog;
                 locationRefreshCompleted = YES;
 
                 NSDictionary *refreshedLocationPayload = [FindMyFriendPayload
-                    locationPayloadForLocation:[self cachedLocationForHandle:locationHandle]
+                    locationPayloadForLocation:[weakSelf cachedLocationForHandle:locationHandle]
                                          handle:locationHandle];
                 if (refreshedLocationPayload != nil) {
                     locationsByFriendIdentifier[friendIdentifier] = refreshedLocationPayload;
@@ -228,8 +229,9 @@ static os_log_t refreshLog;
         return;
     }
 
+    __weak typeof(self) weakSelf = self;
     [self.session getFriendsSharingLocationsWithMeWithCompletion:^(NSArray *requestedFriends) {
-        [self resolveFriendList:requestedFriends timedOut:NO];
+        [weakSelf resolveFriendList:requestedFriends timedOut:NO];
     }];
 
     dispatch_after(

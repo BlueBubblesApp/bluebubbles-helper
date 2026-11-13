@@ -165,7 +165,7 @@
 
     NSArray<NSString *> *timedOutFriendIdentifiers = [[pendingFriendIdentifiers allObjects]
         sortedArrayUsingSelector:@selector(compare:)];
-    BOOL responseIsPartial = friendListTimedOut || timedOutFriendIdentifiers.count > 0;
+    BOOL responseIsPartial = friendListTimedOut || timedOutFriendIdentifiers.count > 0 || unidentifiedFriendCount > 0;
 
     return @{
         @"transactionId": transactionIdentifier ?: [NSNull null],

@@ -13,15 +13,22 @@ socket.
 `refresh-findmy-friends` returns:
 
 - `locations`: one deterministic record per identifiable friend, seeded from
-  the current cache before live refreshes begin
+  the current cache before requested refreshes begin
 - `partial`: whether either the friend-list request or an individual location
-  refresh exceeded its deadline
+  refresh exceeded its deadline, or a friend record could not be identified
 - `friendListTimedOut`: whether the helper had to use the cached friend list
 - `timedOutHandles`: stable identifiers whose live refresh did not finish
 - `skippedFriends`: count of records that had no stable identifier
 
 A friend with no current location remains in `locations` with null coordinates
 and address fields. This keeps slow or offline friends from disappearing.
+
+The helper requests location refreshes, then reads the session's location cache
+when each completion callback arrives. Completion does not guarantee that macOS
+obtained a newer fix: valid cached or shallow locations retain their original
+timestamp and status. The helper does not replace timestamps with the request
+time or promote cached records to `live`. A new location fix is demonstrated by
+new native location data, separately from a completed RPC or callback.
 
 ## Build
 
