@@ -1,4 +1,5 @@
 import CoreLocation
+import CoreFoundation
 import Foundation
 
 enum FindMyDeviceSnapshot {
@@ -231,12 +232,15 @@ enum FindMyDeviceSnapshot {
     }
 
     private static func number(_ value: Any?) -> Double? {
-        guard let unwrappedValue = unwrapped(value), !(unwrappedValue is Bool) else {
+        guard let unwrappedValue = unwrapped(value) else {
             return nil
         }
 
         let numericValue: Double?
         if let numberValue = unwrappedValue as? NSNumber {
+            guard CFGetTypeID(numberValue) != CFBooleanGetTypeID() else {
+                return nil
+            }
             numericValue = numberValue.doubleValue
         } else if let doubleValue = unwrappedValue as? Double {
             numericValue = doubleValue

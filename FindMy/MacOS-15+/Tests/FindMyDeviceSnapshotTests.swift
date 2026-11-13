@@ -39,7 +39,7 @@ private struct MockDevice {
     let model: String?
     let rawDeviceModel: String?
     let systemVersion: String?
-    let batteryLevel: Double?
+    let batteryLevel: Any?
     let batteryStatus: MockBatteryStatus
     let deviceConnectedState: MockConnectedState
     let discoveryIdentifier: String?
@@ -93,7 +93,8 @@ private func device(
     identifier: String,
     name: String?,
     location: MockLocation?,
-    discoveryIdentifier: String? = "00000000-0000-4000-8000-000000000001"
+    discoveryIdentifier: String? = "00000000-0000-4000-8000-000000000001",
+    batteryLevel: Any? = Double(0)
 ) -> MockDevice {
     return MockDevice(
         identifier: identifier,
@@ -102,7 +103,7 @@ private func device(
         model: "Mac14,6",
         rawDeviceModel: "Mac14,6-silver",
         systemVersion: "15.7.7",
-        batteryLevel: 0,
+        batteryLevel: batteryLevel,
         batteryStatus: .charging,
         deviceConnectedState: .online,
         discoveryIdentifier: discoveryIdentifier,
@@ -191,12 +192,31 @@ private func testUnidentifiableDeviceMakesResponsePartial() {
     assert(response["skippedDevices"] as? Int == 1, "skipped private records must be counted")
 }
 
+private func testNSNumberValues() {
+    for level in [0.0, 1.0] {
+        let response = FindMyDeviceSnapshot.response(from: dataSource(devices: [
+            device(identifier: "number", name: nil, location: nil, batteryLevel: NSNumber(value: level)),
+        ]))
+        let devices = response["devices"] as? [[String: Any]]
+        assert(devices?.first?["batteryLevel"] as? Double == level,
+               "numeric NSNumber zero and one must not be mistaken for booleans")
+    }
+    for invalid in [NSNumber(value: false), NSNumber(value: true), NSNumber(value: Double.nan)] {
+        let response = FindMyDeviceSnapshot.response(from: dataSource(devices: [
+            device(identifier: "invalid", name: nil, location: nil, batteryLevel: invalid),
+        ]))
+        let devices = response["devices"] as? [[String: Any]]
+        assert(devices?.first?["batteryLevel"] == nil, "booleans and non-finite numbers must remain excluded")
+    }
+}
+
 @main
 private enum FindMyDeviceSnapshotTests {
     static func main() {
         testPopulatedAndOfflineDevices()
         testUnavailableAndEmptyCollections()
         testUnidentifiableDeviceMakesResponsePartial()
+        testNSNumberValues()
         print("PASS: FindMyDeviceSnapshotTests")
     }
 }
