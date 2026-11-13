@@ -23,6 +23,10 @@ socket.
 A friend with no current location remains in `locations` with null coordinates
 and address fields. This keeps slow or offline friends from disappearing.
 
+A nil or malformed friend-list callback is not a complete empty list. It leaves
+the request pending until the existing deadline returns a partial cached-list
+fallback. A valid empty array remains a complete empty result.
+
 The helper requests location refreshes, then reads the session's location cache
 when each completion callback arrives. Completion does not guarantee that macOS
 obtained a newer fix: valid cached or shallow locations retain their original

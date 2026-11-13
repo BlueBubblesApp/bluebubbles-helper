@@ -402,6 +402,39 @@ static void BBTestCachedAndUpdatedLocationCompletions(void) {
     }
 }
 
+static void BBTestNilAndEmptyFriendListResponses(void) {
+    FMLHandle *handle = BBHandleWithIdentifier(@"cached-list@example.test");
+    BBMockLocation *cached = [[BBMockLocation alloc] init];
+    cached.locationType = 1;
+    cached.timestamp = 1234;
+    for (id requestedFriends in @[[NSNull null], @"invalid-list", @[]]) {
+        BOOL requiresFallback = ![requestedFriends isKindOfClass:[NSArray class]];
+        BBMockFindMySession *session = [[BBMockFindMySession alloc] init];
+        session.friends = requestedFriends == [NSNull null] ? nil : (NSArray *)requestedFriends;
+        session.cachedFriends = @[handle];
+        session.locationsByIdentifier[handle.identifier] = cached;
+        session.immediateRefreshIdentifiers = [NSSet setWithObject:handle.identifier];
+        __block NSDictionary *capturedResponse = nil;
+        FindMyFriendsRefreshCoordinator *coordinator = [[FindMyFriendsRefreshCoordinator alloc]
+            initWithSession:session transactionIdentifier:@"nil-versus-empty-list"
+            friendListTimeout:0.01 locationRefreshTimeout:0.01
+            responseHandler:^(NSDictionary *response) { capturedResponse = response; }];
+        [coordinator start];
+        BBAssert(BBWaitUntil(^BOOL { return capturedResponse != nil; }, 0.2), @"friend-list requests must terminate");
+        BBAssert([capturedResponse[@"partial"] boolValue] == requiresFallback,
+                 @"nil or malformed callbacks need a partial fallback; an empty array is complete");
+        BBAssert([capturedResponse[@"friendListTimedOut"] boolValue] == requiresFallback,
+                 @"unusable callbacks must wait for the existing friend-list deadline");
+        BBAssert([capturedResponse[@"locations"] count] == (requiresFallback ? 1u : 0u),
+                 @"unusable callbacks retain cached friends; valid empty arrays remain empty");
+        if (requiresFallback) {
+            NSDictionary *location = [capturedResponse[@"locations"] firstObject];
+            BBAssert([location[@"status"] isEqual:@"shallow"] && [location[@"last_updated"] isEqual:@1234000],
+                     @"the fallback must preserve native shallow data and timestamps");
+        }
+    }
+}
+
 static void BBTestReconnectQueue(void) {
     ServerConnection *connection = [[ServerConnection alloc] init];
     [connection sendMessage:@{@"transactionId": @"queued-before-connect"}];
@@ -442,6 +475,7 @@ int main(void) {
         BBTestCoordinatorReleaseAfterDeadline();
         BBTestSkippedFriendCoordinatorResponse();
         BBTestCachedAndUpdatedLocationCompletions();
+        BBTestNilAndEmptyFriendListResponses();
         BBTestReconnectQueue();
         NSLog(@"PASS: FindMyFriendsTests");
     }

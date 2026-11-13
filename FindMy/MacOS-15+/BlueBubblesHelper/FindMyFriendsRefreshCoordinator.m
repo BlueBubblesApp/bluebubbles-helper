@@ -231,6 +231,9 @@ static os_log_t refreshLog;
 
     __weak typeof(self) weakSelf = self;
     [self.session getFriendsSharingLocationsWithMeWithCompletion:^(NSArray *requestedFriends) {
+        if (![requestedFriends isKindOfClass:[NSArray class]]) {
+            return;
+        }
         [weakSelf resolveFriendList:requestedFriends timedOut:NO];
     }];
 
