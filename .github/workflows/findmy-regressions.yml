@@ -1,0 +1,51 @@
+name: Find My regressions
+
+on:
+  pull_request:
+    paths:
+      - 'FindMy/**'
+      - '.github/workflows/findmy-regressions.yml'
+  push:
+    paths:
+      - 'FindMy/**'
+      - '.github/workflows/findmy-regressions.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-tests:
+    name: Native tests (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15-intel
+            arch: x86_64
+          - runner: macos-15
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Check host and Xcode
+        env:
+          EXPECTED_ARCH: ${{ matrix.arch }}
+        run: |
+          test "$(uname -m)" = "$EXPECTED_ARCH"
+          xcodebuild -version
+      - name: Run native regression tests
+        run: |
+          export DEVELOPER_DIR="$(xcode-select -p)"
+          ./FindMy/MacOS-15+/Tests/run-tests.sh
+      - name: Build unsigned universal helper
+        if: matrix.arch == 'x86_64'
+        run: |
+          export DEVELOPER_DIR="$(xcode-select -p)"
+          ./FindMy/MacOS-15+/scripts/build-universal.sh
+          lipo -archs ./FindMy/MacOS-15+/dist/BlueBubblesFindMyHelper.dylib
+          otool -D ./FindMy/MacOS-15+/dist/BlueBubblesFindMyHelper.dylib
+          shasum -a 256 ./FindMy/MacOS-15+/dist/BlueBubblesFindMyHelper.dylib

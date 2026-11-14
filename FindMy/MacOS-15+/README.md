@@ -64,3 +64,12 @@ My:
 They cover stable-handle selection, missing and live locations, allowlisted
 fields, deterministic ordering, friend-list and per-handle timeouts, duplicate
 and late callbacks, and response delivery across a server reconnect.
+
+A separate executable compiles the production helper entry point and refresh
+coordinators with fake transport and private-framework providers. It checks
+wrong-host startup, command routing, transaction errors, refresh deadlines, and
+cleanup of active refreshes. GitHub Actions runs these tests on Intel and Apple
+silicon macOS runners without signing, injection, or an Apple account.
+The Intel job also builds the unsigned universal dylib through the Xcode
+workspace, verifies both architectures and the install name, and records its
+checksum. It does not install or publish the product.

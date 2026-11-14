@@ -34,3 +34,17 @@ xcrun --sdk macosx clang \
     -o "$BUILD_DIR/FindMyFriendsTests"
 
 "$BUILD_DIR/FindMyFriendsTests"
+
+# Exercise the actual helper entry point separately from the transport tests.
+xcrun --sdk macosx clang \
+    -fobjc-arc -fmodules -Wall -Wextra -Werror -Wno-deprecated-declarations \
+    -isysroot "$SDKROOT" -mmacosx-version-min=15.0 \
+    -I "$SOURCE_DIR" -I "$SOCKET_DIR" \
+    "$SOURCE_DIR/FindMyFriendsHelper.m" \
+    "$SOURCE_DIR/FindMyFriendPayload.m" \
+    "$SOURCE_DIR/FindMyFriendsRefreshCoordinator.m" \
+    "$ROOT_DIR/Tests/FindMyHelperDispatchTests.m" \
+    -framework Foundation \
+    -o "$BUILD_DIR/FindMyHelperDispatchTests"
+
+"$BUILD_DIR/FindMyHelperDispatchTests"
