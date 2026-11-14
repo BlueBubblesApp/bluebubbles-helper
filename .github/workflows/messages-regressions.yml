@@ -47,7 +47,7 @@ jobs:
       - name: Check built architecture and portable dylib identity
         run: |
           dylib="$RUNNER_TEMP/messages-derived/Build/Products/Release/BlueBubblesHelper.dylib"
-          xcrun lipo -verify_arch '${{ matrix.architecture }}' "$dylib"
+          xcrun lipo "$dylib" -verify_arch '${{ matrix.architecture }}'
           test "$(otool -D "$dylib" | tail -n 1)" = '@rpath/BlueBubblesHelper.dylib'
       - name: Read pinned official Server protocol source
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
