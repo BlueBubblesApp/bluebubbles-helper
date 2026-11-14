@@ -40,9 +40,12 @@ xcodebuild -workspace 'Messages/MacOS-11+/BlueBubblesHelper.xcworkspace' \
 ```
 
 The dylib is written to `Build/Products/Release/BlueBubblesHelper.dylib` under
-that directory. The app's Copy Files phase runs only during deployment
-postprocessing; an ordinary `build` does not copy into `/Applications/BlueBubbles.app`.
-The build does not inject the dylib or launch Messages.
+that directory. Building or archiving does not copy into `/Applications`, inject
+the dylib, or launch or terminate Messages.
+
+Installation is an explicit, separate step owned by BlueBubbles Server. Deploy
+the chosen dylib through the intended Server's helper-resource, checksum and
+injection process. This project does not select or update an installed app.
 
 `.github/workflows/messages-regressions.yml` runs the regression checks and this
 unsigned target build on native Intel and Apple Silicon macOS runners. It also

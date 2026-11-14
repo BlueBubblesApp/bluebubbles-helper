@@ -17,23 +17,8 @@
 		A62991D9297210EB00B7E663 /* IMSharedUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A68E87E128C3B18900882823 /* IMSharedUtilities.framework */; };
 		A62991DA297210F700B7E663 /* IMDPersistence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69A83DF27D18385007BB936 /* IMDPersistence.framework */; };
 		A6490A0E2984697C002B0E1D /* PrefixHeader.pch in Resources */ = {isa = PBXBuildFile; fileRef = FBCE4ECD201C0F4D002F8A61 /* PrefixHeader.pch */; };
-		A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in Copy Files */ = {isa = PBXBuildFile; fileRef = A62991CB29720FAC00B7E663 /* BlueBubblesHelper.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A69960EA2B1F9A700081FB69 /* FMF.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A69960E92B1F9A6F0081FB69 /* FMF.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		A65C21A62A9AAAE600D6FB7F /* Copy Files */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 12;
-			dstPath = "/Applications/BlueBubbles.app/Contents/Resources/appResources/private-api/macos11";
-			dstSubfolderSpec = 0;
-			files = (
-				A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in Copy Files */,
-			);
-			name = "Copy Files";
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2A31F700CE646BC3B6A3921F /* libPods-BlueBubblesHelper DyLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlueBubblesHelper DyLib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -364,7 +349,6 @@
 				A62991C829720FAC00B7E663 /* Sources */,
 				A62991C929720FAC00B7E663 /* Frameworks */,
 				A6490A0D29846973002B0E1D /* Resources */,
-				A65C21A62A9AAAE600D6FB7F /* Copy Files */,
 			);
 			buildRules = (
 			);
