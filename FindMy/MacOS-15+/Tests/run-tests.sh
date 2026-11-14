@@ -54,11 +54,21 @@ xcrun --sdk macosx clang \
     -o "$BUILD_DIR/FindMyHelperDispatchTests"
 
 "$BUILD_DIR/FindMyHelperDispatchTests"
+
+# Link the real Objective-C/Swift bridge into the serializer tests.
+xcrun --sdk macosx clang \
+    -fobjc-arc -fmodules -Wall -Wextra -Werror \
+    -isysroot "$SDKROOT" -mmacosx-version-min=15.0 \
+    -c "$SOURCE_DIR/FindMyDeviceSnapshotBridge.m" \
+    -o "$BUILD_DIR/FindMyDeviceSnapshotBridge.o"
+
 xcrun --sdk macosx swiftc \
     -warnings-as-errors \
     -sdk "$SDKROOT" \
+    -import-objc-header "$SOURCE_DIR/FindMyDeviceSnapshotBridge.h" \
     "$SOURCE_DIR/FindMyDeviceSnapshot.swift" \
     "$ROOT_DIR/Tests/FindMyDeviceSnapshotTests.swift" \
+    "$BUILD_DIR/FindMyDeviceSnapshotBridge.o" \
     -o "$BUILD_DIR/FindMyDeviceSnapshotTests"
 
 "$BUILD_DIR/FindMyDeviceSnapshotTests"

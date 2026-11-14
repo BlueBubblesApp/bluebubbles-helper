@@ -93,3 +93,6 @@ silicon macOS runners without signing, injection, or an Apple account.
 The Intel job also builds the unsigned universal dylib through the Xcode
 workspace, verifies both architectures and the install name, and records its
 checksum. It does not install or publish the product.
+
+The Devices tests also link the actual Objective-C bridge and Swift serializer
+to exercise the exported C entry point and retained dictionary handoff.

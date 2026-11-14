@@ -70,6 +70,14 @@ private struct MockDataSource {
     let mediator: MockMediator
 }
 
+private final class MockObjectDataSource: NSObject {
+    let mediator: MockMediator
+
+    init(devices: [MockDevice]) {
+        mediator = dataSource(devices: devices).mediator
+    }
+}
+
 private func assert(_ condition: @autoclosure () -> Bool, _ message: String) {
     guard condition() else {
         print("FAIL: \(message)")
@@ -210,6 +218,34 @@ private func testNSNumberValues() {
     }
 }
 
+private func testObjectiveCSwiftBridge() {
+    let source = MockObjectDataSource(devices: [
+        device(identifier: "bridge-device", name: "Bridge Device", location: nil),
+    ])
+    let response = FindMyDeviceSnapshotBridge.snapshot(forDataSource: source)
+    let devices = response["devices"] as? [[String: Any]]
+    assert(devices?.first?["identifier"] as? String == "bridge-device",
+           "the Objective-C bridge must call the exported Swift entry point with the data source")
+    assert(response["partial"] as? Bool == false && JSONSerialization.isValidJSONObject(response),
+           "the retained Swift dictionary must reach Objective-C as a JSON-safe response")
+
+    let empty = FindMyDeviceSnapshotBridge.snapshot(forDataSource: MockObjectDataSource(devices: []))
+    assert((empty["devices"] as? [[String: Any]])?.isEmpty == true && empty["partial"] as? Bool == false,
+           "the mixed-language bridge must preserve an initialized empty snapshot")
+    let unavailable = FindMyDeviceSnapshotBridge.snapshot(forDataSource: NSObject())
+    assert(unavailable["error"] as? String == "Find My Devices mediator is unavailable",
+           "the mixed-language bridge must preserve serializer errors")
+
+    guard let pointer = blueBubblesFindMyCopyDevicesSnapshot(nil) else {
+        assert(false, "nil C input must produce a retained error dictionary")
+        return
+    }
+    let missing = Unmanaged<NSDictionary>.fromOpaque(pointer).takeRetainedValue()
+    assert(missing["error"] as? String == "Find My Devices data source is unavailable",
+           "nil C input must remain distinct from an unavailable mediator")
+    print("PASS: Objective-C/Swift snapshot bridge (5 checks)")
+}
+
 @main
 private enum FindMyDeviceSnapshotTests {
     static func main() {
@@ -217,6 +253,7 @@ private enum FindMyDeviceSnapshotTests {
         testUnavailableAndEmptyCollections()
         testUnidentifiableDeviceMakesResponsePartial()
         testNSNumberValues()
+        testObjectiveCSwiftBridge()
         print("PASS: FindMyDeviceSnapshotTests")
     }
 }
