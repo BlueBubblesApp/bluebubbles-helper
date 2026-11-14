@@ -127,7 +127,7 @@ static os_log_t logger;
     }
     @catch (NSException *exception) {
         os_log_error(logger, "Caught exception: %@ - %@", exception.name, exception.reason);
-        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction, @"error": exception.name, @"reason": exception.reason}];
+        [[NetworkController sharedInstance] sendMessage: @{@"transactionId": transaction ?: (id)[NSNull null], @"error": exception.name ?: @"Exception", @"reason": exception.reason ?: @""}];
     }
 }
 
