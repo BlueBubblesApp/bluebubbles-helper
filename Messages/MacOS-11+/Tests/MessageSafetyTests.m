@@ -2,15 +2,41 @@
 #define os_log(...) ((void)0)
 #define os_log_error(...) ((void)0)
 
-@interface NetworkController : NSObject
+@class IMMessage, IMMessagePartChatItem;
+@interface BlueBubblesHelper : NSObject
++ (instancetype)sharedInstance;
+- (void)handleServerEvent:(NSString *)event data:(NSDictionary *)data transactionId:(NSString *)transaction;
+- (void)getIMMessageFromGuid:(NSString *)guid transaction:(NSString *)transaction completionBlock:(void (^)(IMMessage *))block;
+- (void)getIMMessagePartChatItemFromGuid:(NSString *)guid atPartIndex:(NSUInteger)index transaction:(NSString *)transaction completionBlock:(void (^)(IMMessagePartChatItem *))block;
+- (void)addHandleAvailabilityObserver;
+- (void)addTypingIndicatorObserver;
+@end
+
+@interface GCDAsyncSocket : NSObject
+- (void)readDataWithTimeout:(NSTimeInterval)timeout tag:(long)tag;
+@end
+@implementation GCDAsyncSocket
+- (void)readDataWithTimeout:(NSTimeInterval)timeout tag:(long)tag {}
+@end
+
+@interface NetworkController : NSObject { GCDAsyncSocket *asyncSocket; }
 @property NSMutableArray *sent;
 + (instancetype)sharedInstance;
 - (void)sendMessage:(NSDictionary *)message;
+- (NSDictionary *)jsonDecode:(NSString *)json;
+- (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag;
 @end
 @implementation NetworkController
 + (instancetype)sharedInstance { static id value; if (!value) value = [self new]; return value; }
 - (instancetype)init { if ((self = [super init])) self.sent = [NSMutableArray new]; return self; }
 - (void)sendMessage:(NSDictionary *)message { [self.sent addObject:message]; }
+/* NETWORK_SOURCE_METHODS */
+@end
+
+@interface IncompleteException : NSException @end
+@implementation IncompleteException
+- (NSExceptionName)name { return nil; }
+- (NSString *)reason { return nil; }
 @end
 
 @interface IMMessagePartChatItem : NSObject @end
@@ -70,13 +96,19 @@
 @implementation SKStatusSubscription @end
 
 static NSMutableDictionary *handleAvailabilityStatuses;
-@interface BlueBubblesHelper : NSObject
-- (void)getIMMessageFromGuid:(NSString *)guid transaction:(NSString *)transaction completionBlock:(void (^)(IMMessage *))block;
-- (void)getIMMessagePartChatItemFromGuid:(NSString *)guid atPartIndex:(NSUInteger)index transaction:(NSString *)transaction completionBlock:(void (^)(IMMessagePartChatItem *))block;
-- (void)addHandleAvailabilityObserver;
-- (void)addTypingIndicatorObserver;
-@end
+static NSException *dispatchFailure;
+static NSString *dispatchedTransaction;
+static NSString *dispatchedAction;
+static NSDictionary *dispatchedData;
 @implementation BlueBubblesHelper
++ (instancetype)sharedInstance { static id value; if (!value) value = [self new]; return value; }
+- (void)handleServerEvent:(NSString *)event data:(NSDictionary *)data transactionId:(NSString *)transaction {
+    /* DISPATCH_SOURCE_PRELUDE */
+    dispatchedTransaction = transaction;
+    dispatchedAction = event;
+    dispatchedData = data;
+    if (dispatchFailure) @throw dispatchFailure;
+}
 /* SOURCE_METHODS */
 @end
 
@@ -85,6 +117,10 @@ static void Check(BOOL value, NSString *message) { checks++; if (!value) { fprin
 static IMMessage *Message(id items) { IMMessage *m = [IMMessage new]; m._imMessageItem = [IMMessageItem new]; m._imMessageItem.items = items; return m; }
 static NSDictionary *Last(void) { return [NetworkController sharedInstance].sent.lastObject; }
 static void Clear(void) { [[NetworkController sharedInstance].sent removeAllObjects]; }
+static void ReadPacket(NetworkController *network, NSData *data) {
+    @try { [network socket:nil didReadData:data withTag:1]; }
+    @catch (NSException *exception) { Check(NO, @"An exception escaped the actual network catch"); }
+}
 
 int main(void) { @autoreleasepool {
     BlueBubblesHelper *helper = [BlueBubblesHelper new];
@@ -151,5 +187,36 @@ int main(void) { @autoreleasepool {
     subscription.currentStatus.statusPayload.payloadDictionary = @{@"a": @1};
     [[NSNotificationCenter defaultCenter] postNotificationName:@"IMHandleAvailabilityChangedNotification" object:subscription];
     Check([Last()[@"event"] isEqual:@"focus-status-updated"] && [Last()[@"handle"] isEqual:handle.handleString] && [Last()[@"silenced"] isEqual:@NO], @"Valid Focus notifications must preserve their event fields");
+
+    // Run the actual socket parser/catch with a synthetic dispatcher; no socket is opened.
+    Clear(); NetworkController *network = [NetworkController sharedInstance];
+    NSData *(^packet)(NSDictionary *) = ^NSData *(NSDictionary *body) {
+        return [NSJSONSerialization dataWithJSONObject:body options:0 error:nil];
+    };
+    dispatchFailure = [NSException exceptionWithName:@"DispatchFailure" reason:@"synthetic" userInfo:nil];
+    ReadPacket(network, packet(@{@"action": @"fixture", @"data": @{}, @"transactionId": @"network-id"}));
+    Check([Last()[@"transactionId"] isEqual:@"network-id"] && [Last()[@"error"] isEqual:@"DispatchFailure"], @"Dispatch-time failures must retain the request transaction");
+    Clear();
+    dispatchFailure = [IncompleteException exceptionWithName:@"fixture" reason:@"fixture" userInfo:nil];
+    ReadPacket(network, packet(@{@"action": @"fixture", @"data": @{}}));
+    Check(Last()[@"transactionId"] == [NSNull null] && [Last()[@"error"] isEqual:@"Exception"] && [Last()[@"reason"] isEqual:@""], @"The actual catch must serialize missing transaction/name/reason safely");
+    Check([NSJSONSerialization isValidJSONObject:Last()], @"The fallback error must remain valid wire JSON");
+    Clear();
+    ReadPacket(network, packet(@{@"action": @"fixture", @"data": @{}, @"transactionId": [NSNull null]}));
+    Check(Last()[@"transactionId"] == [NSNull null], @"An explicit null transaction must remain safe in the dispatch catch");
+    Clear(); dispatchFailure = nil;
+    ReadPacket(network, packet(@{@"action": @"fixture", @"data": @{}, @"transactionId": @"successful-id"}));
+    Check([dispatchedTransaction isEqual:@"successful-id"] && Last() == nil, @"A successful dispatch must preserve the transaction and create no error reply");
+    for (NSString *action in @[@"get-account-info", @"refresh-findmy-friends"]) {
+        Clear();
+        ReadPacket(network, packet(@{@"action": action, @"data": [NSNull null], @"transactionId": @"null-data"}));
+        Check([dispatchedAction isEqual:action] && [dispatchedTransaction isEqual:@"null-data"] &&
+              [dispatchedData isKindOfClass:[NSDictionary class]] && dispatchedData.count == 0 && Last() == nil,
+              @"A Server JSON-null payload must reach the operation boundary as an empty dictionary");
+    }
+    Clear();
+    ReadPacket(network, packet(@{@"action": @"fixture", @"data": @[], @"transactionId": @"invalid-data"}));
+    Check([Last()[@"transactionId"] isEqual:@"invalid-data"] && Last()[@"error"] != nil,
+          @"A malformed non-null payload must retain its existing error path");
     printf("PASS: %d Messages transaction/notification safety checks using actual helper methods and synthetic objects\n", checks);
 } return 0; }

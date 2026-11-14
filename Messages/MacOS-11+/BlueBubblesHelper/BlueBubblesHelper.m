@@ -1310,7 +1310,7 @@ static NSMutableDictionary *handleAvailabilityStatuses;
 # pragma mark Helpers
 
 -(void) handleServerEvent: (NSString*)event data: (NSDictionary*)data transactionId: (NSString*)transaction {
-    if (data == nil) {
+    if (data == nil || (id)data == [NSNull null]) {
         data = [[NSDictionary alloc] init];
     }
     NSString *chatGuid = data[@"chatGuid"];
