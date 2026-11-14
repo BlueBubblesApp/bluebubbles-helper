@@ -31,7 +31,7 @@
 				A65C21A72A9AAB1500D6FB7F /* BlueBubblesHelper.dylib in Copy Files */,
 			);
 			name = "Copy Files";
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
