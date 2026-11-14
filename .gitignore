@@ -1,2 +1,4 @@
 .DS_Store
 **/*.xcuserdatad
+FindMy/MacOS-15+/.build/
+FindMy/MacOS-15+/dist/
